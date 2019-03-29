@@ -1,0 +1,27 @@
+<h2>My Versions</h2>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="form-group">
+            <button (click)="openModal(createVersion)" class="btn btn-default">Add new version</button>
+            <ng-template #createVersion>
+                <app-version-create></app-version-create>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-sm-12">
+    <div class="form-group">
+        <pfng-list id="myList" [items]="versions" [itemTemplate]="itemTemplate">
+            <ng-template #itemTemplate let-item="item" let-index="index">
+                <div class="list-pf-content-wrapper">
+                    <div class="list-pf-main-content">
+                        <div class="list-pf-title">{{item.versionNumber}}</div>
+                    </div>
+                </div>
+            </ng-template>
+        </pfng-list>
+    </div>
+</div>

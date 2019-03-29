@@ -1,0 +1,33 @@
+<h2>My Issues</h2>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="form-group">
+            <button (click)="openModal(createIssue)" class="btn btn-default">Add new Issue</button>
+            <ng-template #createIssue>
+                <app-issue-create></app-issue-create>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-sm-12">
+    <div class="form-group">
+        <pfng-list id="myList" [items]="issues" [itemTemplate]="itemTemplate">
+            <ng-template #itemTemplate let-item="item" let-index="index">
+                <div class="list-pf-content-wrapper">
+                    <div class="list-pf-main-content">
+                        <div class="list-pf-title">{{item.reference}}</div>
+                        <div class="list-pf-description">{{item.globalReference}}</div>
+                    </div>
+                    <div class="list-pf-additional-content">
+                        <div>
+                            <div class="list-pf-description">{{item.description}}</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </pfng-list>
+    </div>
+</div>
