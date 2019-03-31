@@ -33,6 +33,12 @@ public class Version implements Serializable {
 		super();
 	}
 
+	public Version(String versionNumber) {
+		super();
+		this.versionNumber = versionNumber;
+		this.generatePart();
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -89,7 +95,11 @@ public class Version implements Serializable {
 	@PrePersist
 	@PreUpdate
 	public void generatePart() {
-
+		Runtime.Version v = Runtime.Version.parse(versionNumber);
+		this.baseNumber = v.feature();
+		this.interimNumber = v.interim();
+		this.featureNumber = v.update();
+		this.patchNumber = v.patch();
 	}
 
 	@Override
