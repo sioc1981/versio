@@ -31,7 +31,6 @@ public class GlobalSSE {
 
 	@PostConstruct
 	public void init() {
-		LOG.warn("GlobalSSE.init");
 		GlobalSSE.sseBroadcaster = sse.newBroadcaster();
 		sseBroadcaster.onClose(
 				ses -> LOG.warn("Connection lost for sink {} in {}", System.identityHashCode(ses), sseBroadcaster));

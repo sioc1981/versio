@@ -23,6 +23,7 @@ export class VersionCreateComponent implements OnInit {
 
   data: any = {};
   deployComplete = true;
+  deploySuccess = false;
 
   // Wizard Step 1
   step1Config: WizardStepConfig;
@@ -82,10 +83,16 @@ export class VersionCreateComponent implements OnInit {
     // }, 2500);
     console.log('Saving ' + JSON.stringify(this.data) );
     this.versionService.addVersion(this.data as Version)
-    .subscribe(version => {
+    .subscribe( _ => {
+        console.log('success');
       this.wizardExample.getVersions();
       this.deployComplete = true;
-    });
+      this.deploySuccess = true;
+    }, _ => {
+        console.log('failed');
+      this.deployComplete = true;
+      this.deploySuccess = false;
+    } );
   }
 
   stepChanged($event: WizardEvent) {

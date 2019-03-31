@@ -10,16 +10,24 @@ import javax.persistence.*;
  *
  */
 @Entity
-@Table(name="version", uniqueConstraints = @UniqueConstraint(columnNames= {"versionNumber"}))
+@Table(name = "version", uniqueConstraints = @UniqueConstraint(columnNames = { "versionNumber" }))
 public class Version implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
 	private String versionNumber;
+
+	private int baseNumber;
+
+	private int interimNumber;
+
+	private int featureNumber;
+
+	private int patchNumber;
 
 	public Version() {
 		super();
@@ -41,9 +49,47 @@ public class Version implements Serializable {
 		this.versionNumber = number;
 	}
 
+	public int getBaseNumber() {
+		return baseNumber;
+	}
+
+	public void setBaseNumber(int baseNumber) {
+		this.baseNumber = baseNumber;
+	}
+
+	public int getInterimNumber() {
+		return interimNumber;
+	}
+
+	public void setInterimNumber(int interimNumber) {
+		this.interimNumber = interimNumber;
+	}
+
+	public int getFeatureNumber() {
+		return featureNumber;
+	}
+
+	public void setFeatureNumber(int featureNumber) {
+		this.featureNumber = featureNumber;
+	}
+
+	public int getPatchNumber() {
+		return patchNumber;
+	}
+
+	public void setPatchNumber(int patchNumber) {
+		this.patchNumber = patchNumber;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
+	}
+
+	@PrePersist
+	@PreUpdate
+	public void generatePart() {
+
 	}
 
 	@Override
@@ -60,7 +106,9 @@ public class Version implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Version [versionNumber=" + versionNumber + "]";
+		return String.format(
+				"Version [versionNumber=%s, baseNumber=%s, interimNumber=%s, featureNumber=%s, patchNumber=%s]",
+				versionNumber, baseNumber, interimNumber, featureNumber, patchNumber);
 	}
 
 }

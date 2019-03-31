@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { Version } from './Version';
@@ -36,7 +36,7 @@ export class VersionService {
     /** POST: add a new version to the server */
     addVersion(hero: Version): Observable<Version> {
         return this.http.post<Version>(VERSION_CONSTANT.backendUrl, hero, VERSION_CONSTANT.httpOptions).pipe(
-            catchError(this.handleError<Version>('addVersion'))
+            catchError(this.logAndError('addVersion'))
         );
     }
 
@@ -44,7 +44,7 @@ export class VersionService {
     /** PUT: update the version on the server */
     updateVersion(version: Version): Observable<any> {
         return this.http.put(VERSION_CONSTANT.backendUrl, version, VERSION_CONSTANT.httpOptions).pipe(
-            catchError(this.handleError<any>('updateVersion'))
+            catchError(this.logAndError('updateVersion'))
         );
     }
 
@@ -62,6 +62,22 @@ export class VersionService {
             // this.log(`${operation} failed: ${error.message}`);
             // Let the app keep running by returning an empty result.
             return of(result as T);
+        };
+    }
+    /**
+       * Handle Http operation that failed.
+       * Let the app continue.
+       * @param operation - name of the operation that failed
+       * @param result - optional value to return as the observable result
+       */
+    private logAndError(operation = 'operation') {
+        return (error: any): Observable<never> => {
+            // TODO: send the error to remote logging infrastructure
+            console.error(error); // log to console instead
+            // TODO: better job of transforming error for user consumption
+            // this.log(`${operation} failed: ${error.message}`);
+            // Let the app keep running by returning an empty result.
+            return throwError(error);
         };
     }
 }

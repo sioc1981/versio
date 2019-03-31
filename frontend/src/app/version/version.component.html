@@ -2,8 +2,16 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <div class="form-group">
+        <!-- <div class="form-group">
             <button (click)="openModal(createVersion)" class="btn btn-default">Add new version</button>
+            <ng-template #createVersion>
+                <app-version-create></app-version-create>
+            </ng-template>
+        </div> -->
+        <div class="form-group">
+            <pfng-toolbar [config]="toolbarConfig"  (onActionSelect)="handleAction($event)"
+                (onFilterChange)="filterChanged($event)">
+            </pfng-toolbar>
             <ng-template #createVersion>
                 <app-version-create></app-version-create>
             </ng-template>
@@ -14,7 +22,7 @@
 
 <div class="col-sm-12">
     <div class="form-group">
-        <pfng-list id="myList" [items]="versions" [itemTemplate]="itemTemplate">
+        <pfng-list id="myList" [items]="filteredVersions" [itemTemplate]="itemTemplate">
             <ng-template #itemTemplate let-item="item" let-index="index">
                 <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">

@@ -28,7 +28,7 @@ public class Initializer {
 	
 	@PostConstruct
 	public void init() {
-		LOG.warn("Init");
+		LOG.info("Initialize services");
 		issueService.getCount();
 		patchService.getCount();
 		releaseService.getCount();

@@ -8,7 +8,7 @@ import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
-     ActionModule, ToastNotificationListModule, NotificationService, TableModule } from 'patternfly-ng';
+     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule } from 'patternfly-ng';
 
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -54,6 +54,7 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
     NgxDatatableModule,
     TableModule,
     ToastNotificationListModule,
+    ToolbarModule,
     VerticalNavigationModule,
     WizardModule
   ],

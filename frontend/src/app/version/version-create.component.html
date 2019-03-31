@@ -21,9 +21,13 @@
           <div class="spinner spinner-lg blank-slate-pf-icon"></div>
           <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
         </div>
-        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete">
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
           <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
           <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
+        </div>
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+          <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+          <h3 class="blank-slate-pf-main-action">Creation failed</h3>
         </div>
       </div>
   </pfng-wizard-step>
