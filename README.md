@@ -34,6 +34,7 @@ mvn clean wildfly:deploy
 
 To iniatilze :
 ```
+npm install -g @angular/cli
 npm install
 ```
 
