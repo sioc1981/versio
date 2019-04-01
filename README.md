@@ -32,7 +32,7 @@ mvn clean wildfly:deploy
 
 ## frontend
 
-To iniatilze :
+To initialize :
 ```
 npm install -g @angular/cli
 npm install
