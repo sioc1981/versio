@@ -8,11 +8,10 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { VerticalNavigationItem } from 'patternfly-ng/navigation/vertical-navigation/vertical-navigation-item';
-import { VERSION_CONSTANT } from '../version/shared/version.constants';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.constants';
-import { PATCH_CONSTANT } from '../patch/shared/patch.constants';
 import { VerticalNavigationComponent } from 'patternfly-ng';
-import { RELEASE_CONSTANT } from '../release/shared/release.constants';
+import { RELEASE_CONSTANT } from '../release/shared/release.service';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
+import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 
 
 @Component({
@@ -52,10 +51,10 @@ export class NavigationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-      VERSION_CONSTANT.summary.count$.subscribe(c => this.navigationItems[1].badges[0].count = c);
-      ISSUE_CONSTANT.summary.count$.subscribe(c => this.navigationItems[2].badges[0].count = c);
-      PATCH_CONSTANT.summary.count$.subscribe(c => this.navigationItems[3].badges[0].count = c);
-      RELEASE_CONSTANT.summary.count$.subscribe(c => this.navigationItems[4].badges[0].count = c);
+    //   VERSION_CONSTANT.summary.count$.subscribe(c => this.navigationItems[1].badges[0].count = c);
+    RELEASE_CONSTANT.summary.count$.subscribe(c => this.navigationItems[1].badges[0].count = c);
+      ISSUE_CONSTANT.summary.count$.subscribe(c => this.navigationItems[3].badges[0].count = c);
+      PATCH_CONSTANT.summary.count$.subscribe(c => this.navigationItems[2].badges[0].count = c);
     this.refreshItems();
   }
 
@@ -63,13 +62,7 @@ export class NavigationComponent implements OnInit {
       this.navigationItems = this.getItems();
   }
 
-  getItems(): VerticalNavigationItem[] {
-    return [
-      {
-        title: 'Dashboard',
-        iconStyleClass: 'fa fa-dashboard',
-        url: '/dashboard'
-      },
+  /*
       {
         title: VERSION_CONSTANT.title,
         iconStyleClass: VERSION_CONSTANT.iconStyleClass,
@@ -81,14 +74,23 @@ export class NavigationComponent implements OnInit {
           }
         ]
       },
+
+   */
+  getItems(): VerticalNavigationItem[] {
+    return [
       {
-        title: ISSUE_CONSTANT.title,
-        iconStyleClass: ISSUE_CONSTANT.iconStyleClass,
-        url: ISSUE_CONSTANT.url,
+        title: 'Dashboard',
+        iconStyleClass: 'fa fa-dashboard',
+        url: '/dashboard'
+      },
+      {
+        title: RELEASE_CONSTANT.title,
+        iconStyleClass: RELEASE_CONSTANT.iconStyleClass,
+        url: RELEASE_CONSTANT.url,
         badges: [
           {
-            count: ISSUE_CONSTANT.summary.count,
-            tooltip: 'Total number of issues'
+            count: RELEASE_CONSTANT.summary.count,
+            tooltip: 'Total number of releases'
           }
         ]
       },
@@ -104,13 +106,13 @@ export class NavigationComponent implements OnInit {
         ]
       },
       {
-        title: RELEASE_CONSTANT.title,
-        iconStyleClass: RELEASE_CONSTANT.iconStyleClass,
-        url: RELEASE_CONSTANT.url,
+        title: ISSUE_CONSTANT.title,
+        iconStyleClass: ISSUE_CONSTANT.iconStyleClass,
+        url: ISSUE_CONSTANT.url,
         badges: [
           {
-            count: RELEASE_CONSTANT.summary.count,
-            tooltip: 'Total number of releases'
+            count: ISSUE_CONSTANT.summary.count,
+            tooltip: 'Total number of issues'
           }
         ]
       }

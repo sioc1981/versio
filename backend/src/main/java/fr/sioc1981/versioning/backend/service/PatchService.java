@@ -42,6 +42,7 @@ public class PatchService {
 	public Response create(Patch newPatch) {
 		log.warning("create " + newPatch);
 		this.entityManager.persist(newPatch);
+		
 		getCount();
 		return Response.ok(newPatch).build();
 	}

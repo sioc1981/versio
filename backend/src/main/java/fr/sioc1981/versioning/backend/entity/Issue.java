@@ -6,20 +6,22 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Entity implementation class for Entity: Issue
  *
  */
 @Entity
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Issue implements Serializable {
 
 	@Id
 	private String reference;
 	private String description;
 	private String globalReference;
+	private IssueContainer container;
 	private static final long serialVersionUID = 1L;
-	
-	
 
 	public Issue() {
 		super();
@@ -46,6 +48,12 @@ public class Issue implements Serializable {
 		this.globalReference = globalReference;
 	}
 	
+	public IssueContainer getContainer() {
+		return container;
+	}
+	public void setContainer(IssueContainer url) {
+		this.container = url;
+	}
 	@Override
 	public int hashCode() {
 		return Objects.hash(reference);
@@ -60,13 +68,13 @@ public class Issue implements Serializable {
 			return false;
 		Issue other = (Issue) obj;
 		return Objects.equals(description, other.description) && Objects.equals(globalReference, other.globalReference)
-			&& Objects.equals(reference, other.reference);
+			&& Objects.equals(reference, other.reference) && Objects.equals(container, other.container);
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("Issue [reference=%s, description=%s, globalReference=%s]", reference,
-				description, globalReference);
+		return String.format("Issue [reference=%s, description=%s, globalReference=%s, container=%s]", reference,
+				description, globalReference, container);
 	}
 	
 	

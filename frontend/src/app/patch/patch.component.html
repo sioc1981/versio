@@ -19,12 +19,12 @@
             <ng-template #patchTemplate let-item="item" let-index="index">
                 <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">
-                        <div class="list-pf-title">{{item.version.versionNumber}}</div>
+                        <div class="list-pf-title">{{item.issues[0].reference}} -
+                                {{item.issues[0].description}}</div>
                     </div>
                     <div class="list-pf-additional-content">
                         <div>
-                            <div class="list-pf-description">{{item.issues[0].reference}} -
-                                {{item.issues[0].description}}</div>
+                            <div class="list-pf-description">{{item.release.version.versionNumber}}</div>
                         </div>
                     </div>
                     <div class="list-pf-additional-content">

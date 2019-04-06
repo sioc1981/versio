@@ -1,10 +1,10 @@
-import { Version } from '../../version/shared/Version';
 import { Issue } from '../../issue/shared/Issue';
+import { Release } from '../../release/shared/Release';
 
 export class Patch {
     id: number;
 
-    version: Version;
+    release: Release;
 
     issues: Issue[];
 

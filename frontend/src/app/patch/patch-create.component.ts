@@ -14,8 +14,8 @@ import {
 } from 'patternfly-ng';
 import { Patch } from './shared/Patch';
 import { PatchService } from './shared/patch.service';
-import { VersionService } from '../version/shared/version.service';
-import { Version } from '../version/shared/Version';
+import { ReleaseService } from '../release/shared/release.service';
+import { Release } from '../release/shared/Release';
 import { Issue } from '../issue/shared/Issue';
 import { IssueService } from '../issue/shared/issue.service';
 
@@ -30,11 +30,12 @@ export class PatchCreateComponent implements OnInit {
 
     data: any = {};
     deployComplete = true;
+    deploySuccess = false;
 
     // Wizard Step 1
     step1Config: WizardStepConfig;
-    versions: Version[];
-    versionListConfig: ListConfig;
+    releases: Release[];
+    releaseListConfig: ListConfig;
 
     // Wizard Step 2
     step2Config: WizardStepConfig;
@@ -49,7 +50,7 @@ export class PatchCreateComponent implements OnInit {
     wizardConfig: WizardConfig;
     wizardExample: PatchComponent;
 
-    constructor(private issueService: IssueService, private patchService: PatchService, private versionService: VersionService,
+    constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
         @Host() wizardExample: PatchComponent) {
         this.wizardExample = wizardExample;
     }
@@ -88,11 +89,11 @@ export class PatchCreateComponent implements OnInit {
 
         this.setNavAway(false);
 
-        this.versionListConfig = {
+        this.releaseListConfig = {
             dblClick: false,
             multiSelect: false,
             selectItems: false,
-            selectionMatchProp: 'versionNumber',
+            selectionMatchProp: 'version.versionNumber',
             showCheckbox: false,
             showRadioButton: true,
             useExpandItems: false
@@ -110,8 +111,8 @@ export class PatchCreateComponent implements OnInit {
     }
 
     getVersions(): void {
-        this.versionService.getVersions()
-            .subscribe(newVersions => this.versions = newVersions);
+        this.releaseService.getReleases()
+            .subscribe(newReleases => this.releases = newReleases);
     }
 
     getIssues(): void {
@@ -138,9 +139,15 @@ export class PatchCreateComponent implements OnInit {
         // }, 2500);
         console.log('Saving ' + JSON.stringify(this.data));
         this.patchService.addPatch(this.data as Patch)
-            .subscribe(patch => {
+            .subscribe(_ => {
+                console.log('Create release');
                 this.wizardExample.getPatchs();
                 this.deployComplete = true;
+                this.deploySuccess = true;
+            }, _ => {
+                console.log('Create release failed');
+                this.deployComplete = true;
+                this.deploySuccess = false;
             });
     }
 
@@ -160,7 +167,7 @@ export class PatchCreateComponent implements OnInit {
     }
 
     updateVersion(): void {
-        this.step1Config.nextEnabled = (this.data.version !== undefined);
+        this.step1Config.nextEnabled = (this.data.release !== undefined);
         this.setNavAway(this.step1Config.nextEnabled);
     }
 
@@ -179,7 +186,7 @@ export class PatchCreateComponent implements OnInit {
 
     handleVersionSelectionChange($event: ListEvent): void {
         console.log(JSON.stringify($event.selectedItems));
-        this.data.version = $event.selectedItems[0];
+        this.data.release = $event.selectedItems[0];
         this.updateVersion();
     }
     handleIssuesSelectionChange($event: ListEvent): void {

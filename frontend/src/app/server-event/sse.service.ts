@@ -1,6 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { Summary } from './Summary';
+import { APP_CONSTANT } from '../app.constants';
 
 declare var EventSource;
 
@@ -9,36 +10,45 @@ declare var EventSource;
 })
 export class SseService {
 
-    private static o = new Observable<string>(obs => {
-        const es = new EventSource('http://localhost:8080/backend/api/subscribe');
-        es.onmessage = (evt) => {
-            obs.next(evt.data);
+    private o: Observable<string>;
+
+    private innerZone: NgZone;
+
+    private es: EventSource;
+
+    private subscribers: Subscriber<string>[] = [];
+
+    constructor(private zone: NgZone) {
+        this.innerZone = this.zone;
+        this.o = new Observable<string>(obs => {
+            this.subscribers.push(obs);
+            return () => {
+                const index = this.subscribers.indexOf(obs, 0);
+                if (index > -1) {
+                    this.subscribers.splice(index, 1);
+                }
+            };
+        });
+        this.es = new EventSource(APP_CONSTANT.backendUrlBase + '/subscribe');
+        this.es.onmessage = (evt) => {
+            this.subscribers.forEach(obs => obs.next(evt.data));
         };
-        return () => es.close();
-    });
+    }
 
-    private static innerZone: NgZone;
-
-    static buildSummary(filter: string): Summary {
-        const summary = new Summary();
-        SseService.o.subscribe(message => {
-            SseService.innerZone.run(() => {
+    observeMessages(): Observable<string> {
+        return this.o;
+    }
+    registerSummary(summary: Summary, filter: string): Summary {
+        this.o.subscribe(message => {
+            this.innerZone.run(() => {
                 if (message.startsWith(filter)) {
                     const count = Number(message.substr(filter.length + 1));
-                    console.log(count);
+                    console.log(filter + ': ' + count);
                     summary.count$.emit(count);
                 }
             });
         });
         return summary;
-    }
-
-    constructor(private zone: NgZone) {
-        SseService.innerZone = this.zone;
-    }
-
-    observeMessages(): Observable<string> {
-        return SseService.o;
     }
 
 }

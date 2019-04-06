@@ -8,13 +8,11 @@ import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
-     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule } from 'patternfly-ng';
+     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule, PaginationModule } from 'patternfly-ng';
 
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { AppRoutingModule } from './app-routing.module';
-import { VersionComponent } from './version/version.component';
-import { VersionCreateComponent } from './version/version-create.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { IssueCreateComponent } from './issue/issue-create.component';
 import { IssueComponent } from './issue/issue.component';
@@ -24,6 +22,7 @@ import { ServerEventComponent } from './server-event/server-event.component';
 import { ReleaseComponent } from './release/release.component';
 import { ReleaseCreateComponent } from './release/release-create.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { SseService } from './server-event/sse.service';
 
 @NgModule({
   declarations: [
@@ -35,8 +34,6 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
     ReleaseComponent,
     ReleaseCreateComponent,
     NavigationComponent,
-    VersionComponent,
-    VersionCreateComponent,
     DashboardComponent,
     ServerEventComponent
   ],
@@ -52,13 +49,14 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
     ListModule,
     ModalModule.forRoot(),
     NgxDatatableModule,
+    PaginationModule,
     TableModule,
     ToastNotificationListModule,
     ToolbarModule,
     VerticalNavigationModule,
     WizardModule
   ],
-  providers: [BsDropdownConfig, NotificationService],
+  providers: [BsDropdownConfig, NotificationService, SseService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

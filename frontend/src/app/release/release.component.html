@@ -3,157 +3,176 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="form-group">
-            <button (click)="openModal(createRelease)" class="btn btn-default">Add new Release</button>
+            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)" (onFilterChange)="filterChanged($event)">
+            </pfng-toolbar>
             <ng-template #createRelease>
                 <app-release-create></app-release-create>
             </ng-template>
         </div>
     </div>
-</div>
 
-<div class="col-sm-12">
-    <div class="form-group">
-        <pfng-list id="myList" [actionTemplate]="actionTemplate" [expandTemplate]="expandTemplate" [items]="releases"
-            [itemTemplate]="releaseTemplate">
-            <ng-template #releaseTemplate let-item="item" let-index="index">
-                <div class="list-pf-content-wrapper">
-                    <div class="list-pf-main-content">
-                        <div class="list-pf-title">{{item.version.versionNumber}}</div>
+    <div class="col-sm-12">
+        <div class="form-group">
+            <pfng-list id="myList" [expandTemplate]="expandTemplate" [items]="items" [itemTemplate]="releaseTemplate">
+                <ng-template #releaseTemplate let-item="item" let-index="index">
+                    <div class="list-pf-content-wrapper">
+                        <div class="list-pf-main-content">
+                            <div class="list-pf-title">{{item.release.version.versionNumber}}</div>
+                        </div>
+                        <div class="list-pf-additional-content" style="justify-content:flex-start">
+                            <pfng-list-expand-toggle [expandId]="'issues'" [item]="item" [template]="issueTemplate">
+                                <ng-template #issueTemplate>
+                                    <span class="fas {{issueIconStyleClass}}"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                            <pfng-list-expand-toggle [expandId]="'patches'" [item]="item" [template]="patchTemplate">
+                                <ng-template #patchTemplate>
+                                    <span class="fas {{patchIconStyleClass}}"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                        </div>
+                        <div class="list-pf-additional-content">
+                            <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
+                                <ng-template #buildTemplate>
+                                    <span class="fas myApp myApp-laptop-code"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                            <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item" [template]="qualificationTemplate">
+                                <ng-template #qualificationTemplate>
+                                    <span class="fas myApp myApp-user-shield"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                            <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
+                                <ng-template #keyuserTemplate>
+                                    <span class="fas myApp myApp-cart-check"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                            <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
+                                <ng-template #pilotTemplate>
+                                    <span class="fas myApp myApp-cash-register"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                            <pfng-list-expand-toggle [expandId]="'production'" [item]="item" [template]="productionTemplate">
+                                <ng-template #productionTemplate>
+                                    <span class="fas myApp myApp-store"></span>
+                                </ng-template>
+                            </pfng-list-expand-toggle>
+                        </div>
                     </div>
-                    <div class="list-pf-additional-content">
-                        <pfng-list-expand-toggle [expandId]="'issues'" [item]="item" [template]="issueTemplate">
-                            <ng-template #issueTemplate>
-                                <span class="fas {{issueIconStyleClass}}"></span>
-                            </ng-template>
-                        </pfng-list-expand-toggle>
-                    </div>
-                    <div class="list-pf-additional-content">
-                        <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
-                            <ng-template #buildTemplate>
-                                <span class="fas myApp myApp-laptop-code"></span>
-                            </ng-template>
-                        </pfng-list-expand-toggle>
-                        <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item" [template]="qualificationTemplate">
-                            <ng-template #qualificationTemplate>
-                                <span class="fas myApp myApp-user-shield"></span>
-                            </ng-template>
-                        </pfng-list-expand-toggle>
-                        <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
-                            <ng-template #keyuserTemplate>
-                                <span class="fas myApp myApp-cart-check"></span>
-                            </ng-template>
-                        </pfng-list-expand-toggle>
-                        <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
-                            <ng-template #pilotTemplate>
-                                <span class="fas myApp myApp-cash-register"></span>
-                            </ng-template>
-                        </pfng-list-expand-toggle>
-                        <pfng-list-expand-toggle [expandId]="'production'" [item]="item" [template]="productionTemplate">
-                            <ng-template #productionTemplate>
-                                <span class="fas myApp myApp-store"></span>
-                            </ng-template>
-                        </pfng-list-expand-toggle>
-                    </div>
-                </div>
-            </ng-template>
-            <ng-template #actionTemplate let-item="item" let-index="index">
-                <pfng-action class="list-pf-actions" [config]="getActionConfig(item, actionButtonTemplate, startButtonTemplate)"
-                    (onActionSelect)="handleAction($event, item)">
-                    <ng-template #actionButtonTemplate let-action="action">
-                        <span class="fa fa-plus">&nbsp;</span>{{action.title}}
-                    </ng-template>
-                    <ng-template #startButtonTemplate let-action="action">
-                        {{item.started === true ? "Starting" : action.title}}
-                    </ng-template>
-                </pfng-action>
-            </ng-template>
-            <ng-template #expandTemplate let-item="item" let-index="index">
-                <div *ngIf="item.expandId === 'issues'">
-                    <div class="margin-left-20">
-                        <h4>Issues</h4>
-                        <pfng-list id="myList" [items]="item.issues" [itemTemplate]="issueTemplate">
-                            <ng-template #issueTemplate let-item="item" let-index="index">
-                                <div class="list-pf-content-wrapper">
-                                    <div class="list-pf-main-content">
-                                        <div class="list-pf-title">{{item.reference}}</div>
-                                        <div class="list-pf-description">{{item.globalReference}}</div>
-                                    </div>
-                                    <div class="list-pf-additional-content">
-                                        <div>
-                                            <div class="list-pf-description">{{item.description}}</div>
+                </ng-template>
+                <ng-template #expandTemplate let-item="item" let-index="index">
+                    <div *ngIf="item.expandId === 'issues'">
+                        <div class="margin-left-20">
+                            <h4>Issues</h4>
+                            <pfng-list id="myList" [items]="item.issues" [itemTemplate]="issueTemplate">
+                                <ng-template #issueTemplate let-item="item" let-index="index">
+                                    <div class="list-pf-content-wrapper">
+                                        <div class="list-pf-main-content">
+                                            <div class="list-pf-title">{{item.reference}}</div>
+                                            <div class="list-pf-description">{{item.globalReference}}</div>
+                                        </div>
+                                        <div class="list-pf-additional-content">
+                                            <div>
+                                                <div class="list-pf-description">{{item.description}}</div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </ng-template>
-                        </pfng-list>
-                    </div>
-                </div>
-                <div *ngIf="item.expandId === 'build'">
-                    <div class="margin-left-20">
-                        <h4>Build</h4>
-                        <div class="col-sm-4">
-                            <div><strong>Build Date</strong></div>
-                            <div>{{item.buildDate | date}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div><strong>Package Date</strong></div>
-                            <div>{{item.patckageDate | date}}</div>
+                                </ng-template>
+                            </pfng-list>
                         </div>
                     </div>
-                </div>
-                <div *ngIf="item.expandId === 'qualification'">
-                    <div class="margin-left-20">
-                        <h4>Qualification</h4>
-                        <div class="col-sm-4">
-                            <div><strong>Deploy Date</strong></div>
-                            <div>{{item.qualification.deployDate | date}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div><strong>Validation Date</strong></div>
-                            <div>{{item.qualification.validationDate | date}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="item.expandId === 'keyuser'">
-                    <div class="margin-left-20">
-                        <h4>Key User Qualification</h4>
-                        <div class="col-sm-4">
-                            <div><strong>Deploy Date</strong></div>
-                            <div>{{item.keyuser.deployDate | date}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div><strong>Validation Date</strong></div>
-                            <div>{{item.keyuser.validationDate | date}}</div>
+                    <div *ngIf="item.expandId === 'patches'">
+                        <div class="margin-left-20">
+                            <h4>Patches</h4>
+                            <pfng-list id="myList" [items]="item.patches" [itemTemplate]="patchTemplate">
+                                <ng-template #patchTemplate let-item="item" let-index="index">
+                                    <div class="list-pf-content-wrapper">
+                                        <div class="list-pf-main-content">
+                                            <div class="list-pf-main-content">
+                                                <div class="list-pf-title">{{item.issues[0].reference}} -
+                                                    {{item.issues[0].description}}</div>
+                                            </div>
+                                        </div>
+                                        <div class="list-pf-additional-content">
+                                                    <span class="fas myApp myApp-laptop-code"></span>
+                                                    <span class="fas myApp myApp-user-shield"></span>
+                                                    <span class="fas myApp myApp-cart-check"></span>
+                                                    <span class="fas myApp myApp-cash-register"></span>
+                                                    <span class="fas myApp myApp-store"></span>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </pfng-list>
                         </div>
                     </div>
-                </div>
-                <div *ngIf="item.expandId === 'pilot'">
-                    <div class="margin-left-20">
-                        <h4>Pilot</h4>
-                        <div class="col-sm-4">
-                            <div><strong>Deploy Date</strong></div>
-                            <div>{{item.pilot.deployDate | date}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div><strong>Validation Date</strong></div>
-                            <div>{{item.pilot.validationDate | date}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="item.expandId === 'production'">
-                    <div class="margin-left-20">
-                        <h4>Production</h4>
-                        <div class="col-sm-4">
-                            <div><strong>Deploy Date</strong></div>
-                            <div>{{item.production.deployDate | date}}</div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div><strong>Validation Date</strong></div>
-                            <div>{{item.production.validationDate | date}}</div>
+                    <div *ngIf="item.expandId === 'build'">
+                        <div class="margin-left-20">
+                            <h4>Build</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Build Date</strong></div>
+                                <div>{{item.release.buildDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Package Date</strong></div>
+                                <div>{{item.release.patckageDate | date}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </ng-template>
-        </pfng-list>
+                    <div *ngIf="item.expandId === 'qualification'">
+                        <div class="margin-left-20">
+                            <h4>Qualification</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div>{{item.release.qualification.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div>{{item.release.qualification.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'keyuser'">
+                        <div class="margin-left-20">
+                            <h4>Key User Qualification</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div>{{item.release.keyuser.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div>{{item.release.keyuser.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'pilot'">
+                        <div class="margin-left-20">
+                            <h4>Pilot</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div>{{item.release.pilot.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div>{{item.release.pilot.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'production'">
+                        <div class="margin-left-20">
+                            <h4>Production</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div>{{item.release.production.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div>{{item.release.production.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </pfng-list>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+        </div>
     </div>
-</div>

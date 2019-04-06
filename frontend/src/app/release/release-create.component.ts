@@ -1,205 +1,139 @@
 import {
-    Component,
-    Host,
-    OnInit,
-    ViewChild,
-    Input,
-    ViewEncapsulation
+  Component,
+  Host,
+  OnInit,
+  ViewChild,
+  Input,
+  ViewEncapsulation
 } from '@angular/core';
 
 import { ReleaseComponent } from './release.component';
-import {
-    WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep,
-    WizardStepComponent, ListConfig, ListEvent
-} from 'patternfly-ng';
-import { Release } from './shared/Release';
+import { WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
 import { ReleaseService } from './shared/release.service';
-import { VersionService } from '../version/shared/version.service';
-import { Version } from '../version/shared/Version';
-import { Issue } from '../issue/shared/Issue';
-import { IssueService } from '../issue/shared/issue.service';
+import { ReleaseFull } from './shared/ReleaseFull';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-    selector: 'app-release-create',
-    templateUrl: './release-create.component.html',
-    styleUrls: ['./release-create.component.css']
+  selector: 'app-release-create',
+  templateUrl: './release-create.component.html',
+  styleUrls: ['./release-create.component.css']
 })
 export class ReleaseCreateComponent implements OnInit {
-    @ViewChild('wizard') wizard: WizardComponent;
+   @ViewChild('wizard') wizard: WizardComponent;
 
-    data: any = {};
-    deployComplete = true;
+  data: any = { release: { version: {} }};
+  deployComplete = true;
+  deploySuccess = false;
 
-    // Wizard Step 1
-    step1Config: WizardStepConfig;
-    versions: Version[];
-    versionListConfig: ListConfig;
+  // Wizard Step 1
+  step1Config: WizardStepConfig;
 
-    // Wizard Step 2
-    step2Config: WizardStepConfig;
-    issues: Issue[];
+  // Wizard Step 3
+  step3Config: WizardStepConfig;
 
-    issuesListConfig: ListConfig;
+  // Wizard
+  wizardConfig: WizardConfig;
+  wizardExample: ReleaseComponent;
 
-    // Wizard Step 3
-    step3Config: WizardStepConfig;
+  constructor(private releaseService: ReleaseService, @Host() wizardExample: ReleaseComponent) {
+    this.wizardExample = wizardExample;
+  }
+
+  ngOnInit(): void {
+      console.log('ReleaseCreateComponent on init');
+    // Step 1
+    this.step1Config = {
+      id: 'step1',
+      priority: 0,
+      title: 'Add new release'
+    } as WizardStepConfig;
+
+    // Step 3
+    this.step3Config = {
+      id: 'step3',
+      priority: 1,
+      title: 'create'
+    } as WizardStepConfig;
 
     // Wizard
-    wizardConfig: WizardConfig;
-    wizardExample: ReleaseComponent;
+    this.wizardConfig = {
+    //   title: 'Wizard Title',
+    //   sidebarStyleClass: 'example-wizard-sidebar',
+    //   stepStyleClass: 'example-wizard-step'
+    } as WizardConfig;
 
-    constructor(private issueService: IssueService, private releaseService: ReleaseService, private versionService: VersionService,
-        @Host() wizardExample: ReleaseComponent) {
-        this.wizardExample = wizardExample;
+    this.setNavAway(false);
+  }
+
+  // Methods
+
+  nextClicked($event: WizardEvent): void {
+    if ($event.step.config.id === 'step3') {
+      this.wizardExample.closeModal($event);
     }
+  }
 
-    ngOnInit(): void {
-        this.getVersions();
-        this.getIssues();
-        console.log('ReleaseCreateComponent on init');
-        // Step 1
-        this.step1Config = {
-            id: 'step1',
-            priority: 0,
-            title: 'Select version'
-        } as WizardStepConfig;
+  startDeploy(): void {
+    this.deployComplete = false;
+    this.wizardConfig.done = true;
 
-        // Step 2
-        this.step2Config = {
-            id: 'step2',
-            priority: 1,
-            title: 'select issues'
-        } as WizardStepConfig;
+    // // Simulate a delay
+    // setTimeout(() => {
+    //   this.deployComplete = true;
+    // }, 2500);
+    console.log('Saving ' + JSON.stringify(this.data) );
+    this.releaseService.addRelease(this.data as ReleaseFull)
+    .subscribe( _ => {
+        console.log('Create release');
+      this.wizardExample.getReleases();
+      this.deployComplete = true;
+      this.deploySuccess = true;
+    }, _ => {
+        console.log('Create release failed');
+      this.deployComplete = true;
+      this.deploySuccess = false;
+    } );
+  }
 
-        // Step 3
-        this.step3Config = {
-            id: 'step3',
-            priority: 1,
-            title: 'create'
-        } as WizardStepConfig;
-
-        // Wizard
-        this.wizardConfig = {
-            //   title: 'Wizard Title',
-            //   sidebarStyleClass: 'example-wizard-sidebar',
-            //   stepStyleClass: 'example-wizard-step'
-        } as WizardConfig;
-
-        this.setNavAway(false);
-
-        this.versionListConfig = {
-            dblClick: false,
-            multiSelect: false,
-            selectItems: false,
-            selectionMatchProp: 'versionNumber',
-            showCheckbox: false,
-            showRadioButton: true,
-            useExpandItems: false
-        } as ListConfig;
-
-        this.issuesListConfig = {
-            dblClick: false,
-            multiSelect: false,
-            selectItems: false,
-            selectionMatchProp: 'reference',
-            showCheckbox: true,
-            showRadioButton: false,
-            useExpandItems: false
-        } as ListConfig;
+  stepChanged($event: WizardEvent) {
+    const flatSteps = flattenWizardSteps(this.wizard);
+    const currentStep = flatSteps.filter(step => step.config.id === $event.step.config.id);
+    if (currentStep && currentStep.length > 0) {
+      currentStep[0].config.nextEnabled = true;
     }
-
-    getVersions(): void {
-        this.versionService.getVersions()
-            .subscribe(newVersions => this.versions = newVersions);
+    if ($event.step.config.id === 'step1') {
+      this.updateName();
+    } else if ($event.step.config.id === 'step3') {
+      this.wizardConfig.nextTitle = 'Close';
     }
+  }
 
-    getIssues(): void {
-        this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = newIssues);
-    }
+  updateName(): void {
+    this.step1Config.nextEnabled = (this.data.release !== undefined  && this.data.release.version !== undefined
+        && this.data.release.version.versionNumber !== undefined
+        && this.data.release.version.versionNumber.length > 0);
+    this.setNavAway(this.step1Config.nextEnabled);
+  }
 
+  // Private
 
-    // Methods
+  private setNavAway(allow: boolean) {
+    this.step1Config.allowClickNav = allow;
 
-    nextClicked($event: WizardEvent): void {
-        if ($event.step.config.id === 'step3') {
-            this.wizardExample.closeModal($event);
-        }
-    }
-
-    startDeploy(): void {
-        this.deployComplete = false;
-        this.wizardConfig.done = true;
-        this.data.buildDate = new Date();
-        // // Simulate a delay
-        // setTimeout(() => {
-        //   this.deployComplete = true;
-        // }, 2500);
-        console.log('Saving ' + JSON.stringify(this.data));
-        this.releaseService.addRelease(this.data as Release)
-            .subscribe(release => {
-                this.wizardExample.getReleases();
-                this.deployComplete = true;
-            });
-    }
-
-    stepChanged($event: WizardEvent) {
-        const flatSteps = flattenWizardSteps(this.wizard);
-        const currentStep = flatSteps.filter(step => step.config.id === $event.step.config.id);
-        if (currentStep && currentStep.length > 0) {
-            currentStep[0].config.nextEnabled = true;
-        }
-        if ($event.step.config.id === 'step1') {
-            this.updateVersion();
-        } else if ($event.step.config.id === 'step2') {
-            this.updateIssues();
-        } else if ($event.step.config.id === 'step3') {
-            this.wizardConfig.nextTitle = 'Close';
-        }
-    }
-
-    updateVersion(): void {
-        this.step1Config.nextEnabled = (this.data.version !== undefined);
-        this.setNavAway(this.step1Config.nextEnabled);
-    }
-
-    updateIssues(): void {
-        this.step2Config.nextEnabled = (this.data.issues !== undefined && this.data.issues.length > 0);
-        this.setNavAway(this.step2Config.nextEnabled);
-    }
-
-    // Private
-
-    private setNavAway(allow: boolean) {
-        this.step1Config.allowClickNav = allow;
-        this.step2Config.allowClickNav = allow;
-        this.step3Config.allowClickNav = allow;
-    }
-
-    handleVersionSelectionChange($event: ListEvent): void {
-        console.log(JSON.stringify($event.selectedItems));
-        this.data.version = $event.selectedItems[0];
-        this.updateVersion();
-    }
-    handleIssuesSelectionChange($event: ListEvent): void {
-        console.log(JSON.stringify($event.selectedItems));
-        this.data.issues = $event.selectedItems;
-        this.updateIssues();
-    }
-
+    this.step3Config.allowClickNav = allow;
+  }
 }
 
 function flattenWizardSteps(wizard: WizardComponent): WizardStep[] {
-    const flatWizard: WizardStep[] = [];
-    wizard.steps.forEach((step: WizardStepComponent) => {
-        if (step.hasSubsteps) {
-            step.steps.forEach(substep => {
-                flatWizard.push(substep);
-            });
-        } else {
-            flatWizard.push(step);
-        }
-    });
-    return flatWizard;
+  const flatWizard: WizardStep[] = [];
+  wizard.steps.forEach((step: WizardStepComponent) => {
+    if (step.hasSubsteps) {
+      step.steps.forEach(substep => {
+        flatWizard.push(substep);
+      });
+    } else {
+      flatWizard.push(step);
+    }
+  });
+  return flatWizard;
 }

@@ -1,7 +1,8 @@
 package fr.sioc1981.versioning.backend.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -20,14 +21,19 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import fr.sioc1981.versioning.backend.entity.Release;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Path("/release")
+import fr.sioc1981.versioning.backend.entity.Release;
+import fr.sioc1981.versioning.backend.entity.ReleaseFull;
+
+@Path(ReleaseService.RELEASE_PATH)
 @Stateless
 public class ReleaseService {
-
-	Logger log = Logger.getLogger(ReleaseService.class.getName());
 	
+	static final String RELEASE_PATH = "/release";
+
+	private static final Logger LOG = LoggerFactory.getLogger(ReleaseService.class);
 	@Inject
 	private EntityManager entityManager;
 	
@@ -40,16 +46,22 @@ public class ReleaseService {
 
 	@POST
 	@Consumes("application/json")
-	public Response create(Release newRelease) {
-		log.warning("create " + newRelease);
+	public Response create(ReleaseFull newRelease) {
+		LOG.warn("create " + newRelease);
 		this.entityManager.persist(newRelease);
-		getCount();
-		return Response.ok(newRelease).build();
+		URI uri = null;
+		try {
+			uri = new URI(RELEASE_PATH + "/" /* + newRelease.getRelease().getRelease().getId()*/);
+			getCount();
+		} catch (URISyntaxException e) {
+			LOG.warn("Fail to create URI for new release {}", newRelease, e);
+		}
+		return Response.created(uri).build();
 	}
 
 	@PUT
 	@Consumes("application/json")
-	public Response update(Release newRelease) {
+	public Response update(ReleaseFull newRelease) {
 		return Response.ok(this.entityManager.merge(newRelease)).build();
 	}
 
@@ -71,9 +83,16 @@ public class ReleaseService {
 	@GET
 	@Produces("application/json")
 	public Response findAll() {
-		return Response.ok(this.entityManager.createQuery("from Release").getResultList()).build();
+		return Response.ok(this.entityManager.createQuery("from Release r").getResultList()).build();
 	}
 
+	@GET
+	@Produces("application/json")
+	@Path("/full")
+	public Response findAllFull() {
+		return Response.ok(this.entityManager.createQuery("from ReleaseFull r").getResultList()).build();
+	}
+	
 	@GET
 	@Produces("application/json")
 	@Path("/summary")
@@ -90,8 +109,8 @@ public class ReleaseService {
 	@Path("{id}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") String id) {
-		List<Release> result = this.entityManager.createQuery("from Release where reference = :reference", Release.class)
-				.setParameter("reference", id).getResultList();
+		List<Release> result = this.entityManager.createQuery("from ReleaseFull where release = :id", Release.class)
+				.setParameter("id", id).getResultList();
 
 		if (result.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();

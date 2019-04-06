@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 import { Version } from './Version';
-import { VERSION_CONSTANT } from './version.constants';
+import { APP_CONSTANT } from '../../app.constants';
+
+export const VERSION_CONSTANT = {
+    backendUrl: APP_CONSTANT.backendUrlBase + '/version',
+    httpOptions: APP_CONSTANT.httpOptions,
+    url: '/versions'
+};
 
 @Injectable({
     providedIn: 'root'
@@ -13,17 +19,6 @@ export class VersionService {
 
 
     constructor(private http: HttpClient) { }
-
-    getVersions(): Observable<Version[]> {
-        return this.http.get<Version[]>(VERSION_CONSTANT.backendUrl)
-            .pipe(
-                catchError(this.handleError<Version[]>('getVersions', []))
-            );
-    }
-
-    getSummary(): Observable<number> {
-        return VERSION_CONSTANT.summary.count$;
-    }
 
     /** GET Version by id. Will 404 if id not found */
     getVersion(id: number): Observable<Version> {

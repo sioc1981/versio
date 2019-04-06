@@ -1,32 +1,33 @@
 package fr.sioc1981.versioning.backend.entity;
 
-import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Entity implementation class for Entity: Patch
  *
  */
 @Entity
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Release extends Deployable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
-	private Long id;
-	
-	@ManyToMany(fetch=FetchType.EAGER)
-	private List<Issue> issues;
-	
-	private Version version;
-	
+	protected Long id;
+
+	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	protected Version version;
+
 	public Release() {
 		super();
 	}
@@ -39,13 +40,6 @@ public class Release extends Deployable {
 		this.id = id;
 	}
 
-	public List<Issue> getIssues() {
-		return issues;
-	}
-
-	public void setIssues(List<Issue> issues) {
-		this.issues = issues;
-	}
 
 	public Version getVersion() {
 		return version;
@@ -69,17 +63,14 @@ public class Release extends Deployable {
 		if (getClass() != obj.getClass())
 			return false;
 		Release other = (Release) obj;
-		return Objects.equals(id, other.id) && Objects.equals(issues, other.issues)
-				&& Objects.equals(version, other.version);
+		return Objects.equals(id, other.id) && Objects.equals(version, other.version);
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Release [id=%s, version=%s, issues=%s, buildDate=%s, packageDate=%s, qualificationDate=%s, kuQualificationDate=%s, pilotDate=%s, productionDate=%s]",
-				id, version, issues, buildDate, packageDate, qualificationDate, kuQualificationDate, pilotDate,
-				productionDate);
+				"Release [id=%s, version=%s, buildDate=%s, packageDate=%s, qualificationDate=%s, kuQualificationDate=%s, pilotDate=%s, productionDate=%s]",
+				id, version, buildDate, packageDate, qualificationDate, kuQualificationDate, pilotDate, productionDate);
 	}
-   
-	
+
 }

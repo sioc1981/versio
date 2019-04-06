@@ -1,11 +1,20 @@
 import { Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, Subscription } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { Issue } from './Issue';
-import { ISSUE_CONSTANT } from './issue.constants';
 import { SseService } from '../../server-event/sse.service';
+import { Summary } from '../../server-event/Summary';
+import { APP_CONSTANT } from '../../app.constants';
+export const ISSUE_CONSTANT = {
+    backendUrl: APP_CONSTANT.backendUrlBase + '/issue',
+    httpOptions: APP_CONSTANT.httpOptions,
+    iconStyleClass: 'pficon pficon-security',
+    summary: new Summary(),
+    title: 'Issues',
+    url: '/issues'
+};
 
 @Injectable({
     providedIn: 'root'
@@ -14,7 +23,9 @@ export class IssueService implements OnInit, OnDestroy {
 
     private sseStream: Subscription;
 
-    constructor(private http: HttpClient, private sseService: SseService) { }
+    constructor(private http: HttpClient, private sseService: SseService) {
+        sseService.registerSummary(ISSUE_CONSTANT.summary, 'issue');
+    }
 
     ngOnInit() {
         this.sseStream = this.sseService.observeMessages()

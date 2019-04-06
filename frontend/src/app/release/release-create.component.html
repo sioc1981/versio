@@ -6,43 +6,13 @@
   <pfng-wizard-step [config]="step1Config">
       <form class="form-horizontal">
         <div class="form-group required">
-          <label class="col-sm-4 control-label  required-pf" for="name">Version</label>
-        </div>
-          <div class="col-sm-12">
-            <pfng-list id="myList" [config]="versionListConfig" [items]="versions" [itemTemplate]="versionTemplate" (onSelectionChange)="handleVersionSelectionChange($event)">
-                <ng-template #versionTemplate let-item="item" let-index="index">
-                    <div class="list-pf-content-wrapper">
-                        <div class="list-pf-main-content">
-                            <div class="list-pf-title">{{item.versionNumber}}</div>
-                        </div>
-                    </div>
-                </ng-template>
-            </pfng-list>
+          <label class="col-sm-4 control-label required-pf" for="releaseNumber">Release Number</label>
+          <div class="col-sm-8">
+            <input class="form-control" id="versionNumber" name="Release Number" type="text" required
+                   [(ngModel)]="data.release.version.versionNumber"
+                   (ngModelChange)="updateName()">
           </div>
-      </form>
-  </pfng-wizard-step>
-  <pfng-wizard-step [config]="step2Config">
-      <form class="form-horizontal">
-        <div class="form-group required">
-          <label class="col-sm-4 control-label  required-pf" for="name">Issues</label>
         </div>
-          <div class="col-sm-12">
-            <pfng-list id="myList" [config]="issuesListConfig" [items]="issues" [itemTemplate]="issuesTemplate" (onSelectionChange)="handleIssuesSelectionChange($event)">
-                <ng-template #issuesTemplate let-item="item" let-index="index">
-                    <div class="list-pf-content-wrapper">
-                        <div class="list-pf-main-content">
-                            <div class="list-pf-title">{{item.reference}}</div>
-                            <div class="list-pf-description">{{item.globalReference}}</div>
-                        </div>
-                        <div class="list-pf-additional-content">
-                            <div>
-                                <div class="list-pf-description">{{item.description}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </ng-template>
-            </pfng-list>
-          </div>
       </form>
   </pfng-wizard-step>
   <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
@@ -51,9 +21,13 @@
           <div class="spinner spinner-lg blank-slate-pf-icon"></div>
           <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
         </div>
-        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete">
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
           <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
           <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
+        </div>
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+          <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+          <h3 class="blank-slate-pf-main-action">Creation failed</h3>
         </div>
       </div>
   </pfng-wizard-step>

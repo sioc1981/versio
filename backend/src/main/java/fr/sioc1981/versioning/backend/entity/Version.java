@@ -10,7 +10,7 @@ import javax.persistence.*;
  *
  */
 @Entity
-@Table(name = "version", uniqueConstraints = @UniqueConstraint(columnNames = { "versionNumber" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "versionNumber" }))
 public class Version implements Serializable {
 
 	private static final long serialVersionUID = 1L;
