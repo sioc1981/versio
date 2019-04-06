@@ -1,3 +1,5 @@
+@import "../node_modules/patternfly/dist/less/color-variables.less";
+
 @font-face {
   font-family: 'myApp';
   src:  url('./assets/fonts/myApp.eot?cs5t97');
@@ -46,4 +48,22 @@
     font-size: inherit;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
+}
+
+.myApp-red {
+    color: @color-pf-red-100;
+}
+
+.myApp-orange {
+    color: @color-pf-orange-300;
+}
+
+.myApp-green {
+    color: @color-pf-green-400;
+}
+
+.list-pf-additional-content {
+    .myApp {
+        font-size: 22px;
+    }
 }

@@ -30,27 +30,27 @@
                     <div class="list-pf-additional-content">
                         <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
                             <ng-template #buildTemplate>
-                                <span class="fas myApp myApp-laptop-code"></span>
+                                <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate" [class.myApp-orange]="!item.packageDate"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item" [template]="qualificationTemplate">
                             <ng-template #qualificationTemplate>
-                                <span class="fas myApp myApp-user-shield"></span>
+                                <span class="fas fa myApp myApp-user-shield myApp-green"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
                             <ng-template #keyuserTemplate>
-                                <span class="fas myApp myApp-cart-check"></span>
+                                <span class="fas fa myApp myApp-cart-check myApp-orange"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
                             <ng-template #pilotTemplate>
-                                <span class="fas myApp myApp-cash-register"></span>
+                                <span class="fas fa myApp myApp-cash-register myApp-red"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'production'" [item]="item" [template]="productionTemplate">
                             <ng-template #productionTemplate>
-                                <span class="fas myApp myApp-store"></span>
+                                <span class="fas fa myApp myApp-store myApp-red"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                     </div>
@@ -77,7 +77,7 @@
                         </div>
                         <div class="col-sm-4">
                             <div><strong>Package Date</strong></div>
-                            <div>{{item.patckageDate | date}}</div>
+                            <div>{{item.packageDate | date}}</div>
                         </div>
                     </div>
                 </div>
