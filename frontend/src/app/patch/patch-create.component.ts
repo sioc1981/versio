@@ -3,7 +3,6 @@ import {
     Host,
     OnInit,
     ViewChild,
-    Input,
     ViewEncapsulation
 } from '@angular/core';
 
@@ -36,8 +35,6 @@ export class PatchCreateComponent implements OnInit {
     // Wizard Step 1
     step1Config: WizardStepConfig;
     releases: Release[];
-    releaseListConfig: ListConfig;
-
     releaseVersion: String;
 
     // Wizard Step 2
@@ -51,11 +48,11 @@ export class PatchCreateComponent implements OnInit {
 
     // Wizard
     wizardConfig: WizardConfig;
-    wizardExample: PatchComponent;
+    patchComponent: PatchComponent;
 
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
-        @Host() wizardExample: PatchComponent) {
-        this.wizardExample = wizardExample;
+        @Host() patchComponent: PatchComponent) {
+        this.patchComponent = patchComponent;
     }
 
     ngOnInit(): void {
@@ -92,16 +89,6 @@ export class PatchCreateComponent implements OnInit {
 
         this.setNavAway(false);
 
-        this.releaseListConfig = {
-            dblClick: false,
-            multiSelect: false,
-            selectItems: false,
-            selectionMatchProp: 'version.versionNumber',
-            showCheckbox: false,
-            showRadioButton: true,
-            useExpandItems: false
-        } as ListConfig;
-
         this.issuesListConfig = {
             dblClick: false,
             multiSelect: false,
@@ -128,7 +115,7 @@ export class PatchCreateComponent implements OnInit {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3') {
-            this.wizardExample.closeModal($event);
+            this.patchComponent.closeModal($event);
         }
     }
 
@@ -136,19 +123,12 @@ export class PatchCreateComponent implements OnInit {
         this.deployComplete = false;
         this.wizardConfig.done = true;
         this.data.buildDate = new Date();
-        // // Simulate a delay
-        // setTimeout(() => {
-        //   this.deployComplete = true;
-        // }, 2500);
-        console.log('Saving ' + JSON.stringify(this.data));
         this.patchService.addPatch(this.data as Patch)
             .subscribe(_ => {
-                console.log('Create release');
-                this.wizardExample.getPatchs();
+                this.patchComponent.getPatchs();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
-                console.log('Create release failed');
                 this.deployComplete = true;
                 this.deploySuccess = false;
             });
@@ -187,11 +167,6 @@ export class PatchCreateComponent implements OnInit {
         this.step3Config.allowClickNav = allow;
     }
 
-    handleVersionSelectionChange($event: ListEvent): void {
-        console.log(JSON.stringify($event.selectedItems));
-        this.data.release = $event.selectedItems[0];
-        this.updateVersion();
-    }
     handleIssuesSelectionChange($event: ListEvent): void {
         console.log(JSON.stringify($event.selectedItems));
         this.data.issues = $event.selectedItems;

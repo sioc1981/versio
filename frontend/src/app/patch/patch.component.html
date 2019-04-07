@@ -15,23 +15,20 @@
 
 <div class="col-sm-12">
     <div class="form-group">
-        <pfng-list id="myList" [expandTemplate]="expandTemplate" [items]="items" [itemTemplate]="patchTemplate">
+        <pfng-list id="myList" [expandTemplate]="expandTemplate" [actionTemplate]="actionTemplate" [items]="items"
+            [itemTemplate]="patchTemplate">
             <ng-template #patchTemplate let-item="item" let-index="index">
                 <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">
                         <div class="list-pf-title">{{item.sequenceNumber}}</div>
-                        <div class="list-pf-description">{{item.issues[0].reference}} -
-                            {{item.issues[0].description}}</div>
-                    </div>
-                    <div class="list-pf-additional-content">
-                        <div> 
-                            <div class="list-pf-description">{{item.release.version.versionNumber}}</div>
-                        </div>
+                        <div class="list-pf-description">{{item.release.version.versionNumber}}</div>
+                        <div class="list-pf-description">{{item.issues[0].reference}} - {{item.issues[0].description}}</div>
                     </div>
                     <div class="list-pf-additional-content">
                         <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
                             <ng-template #buildTemplate>
-                                <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate" [class.myApp-orange]="!item.packageDate"></span>
+                                <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate"
+                                    [class.myApp-orange]="!item.packageDate"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item" [template]="qualificationTemplate">
@@ -46,7 +43,7 @@
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
                             <ng-template #pilotTemplate>
-                                <span class="fas fa myApp myApp-cash-register" [appHistoryColor]="item.pilot"></span> 
+                                <span class="fas fa myApp myApp-cash-register" [appHistoryColor]="item.pilot"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'production'" [item]="item" [template]="productionTemplate">
@@ -57,7 +54,11 @@
                     </div>
                 </div>
             </ng-template>
-             <ng-template #expandTemplate let-item="item" let-index="index">
+            <ng-template #actionTemplate let-item="item" let-index="index">
+                <pfng-action class="list-pf-actions" [config]="patchActionConfig" (onActionSelect)="handleAction($event, item)">
+                </pfng-action>
+            </ng-template>
+            <ng-template #expandTemplate let-item="item" let-index="index">
                 <div *ngIf="item.expandId === 'build'">
                     <div class="margin-left-20">
                         <h4>Build</h4>
@@ -125,7 +126,10 @@
                 </div>
             </ng-template>
         </pfng-list>
-            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
-                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+        <ng-template #updatePatch>
+            <app-patch-update></app-patch-update>
+        </ng-template>
+
+        <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)" (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
     </div>
 </div>

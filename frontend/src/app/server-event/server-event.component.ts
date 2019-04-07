@@ -19,7 +19,7 @@ export class ServerEventComponent implements OnInit, OnDestroy {
         this.notifications = this.notificationService.getNotifications();
         this.sseStream = this.sseService.observeMessages()
                         .subscribe(message => {
-                            this.notificationService.message(NotificationType.INFO, '', message, false, null, null);
+                            // this.notificationService.message(NotificationType.INFO, '', message, false, null, null);
                         });
     }
 

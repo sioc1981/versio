@@ -1,18 +1,21 @@
 import { Issue } from '../../issue/shared/Issue';
 import { Release } from '../../release/shared/Release';
+import { PlatformHistory } from '../../common/PlatformHistory';
 
 export class Patch {
     id: number;
 
     release: Release;
 
+    sequenceNumber: string;
+
     issues: Issue[];
 
     buildDate: Date;
     packageDate: Date;
-    qualificationDate: Date;
-    kuQualificationDate: Date;
-    pilotDate: Date;
-    productionDate: Date;
+    qualification: PlatformHistory;
+    keyuser: PlatformHistory;
+    pilot: PlatformHistory;
+    production: PlatformHistory;
 
 }

@@ -18,10 +18,12 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 })
 export class PatchComponent implements OnInit {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
-    @ViewChild('createPatch') createReleaseTemplate: TemplateRef<any>;
+    @ViewChild('createPatch') createPatchTemplate: TemplateRef<any>;
+    @ViewChild('updatePatch') updatePatchTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
     actionConfig: ActionConfig;
+    patchActionConfig: ActionConfig;
     isAscendingSort = true;
     filterConfig: FilterConfig;
     sortConfig: SortConfig;
@@ -30,6 +32,8 @@ export class PatchComponent implements OnInit {
     patches: Patch[];
     filteredPatches: Patch[] = [];
     items: Patch[] = [];
+
+    selectedPatch: Patch;
 
     paginationConfig: PaginationConfig;
 
@@ -62,9 +66,17 @@ export class PatchComponent implements OnInit {
 
         this.actionConfig = {
             primaryActions: [{
-                id: 'addRelease',
-                title: 'Add new release',
-                tooltip: 'Add a new release'
+                id: 'addPatch',
+                title: 'Add new patch',
+                tooltip: 'Add a new patch'
+            }]
+        } as ActionConfig;
+
+        this.patchActionConfig = {
+            primaryActions: [{
+                id: 'editPatch',
+                title: 'Edit patch',
+                tooltip: 'Edit patch'
             }]
         } as ActionConfig;
 
@@ -154,9 +166,14 @@ export class PatchComponent implements OnInit {
         return matches;
     }
 
-    handleAction(action: Action): void {
-        if (action.id === 'addRelease') {
-            this.openModal(this.createReleaseTemplate);
+    handleAction(action: Action, item?: any): void {
+        if (action.id === 'addPatch') {
+            this.openModal(this.createPatchTemplate);
+        } else if (action.id === 'editPatch') {
+            this.selectedPatch = item;
+            this.openModal(this.updatePatchTemplate);
+        } else {
+            console.log('handleAction: unknown action: ' + action.id);
         }
     }
 

@@ -1,5 +1,7 @@
 export class Issue {
-  globalReference: string;
-  description: string;
-  reference: string;
+    globalReference: string;
+    description: string;
+    reference: string;
+
+    selected?: boolean;
 }

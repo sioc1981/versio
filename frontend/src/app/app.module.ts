@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 // NGX Bootstrap
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -19,6 +20,7 @@ import { IssueCreateComponent } from './issue/issue-create.component';
 import { IssueComponent } from './issue/issue.component';
 import { PatchComponent } from './patch/patch.component';
 import { PatchCreateComponent } from './patch/patch-create.component';
+import { PatchUpdateComponent } from './patch/patch-update.component';
 import { ServerEventComponent } from './server-event/server-event.component';
 import { ReleaseComponent } from './release/release.component';
 import { ReleaseCreateComponent } from './release/release-create.component';
@@ -33,6 +35,7 @@ import { HistoryColorDirective } from './common/history-color.directive';
     IssueCreateComponent,
     PatchComponent,
     PatchCreateComponent,
+    PatchUpdateComponent,
     ReleaseComponent,
     ReleaseCreateComponent,
     NavigationComponent,
@@ -44,6 +47,7 @@ import { HistoryColorDirective } from './common/history-color.directive';
     AboutModalModule,
     ActionModule,
     AppRoutingModule,
+    BsDatepickerModule.forRoot(),
     BsDropdownModule.forRoot(),
     BrowserModule,
     FormsModule,
