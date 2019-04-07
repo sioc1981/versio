@@ -33,7 +33,7 @@ public class GlobalSSE {
 	public void init() {
 		GlobalSSE.sseBroadcaster = sse.newBroadcaster();
 		sseBroadcaster.onClose(
-				ses -> LOG.warn("Connection lost for sink {} in {}", System.identityHashCode(ses), sseBroadcaster));
+				ses -> LOG.warn("Connection lost for sink {}", System.identityHashCode(ses)));
 	}
 
 	@GET

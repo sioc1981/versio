@@ -46,6 +46,11 @@ export class PatchComponent implements OnInit {
                 placeholder: 'Filter by Version...',
                 type: FilterType.TEXT
             }, {
+                id: 'sequence',
+                title: 'Sequence',
+                placeholder: 'Filter by Sequence Number...',
+                type: FilterType.TEXT
+            }, {
                 id: 'issue',
                 title: 'issue',
                 placeholder: 'Filter by issue...',
@@ -112,6 +117,9 @@ export class PatchComponent implements OnInit {
 
     matchesFilter(item: any, filter: Filter): boolean {
         let match = true;
+        if (filter.field.id === 'sequence') {
+            match = item.sequenceNumber.indexOf(filter.value) !== -1;
+        }
         if (filter.field.id === 'version') {
             match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
         }

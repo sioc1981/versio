@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 // NGX Bootstrap
 import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
@@ -23,6 +24,7 @@ import { ReleaseComponent } from './release/release.component';
 import { ReleaseCreateComponent } from './release/release-create.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SseService } from './server-event/sse.service';
+import { HistoryColorDirective } from './common/history-color.directive';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,8 @@ import { SseService } from './server-event/sse.service';
     ReleaseCreateComponent,
     NavigationComponent,
     DashboardComponent,
-    ServerEventComponent
+    ServerEventComponent,
+    HistoryColorDirective
   ],
   imports: [
     AboutModalModule,
@@ -53,6 +56,7 @@ import { SseService } from './server-event/sse.service';
     TableModule,
     ToastNotificationListModule,
     ToolbarModule,
+    TypeaheadModule.forRoot(),
     VerticalNavigationModule,
     WizardModule
   ],

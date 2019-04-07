@@ -3,15 +3,12 @@ package fr.sioc1981.versioning.backend.entity;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -94,9 +91,9 @@ public class Patch extends Deployable {
 	@Override
 	public String toString() {
 		return String.format(
-				"Patch [id=%s, release=%s, sequenceNumber=%s, issues=%s, buildDate=%s, packageDate=%s, qualificationDate=%s, kuQualificationDate=%s, pilotDate=%s, productionDate=%s]",
-				id, release.getVersion(), sequenceNumber, issues, buildDate, packageDate, qualificationDate, kuQualificationDate,
-				pilotDate, productionDate);
+				"Patch [id=%s, issues=%s, release=%s, sequenceNumber=%s, buildDate=%s, packageDate=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
+				id, issues, release, sequenceNumber, buildDate, packageDate, qualification, keyUser, pilot, production);
 	}
+
 
 }

@@ -11,23 +11,39 @@ import javax.persistence.*;
  *
  */
 @MappedSuperclass
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Deployable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Temporal(TemporalType.DATE)
 	protected Date buildDate;
 	@Temporal(TemporalType.DATE)
 	protected Date packageDate;
-	@Temporal(TemporalType.DATE)
-	protected Date qualificationDate;
-	@Temporal(TemporalType.DATE)
-	protected Date kuQualificationDate;
-	@Temporal(TemporalType.DATE)
-	protected Date pilotDate;
-	@Temporal(TemporalType.DATE)
-	protected Date productionDate;
+
+	@Embedded
+	// rename the basic mappings
+	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "QUALIFICATION_DEPLOY_DATE")),
+			@AttributeOverride(name = "validationDate", column = @Column(name = "QUALIFICATION_VALIDATION_DATE")) })
+	protected PlatformHistory qualification;
+
+	@Embedded
+	// rename the basic mappings
+	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "KEYUSER_DEPLOY_DATE")),
+			@AttributeOverride(name = "validationDate", column = @Column(name = "KEYUSER_VALIDATION_DATE")) })
+	protected PlatformHistory keyUser;
+
+	@Embedded
+	// rename the basic mappings
+	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "PILOT_DEPLOY_DATE")),
+			@AttributeOverride(name = "validationDate", column = @Column(name = "PILOT_VALIDATION_DATE")) })
+	protected PlatformHistory pilot;
+
+	@Embedded
+	// rename the basic mappings
+	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "PRODUCTION_DEPLOY_DATE")),
+			@AttributeOverride(name = "validationDate", column = @Column(name = "PRODUCTION_VALIDATION_DATE")) })
+	protected PlatformHistory production;
 
 	public Deployable() {
 		super();
@@ -49,41 +65,41 @@ public abstract class Deployable implements Serializable {
 		this.packageDate = packageDate;
 	}
 
-	public Date getQualificationDate() {
-		return qualificationDate;
+	public PlatformHistory getQualification() {
+		return qualification;
 	}
 
-	public void setQualificationDate(Date qualificationDate) {
-		this.qualificationDate = qualificationDate;
+	public void setQualification(PlatformHistory qualification) {
+		this.qualification = qualification;
 	}
 
-	public Date getKuQualificationDate() {
-		return kuQualificationDate;
+	public PlatformHistory getKeyUser() {
+		return keyUser;
 	}
 
-	public void setKuQualificationDate(Date kuQualificationDate) {
-		this.kuQualificationDate = kuQualificationDate;
+	public void setKeyUser(PlatformHistory keyUser) {
+		this.keyUser = keyUser;
 	}
 
-	public Date getPilotDate() {
-		return pilotDate;
+	public PlatformHistory getPilot() {
+		return pilot;
 	}
 
-	public void setPilotDate(Date pilotDate) {
-		this.pilotDate = pilotDate;
+	public void setPilot(PlatformHistory pilot) {
+		this.pilot = pilot;
 	}
 
-	public Date getProductionDate() {
-		return productionDate;
+	public PlatformHistory getProduction() {
+		return production;
 	}
 
-	public void setProductionDate(Date productionDate) {
-		this.productionDate = productionDate;
+	public void setProduction(PlatformHistory production) {
+		this.production = production;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(buildDate, kuQualificationDate, packageDate, pilotDate, productionDate, qualificationDate);
+		return Objects.hash(buildDate, keyUser, packageDate, pilot, production, qualification);
 	}
 
 	@Override
@@ -95,11 +111,16 @@ public abstract class Deployable implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Deployable other = (Deployable) obj;
-		return Objects.equals(buildDate, other.buildDate)
-				&& Objects.equals(kuQualificationDate, other.kuQualificationDate)
-				&& Objects.equals(packageDate, other.packageDate) && Objects.equals(pilotDate, other.pilotDate)
-				&& Objects.equals(productionDate, other.productionDate)
-				&& Objects.equals(qualificationDate, other.qualificationDate);
+		return Objects.equals(buildDate, other.buildDate) && Objects.equals(keyUser, other.keyUser)
+				&& Objects.equals(packageDate, other.packageDate) && Objects.equals(pilot, other.pilot)
+				&& Objects.equals(production, other.production) && Objects.equals(qualification, other.qualification);
 	}
-	
+
+	@Override
+	public String toString() {
+		return String.format(
+				"Deployable [buildDate=%s, packageDate=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
+				buildDate, packageDate, qualification, keyUser, pilot, production);
+	}
+
 }

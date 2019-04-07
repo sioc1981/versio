@@ -69,8 +69,8 @@ public class Release extends Deployable {
 	@Override
 	public String toString() {
 		return String.format(
-				"Release [id=%s, version=%s, buildDate=%s, packageDate=%s, qualificationDate=%s, kuQualificationDate=%s, pilotDate=%s, productionDate=%s]",
-				id, version, buildDate, packageDate, qualificationDate, kuQualificationDate, pilotDate, productionDate);
+				"Release [id=%s, version=%s, buildDate=%s, packageDate=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
+				id, version, buildDate, packageDate, qualification, keyUser, pilot, production);
 	}
 
 }

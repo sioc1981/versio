@@ -18,6 +18,7 @@ import { ReleaseService } from '../release/shared/release.service';
 import { Release } from '../release/shared/Release';
 import { Issue } from '../issue/shared/Issue';
 import { IssueService } from '../issue/shared/issue.service';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -36,6 +37,8 @@ export class PatchCreateComponent implements OnInit {
     step1Config: WizardStepConfig;
     releases: Release[];
     releaseListConfig: ListConfig;
+
+    releaseVersion: String;
 
     // Wizard Step 2
     step2Config: WizardStepConfig;
@@ -193,6 +196,12 @@ export class PatchCreateComponent implements OnInit {
         console.log(JSON.stringify($event.selectedItems));
         this.data.issues = $event.selectedItems;
         this.updateIssues();
+    }
+
+    onSelect(event: TypeaheadMatch): void {
+        this.data.release = event.item;
+        console.log('version' + this.data.release);
+        this.updateVersion();
     }
 
 }

@@ -19,11 +19,12 @@
             <ng-template #patchTemplate let-item="item" let-index="index">
                 <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">
-                        <div class="list-pf-title">{{item.issues[0].reference}} -
-                                {{item.issues[0].description}}</div>
+                        <div class="list-pf-title">{{item.sequenceNumber}}</div>
+                        <div class="list-pf-description">{{item.issues[0].reference}} -
+                            {{item.issues[0].description}}</div>
                     </div>
                     <div class="list-pf-additional-content">
-                        <div>
+                        <div> 
                             <div class="list-pf-description">{{item.release.version.versionNumber}}</div>
                         </div>
                     </div>
@@ -35,22 +36,22 @@
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item" [template]="qualificationTemplate">
                             <ng-template #qualificationTemplate>
-                                <span class="fas fa myApp myApp-user-shield myApp-green"></span>
+                                <span class="fas fa myApp myApp-user-shield" [appHistoryColor]="item.qualification"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
                             <ng-template #keyuserTemplate>
-                                <span class="fas fa myApp myApp-cart-check myApp-orange"></span>
+                                <span class="fas fa myApp myApp-cart-check" [appHistoryColor]="item.keyuser"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
                             <ng-template #pilotTemplate>
-                                <span class="fas fa myApp myApp-cash-register myApp-red"></span>
+                                <span class="fas fa myApp myApp-cash-register" [appHistoryColor]="item.pilot"></span> 
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'production'" [item]="item" [template]="productionTemplate">
                             <ng-template #productionTemplate>
-                                <span class="fas fa myApp myApp-store myApp-red"></span>
+                                <span class="fas fa myApp myApp-store" [appHistoryColor]="item.production"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                     </div>

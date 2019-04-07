@@ -2,7 +2,6 @@ package fr.sioc1981.versioning.backend.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
