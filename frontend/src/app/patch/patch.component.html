@@ -38,7 +38,7 @@
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
                             <ng-template #keyuserTemplate>
-                                <span class="fas fa myApp myApp-cart-check" [appHistoryColor]="item.keyuser"></span>
+                                <span class="fas fa myApp myApp-cart-check" [appHistoryColor]="item.keyUser"></span>
                             </ng-template>
                         </pfng-list-expand-toggle>
                         <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
@@ -90,11 +90,11 @@
                         <h4>Key User Qualification</h4>
                         <div class="col-sm-4">
                             <div><strong>Deploy Date</strong></div>
-                            <div>{{item.keyuser.deployDate | date}}</div>
+                            <div>{{item.keyUser.deployDate | date}}</div>
                         </div>
                         <div class="col-sm-4">
                             <div><strong>Validation Date</strong></div>
-                            <div>{{item.keyuser.validationDate | date}}</div>
+                            <div>{{item.keyUser.validationDate | date}}</div>
                         </div>
                     </div>
                 </div>

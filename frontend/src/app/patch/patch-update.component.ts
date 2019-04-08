@@ -19,6 +19,7 @@ import { ReleaseService } from '../release/shared/release.service';
 import { IssueService } from '../issue/shared/issue.service';
 import { Issue } from '../issue/shared/Issue';
 import { cloneDeep } from 'lodash';
+import { PlatformHistory } from '../common/PlatformHistory';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class PatchUpdateComponent implements OnInit {
 
     data: any = {};
     deployComplete = true;
+    deploySuccess = false;
 
     // Wizard Step 1
     step1Config: WizardStepConfig;
@@ -76,8 +78,11 @@ export class PatchUpdateComponent implements OnInit {
         this.patch = this.patchComponent.selectedPatch;
         this.data = cloneDeep(this.patch);
         this.data.buildDate = new Date(this.patch.buildDate);
-        this.data.packageDate = this.patch.packageDate ? new Date(this.patch.packageDate) : this.patch.packageDate;
-        console.log('update patch:' + JSON.stringify(this.data));
+        this.data.packageDate = this.initDate(this.patch.packageDate);
+        this.data.qualification = this.initPlatformHistory(this.data.qualification);
+        this.data.keyUser = this.initPlatformHistory(this.data.keyUser);
+        this.data.pilot = this.initPlatformHistory(this.data.pilot);
+        this.data.production = this.initPlatformHistory(this.data.production);
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
         this.getIssues();
@@ -187,6 +192,21 @@ export class PatchUpdateComponent implements OnInit {
         this.updateIssues();
 
     }
+
+    initDate(date: Date): Date {
+        return date ? new Date(date) : date;
+    }
+
+    initPlatformHistory(platformHistory: PlatformHistory): PlatformHistory {
+        if (platformHistory) {
+            platformHistory.deployDate = this.initDate(platformHistory.deployDate);
+            platformHistory.validationDate = this.initDate(platformHistory.validationDate);
+        } else {
+            platformHistory = new PlatformHistory();
+        }
+        return platformHistory;
+    }
+
     getVersions(): void {
         this.releaseService.getReleases()
             .subscribe(newReleases => this.releases = newReleases);
@@ -219,11 +239,15 @@ export class PatchUpdateComponent implements OnInit {
     startDeploy(): void {
         this.deployComplete = false;
         this.wizardConfig.done = true;
-
-        // Simulate a delay
-        setTimeout(() => {
-            this.deployComplete = true;
-        }, 2500);
+        this.patchService.updatePatch(this.data as Patch)
+            .subscribe(_ => {
+                this.patchComponent.getPatchs();
+                this.deployComplete = true;
+                this.deploySuccess = true;
+            }, _ => {
+                this.deployComplete = true;
+                this.deploySuccess = false;
+            });
     }
 
     stepChanged($event: WizardEvent) {

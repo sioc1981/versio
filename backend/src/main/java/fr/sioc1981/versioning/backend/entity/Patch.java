@@ -12,12 +12,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Entity implementation class for Entity: Patch
  *
  */
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "release_id", "sequenceNumber" }))
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Patch extends Deployable {
 
 	private static final long serialVersionUID = 1L;

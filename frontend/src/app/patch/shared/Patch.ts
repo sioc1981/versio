@@ -14,7 +14,7 @@ export class Patch {
     buildDate: Date;
     packageDate: Date;
     qualification: PlatformHistory;
-    keyuser: PlatformHistory;
+    keyUser: PlatformHistory;
     pilot: PlatformHistory;
     production: PlatformHistory;
 
