@@ -21,9 +21,11 @@ import { ReleaseFull } from './shared/ReleaseFull';
 export class ReleaseComponent implements OnInit {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createRelease') createReleaseTemplate: TemplateRef<any>;
+    @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
     actionConfig: ActionConfig;
+    releaseActionConfig: ActionConfig;
     isAscendingSort = true;
     filterConfig: FilterConfig;
     sortConfig: SortConfig;
@@ -32,6 +34,8 @@ export class ReleaseComponent implements OnInit {
     releases: ReleaseFull[] = [];
     filteredReleases: ReleaseFull[] = [];
     items: ReleaseFull[] = [];
+
+    selectedRelease: ReleaseFull;
 
     paginationConfig: PaginationConfig;
 
@@ -58,6 +62,14 @@ export class ReleaseComponent implements OnInit {
                 id: 'addRelease',
                 title: 'Add new release',
                 tooltip: 'Add a new release'
+            }]
+        } as ActionConfig;
+
+        this.releaseActionConfig = {
+            primaryActions: [{
+                id: 'editRelease',
+                title: 'Edit release',
+                tooltip: 'Edit release'
             }]
         } as ActionConfig;
 
@@ -130,9 +142,14 @@ export class ReleaseComponent implements OnInit {
         return matches;
     }
 
-    handleAction(action: Action): void {
+    handleAction(action: Action, item?: any): void {
         if (action.id === 'addRelease') {
             this.openModal(this.createReleaseTemplate);
+        } else if (action.id === 'editRelease') {
+            this.selectedRelease = item;
+            this.openModal(this.updateReleaseTemplate);
+        } else {
+            console.log('handleAction: unknown action: ' + action.id);
         }
     }
 

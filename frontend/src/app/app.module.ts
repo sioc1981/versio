@@ -24,6 +24,7 @@ import { PatchUpdateComponent } from './patch/patch-update.component';
 import { ServerEventComponent } from './server-event/server-event.component';
 import { ReleaseComponent } from './release/release.component';
 import { ReleaseCreateComponent } from './release/release-create.component';
+import { ReleaseUpdateComponent } from './release/release-update.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SseService } from './server-event/sse.service';
 import { HistoryColorDirective } from './common/history-color.directive';
@@ -38,6 +39,7 @@ import { HistoryColorDirective } from './common/history-color.directive';
     PatchUpdateComponent,
     ReleaseComponent,
     ReleaseCreateComponent,
+    ReleaseUpdateComponent,
     NavigationComponent,
     DashboardComponent,
     ServerEventComponent,

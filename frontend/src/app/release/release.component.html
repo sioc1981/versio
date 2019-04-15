@@ -3,7 +3,8 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="form-group">
-            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)" (onFilterChange)="filterChanged($event)">
+            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)"
+                (onFilterChange)="filterChanged($event)">
             </pfng-toolbar>
             <ng-template #createRelease>
                 <app-release-create></app-release-create>
@@ -13,13 +14,14 @@
 
     <div class="col-sm-12">
         <div class="form-group">
-            <pfng-list id="myList" [expandTemplate]="expandTemplate" [items]="items" [itemTemplate]="releaseTemplate">
+            <pfng-list id="myList" [expandTemplate]="expandTemplate" [actionTemplate]="actionTemplate" [items]="items"
+                [itemTemplate]="releaseTemplate">
                 <ng-template #releaseTemplate let-item="item" let-index="index">
                     <div class="list-pf-content-wrapper">
                         <div class="list-pf-main-content">
                             <div class="list-pf-title">{{item.release.version.versionNumber}}</div>
                         </div>
-                        <div class="list-pf-additional-content" style="justify-content:flex-start">
+                        <div class="list-pf-additional-content" style="justify-content:flex-start; flex-basis: 16%">
                             <pfng-list-expand-toggle [expandId]="'issues'" [item]="item" [template]="issueTemplate">
                                 <ng-template #issueTemplate>
                                     <span class="fas {{issueIconStyleClass}}"></span>
@@ -31,20 +33,22 @@
                                 </ng-template>
                             </pfng-list-expand-toggle>
                         </div>
-                        <div class="list-pf-additional-content">
+                        <div class="list-pf-additional-content" style="justify-content:flex-end">
                             <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
-                                <ng-template #buildTemplate>
-                                    <span class="fas myApp myApp-laptop-code" [class.myApp-green]="item.release.packageDate" [class.myApp-orange]="!item.release.packageDate"></span>
+                                <ng-template #buildTemplate let-release="item.release">
+                                    <span class="fas myApp myApp-laptop-code" [class.myApp-green]="release.packageDate"
+                                        [class.myApp-orange]="!release.packageDate"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
-                            <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item" [template]="qualificationTemplate">
-                                <ng-template #qualificationTemplate>
-                                    <span class="fas myApp myApp-user-shield myApp-green"></span>
+                            <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item"
+                                [template]="qualificationTemplate">
+                                <ng-template #qualificationTemplate let-release="item.release">
+                                    <span class="fas myApp myApp-user-shield" [appHistoryColor]="release.qualification"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                             <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
-                                <ng-template #keyuserTemplate>
-                                    <span class="fas myApp myApp-cart-check myApp-orange"></span>
+                                <ng-template #keyuserTemplate  let-release="item.release">
+                                    <span class="fas myApp myApp-cart-check" [appHistoryColor]="release.keyUser"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                             <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
@@ -52,15 +56,22 @@
                                     <span class="fas myApp myApp-cash-register myApp-red"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
-                            <pfng-list-expand-toggle [expandId]="'production'" [item]="item" [template]="productionTemplate">
+                            <pfng-list-expand-toggle [expandId]="'production'" [item]="item"
+                                [template]="productionTemplate">
                                 <ng-template #productionTemplate>
-                                    <span class="fas myApp myApp-store myApp-red"></span>
+                                    <span class="fas myApp myApp-store"
+                                        [appHistoryColor]="item.release.production"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                         </div>
                     </div>
                 </ng-template>
-                <ng-template #expandTemplate let-item="item" let-index="index">
+                <ng-template #actionTemplate let-item="item" let-index="index">
+                    <pfng-action class="list-pf-actions" [config]="releaseActionConfig"
+                        (onActionSelect)="handleAction($event, item)">
+                    </pfng-action>
+                </ng-template>
+                <ng-template #expandTemplate let-item="item" let-index="index" let-release="item.release">
                     <div *ngIf="item.expandId === 'issues'">
                         <div class="margin-left-20">
                             <h4>Issues</h4>
@@ -94,11 +105,13 @@
                                             </div>
                                         </div>
                                         <div class="list-pf-additional-content">
-                                                    <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate" [class.myApp-orange]="!item.packageDate"></span>
-                                                    <span class="fas fa myApp myApp-user-shield myApp-green"></span>
-                                                    <span class="fas fa myApp myApp-cart-check myApp-orange"></span>
-                                                    <span class="fas fa myApp myApp-cash-register myApp-red"></span>
-                                                    <span class="fas fa myApp myApp-store myApp-red"></span>
+                                            <span class="fas fa myApp myApp-laptop-code"
+                                                [class.myApp-green]="item.packageDate"
+                                                [class.myApp-orange]="!item.packageDate"></span>
+                                            <span class="fas fa myApp myApp-user-shield" [appHistoryColor]="item.qualification"></span>
+                                            <span class="fas fa myApp myApp-cart-check" [appHistoryColor]="item.keyUser"></span>
+                                            <span class="fas fa myApp myApp-cash-register" [appHistoryColor]="item.pilot"></span>
+                                            <span class="fas fa myApp myApp-store" [appHistoryColor]="item.production"></span>
                                         </div>
                                     </div>
                                 </ng-template>
@@ -110,11 +123,11 @@
                             <h4>Build</h4>
                             <div class="col-sm-4">
                                 <div><strong>Build Date</strong></div>
-                                <div>{{item.release.buildDate | date}}</div>
+                                <div>{{release.buildDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Package Date</strong></div>
-                                <div>{{item.release.patckageDate | date}}</div>
+                                <div>{{release.packageDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -123,11 +136,11 @@
                             <h4>Qualification</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{item.release.qualification.deployDate | date}}</div>
+                                <div>{{release.qualification.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{item.release.qualification.validationDate | date}}</div>
+                                <div>{{release.qualification.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -136,11 +149,11 @@
                             <h4>Key User Qualification</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{item.release.keyuser.deployDate | date}}</div>
+                                <div>{{release.keyuser.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{item.release.keyuser.validationDate | date}}</div>
+                                <div>{{release.keyuser.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -149,11 +162,11 @@
                             <h4>Pilot</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{item.release.pilot.deployDate | date}}</div>
+                                <div>{{release.pilot.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{item.release.pilot.validationDate | date}}</div>
+                                <div>{{release.pilot.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -162,16 +175,19 @@
                             <h4>Production</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{item.release.production.deployDate | date}}</div>
+                                <div>{{release.production.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{item.release.production.validationDate | date}}</div>
+                                <div>{{release.production.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
                 </ng-template>
             </pfng-list>
+            <ng-template #updateRelease>
+                <app-release-update></app-release-update>
+            </ng-template>
             <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
                 (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
         </div>
