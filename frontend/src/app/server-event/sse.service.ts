@@ -1,16 +1,16 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
-import { Summary } from './Summary';
 import { APP_CONSTANT } from '../app.constants';
+import { Summary } from '../shared/Summary';
 
-declare var EventSource;
+//declare var EventSource;
 
 @Injectable({
     providedIn: 'root'
 })
 export class SseService {
 
-    private o: Observable<string>;
+    private o: Observable<any>;
 
     private innerZone: NgZone;
 
@@ -31,20 +31,26 @@ export class SseService {
         });
         this.es = new EventSource(APP_CONSTANT.backendUrlBase + '/subscribe');
         this.es.onmessage = (evt) => {
-            this.subscribers.forEach(obs => obs.next(evt.data));
+            console.log('sse received: ', evt.data);
+            const data: any = JSON.parse(evt.data);
+            this.subscribers.forEach(obs => obs.next(data));
         };
     }
 
-    observeMessages(): Observable<string> {
+    close(): void {
+        console.log('close sseService ');
+        this.es.close();
+    }
+
+    observeMessages(): Observable<any> {
         return this.o;
     }
+
     registerSummary(summary: Summary, filter: string): Summary {
         this.o.subscribe(message => {
             this.innerZone.run(() => {
-                if (message.startsWith(filter)) {
-                    const count = Number(message.substr(filter.length + 1));
-                    console.log(filter + ': ' + count);
-                    summary.count$.emit(count);
+                if (summary.sseCallback !== undefined && message[filter] !== undefined) {
+                    summary.sseCallback(message[filter]);
                 }
             });
         });

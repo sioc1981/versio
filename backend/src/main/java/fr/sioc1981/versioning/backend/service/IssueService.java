@@ -83,7 +83,7 @@ public class IssueService {
 
 	public Long getCount() {
 		Long count =  this.entityManager.createQuery("select count(1) as count from Issue", Long.class).getSingleResult();
-		globalSSE.broadcast("issue", count);
+		globalSSE.broadcast("issue_count", count);
 		return count;
 	}
 	@GET

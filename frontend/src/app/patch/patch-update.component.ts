@@ -19,7 +19,7 @@ import { ReleaseService } from '../release/shared/release.service';
 import { IssueService } from '../issue/shared/issue.service';
 import { Issue } from '../issue/shared/Issue';
 import { cloneDeep } from 'lodash';
-import { PlatformHistory } from '../common/PlatformHistory';
+import { PlatformHistory } from '../shared/PlatformHistory';
 
 
 @Component({

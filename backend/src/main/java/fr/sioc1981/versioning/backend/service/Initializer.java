@@ -23,16 +23,13 @@ public class Initializer {
 	@EJB
 	private ReleaseService releaseService;
 	
-	@EJB
-	private VersionService versionService;
-	
 	@PostConstruct
 	public void init() {
 		LOG.info("Initialize services");
 		issueService.getCount();
 		patchService.getCount();
 		releaseService.getCount();
-		versionService.getCount();
+		releaseService.getSummary();
 	}
 	
 }

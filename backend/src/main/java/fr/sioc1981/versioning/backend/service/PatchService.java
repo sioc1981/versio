@@ -33,6 +33,9 @@ public class PatchService {
 
 	@EJB
 	private GlobalSSE globalSSE; 
+	
+	@EJB
+	private ReleaseService releaseService;
 
 	@Context
 	private HttpServletRequest request;
@@ -44,13 +47,16 @@ public class PatchService {
 		this.entityManager.persist(newPatch);
 		
 		getCount();
+		releaseService.getSummary(newPatch.getRelease().getId());
 		return Response.ok(newPatch).build();
 	}
 
 	@PUT
 	@Consumes("application/json")
 	public Response update(Patch newPatch) {
-		return Response.ok(this.entityManager.merge(newPatch)).build();
+		Patch patch = this.entityManager.merge(newPatch);
+		releaseService.getSummary(newPatch.getRelease().getId());
+		return Response.ok(patch).build();
 	}
 
 	@Path("{id}")
@@ -83,7 +89,7 @@ public class PatchService {
 
 	public Long getCount() {
 		Long count =  this.entityManager.createQuery("select count(1) as count from Patch", Long.class).getSingleResult();
-		globalSSE.broadcast("patch", count);
+		globalSSE.broadcast("patch_count", count);
 		return count;
 	}
 	@GET

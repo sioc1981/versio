@@ -5,8 +5,8 @@ import { catchError, tap } from 'rxjs/operators';
 
 import { Issue } from './Issue';
 import { SseService } from '../../server-event/sse.service';
-import { Summary } from '../../server-event/Summary';
 import { APP_CONSTANT } from '../../app.constants';
+import { Summary } from 'src/app/shared/Summary';
 export const ISSUE_CONSTANT = {
     backendUrl: APP_CONSTANT.backendUrlBase + '/issue',
     httpOptions: APP_CONSTANT.httpOptions,
@@ -19,29 +19,20 @@ export const ISSUE_CONSTANT = {
 @Injectable({
     providedIn: 'root'
 })
-export class IssueService implements OnInit, OnDestroy {
-
-    private sseStream: Subscription;
+export class IssueService {
 
     constructor(private http: HttpClient, private sseService: SseService) {
-        sseService.registerSummary(ISSUE_CONSTANT.summary, 'issue');
+        ISSUE_CONSTANT.summary.sseCallback = this.sseCallback;
+        this.sseService.registerSummary(ISSUE_CONSTANT.summary, 'issue');
     }
 
-    ngOnInit() {
-        this.sseStream = this.sseService.observeMessages()
-            .subscribe(message => {
-                console.log(message);
-                if (message.startsWith('issue=')) {
-                    const count = Number(message.substr('issue='.length));
-                    console.log(count);
-                    ISSUE_CONSTANT.summary.count$.emit(count);
-                }
-            });
-    }
+    private sseCallback(data: any): void {
+        console.log('issue sse callback: ' + data);
+        if (data['count'] !== undefined) {
+         const count = Number(data['count']);
+            console.log('issues count: ' + count);
+            ISSUE_CONSTANT.summary.count$.emit(count);
 
-    ngOnDestroy() {
-        if (this.sseStream) {
-            this.sseStream.unsubscribe();
         }
     }
 

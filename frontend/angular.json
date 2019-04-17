@@ -29,7 +29,9 @@
               "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "src/styles.less"
             ],
-            "scripts": []
+            "scripts": [
+                "./node_modules/patternfly/dist/js/patternfly-settings.js"
+            ]
           },
           "configurations": {
             "production": {

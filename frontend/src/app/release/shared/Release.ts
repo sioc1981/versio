@@ -1,5 +1,6 @@
 import { Version } from '../../version/shared/Version';
 import { Issue } from '../../issue/shared/Issue';
+import { PlatformHistory } from 'src/app/shared/PlatformHistory';
 
 export class Release {
     id: number;
@@ -10,9 +11,9 @@ export class Release {
 
     buildDate: Date;
     packageDate: Date;
-    qualificationDate: Date;
-    kuQualificationDate: Date;
-    pilotDate: Date;
-    productionDate: Date;
+    qualification: PlatformHistory;
+    keyUser: PlatformHistory;
+    pilot: PlatformHistory;
+    production: PlatformHistory;
 
 }

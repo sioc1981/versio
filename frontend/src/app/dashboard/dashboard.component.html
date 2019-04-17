@@ -8,12 +8,17 @@
             <pfng-info-status-card [config]="patchConfig">
             </pfng-info-status-card>
         </div>
-    </div>
-    <hr/>
-    <div class="row">
         <div class="col-lg-4">
             <pfng-info-status-card [config]="issueConfig">
             </pfng-info-status-card>
+        </div>
+    </div>
+    <hr />
+    <div class="row  row-cards-pf">
+        <div *ngFor="let item of releaseSummaries">
+            <div *ngIf="item">
+                <app-release-card [item]="item"></app-release-card>
+            </div>
         </div>
     </div>
 </div>

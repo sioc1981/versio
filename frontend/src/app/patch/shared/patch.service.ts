@@ -6,8 +6,8 @@ import { catchError, tap } from 'rxjs/operators';
 import { Patch } from './Patch';
 
 import { SseService } from '../../server-event/sse.service';
-import { Summary } from '../../server-event/Summary';
 import { APP_CONSTANT } from '../../app.constants';
+import { Summary } from 'src/app/shared/Summary';
 
 export const PATCH_CONSTANT = {
     backendUrl: APP_CONSTANT.backendUrlBase + '/patch',
@@ -25,7 +25,17 @@ export class PatchService {
 
 
     constructor(private http: HttpClient, private sseService: SseService) {
+        PATCH_CONSTANT.summary.sseCallback = this.sseCallback;
         sseService.registerSummary(PATCH_CONSTANT.summary, 'patch');
+    }
+
+    private sseCallback(data: any): void {
+        console.log('patch sse callback: ' + data);
+        if (data['count'] !== undefined) {
+            const count = Number(data['count']);
+            PATCH_CONSTANT.summary.count$.emit(count);
+
+        }
     }
 
     getPatchs(): Observable<Patch[]> {
@@ -79,12 +89,12 @@ export class PatchService {
         };
     }
 
-        /**
-       * Handle Http operation that failed.
-       * Let the app continue.
-       * @param operation - name of the operation that failed
-       * @param result - optional value to return as the observable result
-       */
+    /**
+   * Handle Http operation that failed.
+   * Let the app continue.
+   * @param operation - name of the operation that failed
+   * @param result - optional value to return as the observable result
+   */
     private logAndError(operation = 'operation') {
         return (error: any): Observable<never> => {
             // TODO: send the error to remote logging infrastructure

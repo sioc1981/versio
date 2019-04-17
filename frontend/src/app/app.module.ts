@@ -10,7 +10,8 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
-     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule, PaginationModule } from 'patternfly-ng';
+     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule,
+     PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule } from 'patternfly-ng';
 
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -27,7 +28,9 @@ import { ReleaseCreateComponent } from './release/release-create.component';
 import { ReleaseUpdateComponent } from './release/release-update.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { SseService } from './server-event/sse.service';
-import { HistoryColorDirective } from './common/history-color.directive';
+import { HistoryColorDirective } from './shared/history-color.directive';
+import { ReleaseCardComponent } from './dashboard/release-card/release-card.component';
+import { SummaryColorDirective } from './shared/summary-color.directive';
 
 @NgModule({
   declarations: [
@@ -43,7 +46,9 @@ import { HistoryColorDirective } from './common/history-color.directive';
     NavigationComponent,
     DashboardComponent,
     ServerEventComponent,
-    HistoryColorDirective
+    HistoryColorDirective,
+    SummaryColorDirective,
+    ReleaseCardComponent
   ],
   imports: [
     AboutModalModule,
@@ -52,6 +57,8 @@ import { HistoryColorDirective } from './common/history-color.directive';
     BsDatepickerModule.forRoot(),
     BsDropdownModule.forRoot(),
     BrowserModule,
+    CardModule,
+    DonutChartModule,
     FormsModule,
     HttpClientModule,
     InfoStatusCardModule,
@@ -64,6 +71,7 @@ import { HistoryColorDirective } from './common/history-color.directive';
     ToolbarModule,
     TypeaheadModule.forRoot(),
     VerticalNavigationModule,
+    UtilizationDonutChartModule,
     WizardModule
   ],
   providers: [BsDropdownConfig, NotificationService, SseService],

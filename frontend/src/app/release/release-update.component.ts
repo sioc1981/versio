@@ -16,8 +16,8 @@ import { ReleaseService } from './shared/release.service';
 import { IssueService } from '../issue/shared/issue.service';
 import { Issue } from '../issue/shared/Issue';
 import { cloneDeep } from 'lodash';
-import { PlatformHistory } from '../common/PlatformHistory';
 import { ReleaseFull } from './shared/ReleaseFull';
+import { PlatformHistory } from '../shared/PlatformHistory';
 
 
 @Component({
