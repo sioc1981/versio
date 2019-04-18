@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { InfoStatusCardConfig, UtilizationDonutChartConfig } from 'patternfly-ng';
 import { RELEASE_CONSTANT } from '../release/shared/release.service';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { ReleaseSummary } from '../release/shared/ReleaseSummary';
 
 @Component({
@@ -12,7 +12,7 @@ import { ReleaseSummary } from '../release/shared/ReleaseSummary';
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
 
     issueConfig: InfoStatusCardConfig = this.getIssueCardConfig();
@@ -21,25 +21,31 @@ export class DashboardComponent implements OnInit {
 
     releaseSummaries: ReleaseSummary[] = RELEASE_CONSTANT.releaseSummaries;
 
-        packageConfig: UtilizationDonutChartConfig = {
-    chartId: 'exampleUtilizationDonut',
-    centerLabelFormat: 'used',
-    outerLabelAlignment: 'right',
-    thresholds: {'warning': 60, 'error': 80},
-    total: 100,
-    units: 'Package',
-    used: 10
-  };
+    packageConfig: UtilizationDonutChartConfig = {
+        chartId: 'exampleUtilizationDonut',
+        centerLabelFormat: 'used',
+        outerLabelAlignment: 'right',
+        thresholds: { 'warning': 60, 'error': 80 },
+        total: 100,
+        units: 'Package',
+        used: 10
+    };
 
-
+    private subscriptions: Subscription[] = [];
     constructor() { }
 
     ngOnInit() {
-        ISSUE_CONSTANT.summary.count$.subscribe(_ => this.issueConfig = this.getIssueCardConfig());
-        PATCH_CONSTANT.summary.count$.subscribe(_ => this.patchConfig = this.getPatchCardConfig());
-        RELEASE_CONSTANT.summary.count$.subscribe(_ => this.releaseConfig = this.getReleaseCardConfig());
+        this.subscriptions.push(ISSUE_CONSTANT.summary.count$.subscribe(_ => this.issueConfig = this.getIssueCardConfig()));
+        this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(_ => this.patchConfig = this.getPatchCardConfig()));
+        this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(_ => this.releaseConfig = this.getReleaseCardConfig()));
     }
-
+    /**
+      * Clean up subscriptions
+      */
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
+    
     private getIssueCardConfig(): InfoStatusCardConfig {
         return {
             showTopBorder: true,

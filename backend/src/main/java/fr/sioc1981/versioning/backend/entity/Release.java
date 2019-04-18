@@ -25,7 +25,7 @@ public class Release extends Deployable {
 	@GeneratedValue
 	protected Long id;
 
-	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
 	protected Version version;
 
 	public Release() {

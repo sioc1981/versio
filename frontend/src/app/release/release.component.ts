@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { Release } from './shared/Release';
 import { ReleaseService } from './shared/release.service';
 import {
@@ -11,6 +11,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { ReleaseFull } from './shared/ReleaseFull';
+import { Subscription } from 'rxjs';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -18,7 +19,7 @@ import { ReleaseFull } from './shared/ReleaseFull';
     templateUrl: './release.component.html',
     styleUrls: ['./release.component.less']
 })
-export class ReleaseComponent implements OnInit {
+export class ReleaseComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createRelease') createReleaseTemplate: TemplateRef<any>;
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
@@ -41,6 +42,8 @@ export class ReleaseComponent implements OnInit {
 
     issueIconStyleClass = ISSUE_CONSTANT.iconStyleClass;
     patchIconStyleClass = PATCH_CONSTANT.iconStyleClass;
+
+    private subscriptions: Subscription[] = [];
 
     constructor(private releaseService: ReleaseService, private modalService: BsModalService) { }
 
@@ -87,9 +90,16 @@ export class ReleaseComponent implements OnInit {
 
     }
 
+    /**
+      * Clean up subscriptions
+      */
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
+
     getReleases(): void {
-        this.releaseService.getFullReleases()
-            .subscribe(newReleases => { this.releases = newReleases; this.applyFilters(); });
+        this.subscriptions.push(this.releaseService.getFullReleases()
+            .subscribe(newReleases => { this.releases = newReleases; this.applyFilters(); }));
     }
 
     closeModal($event: WizardEvent): void {

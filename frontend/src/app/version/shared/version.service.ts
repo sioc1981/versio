@@ -20,6 +20,14 @@ export class VersionService {
 
     constructor(private http: HttpClient) { }
 
+        /** GET Version by id. Will 404 if id not found */
+    getVersions(): Observable<Version[]> {
+        return this.http.get<Version[]>(VERSION_CONSTANT.backendUrl)
+            .pipe(
+                catchError(this.handleError<Version[]>('getVersions', []))
+            );
+    }
+
     /** GET Version by id. Will 404 if id not found */
     getVersion(id: number): Observable<Version> {
         const url = `${VERSION_CONSTANT.backendUrl}/${id}`;

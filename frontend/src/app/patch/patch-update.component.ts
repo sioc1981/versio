@@ -4,6 +4,7 @@ import {
     OnInit,
     ViewChild,
     ViewEncapsulation,
+    OnDestroy,
 } from '@angular/core';
 
 import { PatchComponent } from './patch.component';
@@ -20,6 +21,7 @@ import { IssueService } from '../issue/shared/issue.service';
 import { Issue } from '../issue/shared/Issue';
 import { cloneDeep } from 'lodash';
 import { PlatformHistory } from '../shared/PlatformHistory';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -28,7 +30,7 @@ import { PlatformHistory } from '../shared/PlatformHistory';
     templateUrl: './patch-update.component.html',
     styleUrls: ['./patch-update.component.css']
 })
-export class PatchUpdateComponent implements OnInit {
+export class PatchUpdateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
 
     data: any = {};
@@ -68,6 +70,8 @@ export class PatchUpdateComponent implements OnInit {
 
 
     patch: Patch;
+
+    private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
         @Host() patchComponent: PatchComponent) {
@@ -193,6 +197,13 @@ export class PatchUpdateComponent implements OnInit {
 
     }
 
+    /**
+       * Clean up subscriptions
+       */
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
+
     initDate(date: Date): Date {
         return date ? new Date(date) : date;
     }
@@ -208,13 +219,13 @@ export class PatchUpdateComponent implements OnInit {
     }
 
     getVersions(): void {
-        this.releaseService.getReleases()
-            .subscribe(newReleases => this.releases = newReleases);
+        this.subscriptions.push(this.releaseService.getReleases()
+            .subscribe(newReleases => this.releases = newReleases));
     }
 
     getIssues(): void {
-        this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = this.preSelect(newIssues));
+        this.subscriptions.push(this.issueService.getIssues()
+            .subscribe(newIssues => this.issues = this.preSelect(newIssues)));
     }
 
 
@@ -239,7 +250,7 @@ export class PatchUpdateComponent implements OnInit {
     startDeploy(): void {
         this.deployComplete = false;
         this.wizardConfig.done = true;
-        this.patchService.updatePatch(this.data as Patch)
+        this.subscriptions.push(this.patchService.updatePatch(this.data as Patch)
             .subscribe(_ => {
                 this.patchComponent.getPatchs();
                 this.deployComplete = true;
@@ -247,7 +258,7 @@ export class PatchUpdateComponent implements OnInit {
             }, _ => {
                 this.deployComplete = true;
                 this.deploySuccess = false;
-            });
+            }));
     }
 
     stepChanged($event: WizardEvent) {

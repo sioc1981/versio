@@ -29,8 +29,7 @@ export class IssueService {
     private sseCallback(data: any): void {
         console.log('issue sse callback: ' + data);
         if (data['count'] !== undefined) {
-         const count = Number(data['count']);
-            console.log('issues count: ' + count);
+            const count = Number(data['count']);
             ISSUE_CONSTANT.summary.count$.emit(count);
 
         }
@@ -39,7 +38,7 @@ export class IssueService {
     getIssues(): Observable<Issue[]> {
         return this.http.get<Issue[]>(ISSUE_CONSTANT.backendUrl)
             .pipe(
-                    catchError(this.handleError<Issue[]>('getIssues', []))
+                catchError(this.handleError<Issue[]>('getIssues', []))
             );
     }
 

@@ -11,7 +11,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
      ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule,
-     PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule } from 'patternfly-ng';
+     PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule, EmptyStateModule } from 'patternfly-ng';
 
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -31,6 +31,8 @@ import { SseService } from './server-event/sse.service';
 import { HistoryColorDirective } from './shared/history-color.directive';
 import { ReleaseCardComponent } from './dashboard/release-card/release-card.component';
 import { SummaryColorDirective } from './shared/summary-color.directive';
+import { ReleaseCompareComponent } from './release-compare/release-compare.component';
+import { VersionGraphComponent } from './release-compare/version-graph.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,9 @@ import { SummaryColorDirective } from './shared/summary-color.directive';
     ServerEventComponent,
     HistoryColorDirective,
     SummaryColorDirective,
-    ReleaseCardComponent
+    ReleaseCardComponent,
+    ReleaseCompareComponent,
+    VersionGraphComponent
   ],
   imports: [
     AboutModalModule,
@@ -59,6 +63,7 @@ import { SummaryColorDirective } from './shared/summary-color.directive';
     BrowserModule,
     CardModule,
     DonutChartModule,
+    EmptyStateModule,
     FormsModule,
     HttpClientModule,
     InfoStatusCardModule,

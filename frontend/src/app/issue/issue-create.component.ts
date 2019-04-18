@@ -4,13 +4,15 @@ import {
     OnInit,
     ViewChild,
     Input,
-    ViewEncapsulation
+    ViewEncapsulation,
+    OnDestroy
 } from '@angular/core';
 
 import { IssueComponent } from './issue.component';
 import { WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
 import { Issue } from './shared/Issue';
 import { IssueService } from './shared/issue.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -18,7 +20,7 @@ import { IssueService } from './shared/issue.service';
     templateUrl: './issue-create.component.html',
     styleUrls: ['./issue-create.component.css']
 })
-export class IssueCreateComponent implements OnInit {
+export class IssueCreateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
 
     data: any = {};
@@ -34,12 +36,13 @@ export class IssueCreateComponent implements OnInit {
     wizardConfig: WizardConfig;
     wizardExample: IssueComponent;
 
+    private subscriptions: Subscription[] = [];
+
     constructor(private issueService: IssueService, @Host() wizardExample: IssueComponent) {
         this.wizardExample = wizardExample;
     }
 
     ngOnInit(): void {
-        console.log('IssueCreateComponent on init');
         // Step 1
         this.step1Config = {
             id: 'step1',
@@ -64,6 +67,13 @@ export class IssueCreateComponent implements OnInit {
         this.setNavAway(false);
     }
 
+    /**
+        * Clean up subscriptions
+        */
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
+
     // Methods
 
     nextClicked($event: WizardEvent): void {
@@ -81,11 +91,11 @@ export class IssueCreateComponent implements OnInit {
         //   this.deployComplete = true;
         // }, 2500);
         console.log('Saving ' + JSON.stringify(this.data));
-        this.issueService.addIssue(this.data as Issue)
+        this.subscriptions.push(this.issueService.addIssue(this.data as Issue)
             .subscribe(issue => {
                 this.wizardExample.getIssues();
                 this.deployComplete = true;
-            });
+            }));
     }
 
     stepChanged($event: WizardEvent) {

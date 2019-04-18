@@ -2,7 +2,10 @@ package fr.sioc1981.versioning.backend.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -11,6 +14,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -31,6 +35,7 @@ import fr.sioc1981.versioning.backend.entity.PlatformCount;
 import fr.sioc1981.versioning.backend.entity.Release;
 import fr.sioc1981.versioning.backend.entity.ReleaseFull;
 import fr.sioc1981.versioning.backend.entity.ReleaseFullSummary;
+import fr.sioc1981.versioning.backend.entity.Version;
 
 @Path(ReleaseService.RELEASE_PATH)
 @Stateless
@@ -148,7 +153,7 @@ public class ReleaseService {
 	}
 
 	@GET
-	@Path("{id}")
+	@Path("{id}/full")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") String id) {
 		List<Release> result = this.entityManager.createQuery("from ReleaseFull where release = :id", Release.class)
@@ -160,5 +165,78 @@ public class ReleaseService {
 
 		return Response.ok(result.get(0)).build();
 	}
+	
+	@GET
+	@Produces("application/json")
+	@Path("{source}/compare/{dest}")
+	public Response compare(@PathParam("source") String source, @PathParam("dest") String dest) {
+		Version v1 = new Version(source);
+		Version v2 = new Version(dest);
+
+		final Version baseVersion = new Version(findVersionBase(v1, v2));
+		Map<String, List<Release>> result = new HashMap<>();
+		result.put("sourceReleases", findAllBetween(baseVersion, v1));
+		result.put("destReleases", findAllBetween(baseVersion, v2));
+		return Response.ok(result).build();
+	}
+
+	public List<Release> findAllBetween(Version baseVersion, Version v1) {
+		if (baseVersion.equals(v1)) {
+			return Collections.emptyList();
+		}
+
+		String qlString = "SELECT r FROM Release r join fetch r.version v where v.baseNumber = :baseNumber and v.interimNumber = :interimNumber and ";
+		HashMap<String, Integer> params = new HashMap<String, Integer>();
+		params.put("baseNumber", baseVersion.getBaseNumber());
+		params.put("interimNumber", baseVersion.getInterimNumber());
+		boolean featureSearch = false;
+		int compare = baseVersion.getFeatureNumber() - v1.getFeatureNumber();
+		if (compare != 0) {
+			qlString += "(v.featureNumber BETWEEN :baseFeatureNumber AND :versionFeatureNumber and v.patchNumber = 0)";
+			params.put("baseFeatureNumber", baseVersion.getFeatureNumber());
+			params.put("versionFeatureNumber", v1.getFeatureNumber());
+			featureSearch = true;
+		}
+		if (v1.getPatchNumber() != 0) {
+			params.put("featureNumber", v1.getFeatureNumber());
+			int basePatch = baseVersion.getPatchNumber();
+			if (featureSearch) {
+				qlString += " OR ";
+				basePatch = 0;
+			}
+			qlString += "(v.featureNumber = :featureNumber and v.patchNumber BETWEEN :basePatchNumber AND :versionPatchNumber)";
+			params.put("basePatchNumber", basePatch);
+			params.put("versionPatchNumber", v1.getPatchNumber());
+		}
+		qlString += " order by v.versionNumber";
+		TypedQuery<Release> query = this.entityManager.createQuery(qlString, Release.class);
+		params.forEach((name, value) -> query.setParameter(name, value));
+		return query.getResultList();
+	}
+
+	private String findVersionBase(Version v1, Version v2) {
+		StringBuilder base = new StringBuilder();
+		int compare = v1.getBaseNumber() - v2.getBaseNumber();
+		if (compare != 0) {
+			return String.valueOf(Math.min(v1.getBaseNumber(), v2.getBaseNumber()));
+		}
+		base.append(v1.getBaseNumber());
+		base.append(".");
+		compare = v1.getInterimNumber() - v2.getInterimNumber();
+		if (compare != 0) {
+			return base.toString() + String.valueOf(Math.min(v1.getInterimNumber(), v2.getInterimNumber()));
+		}
+		base.append(v1.getInterimNumber());
+		base.append(".");
+		compare = v1.getFeatureNumber() - v2.getFeatureNumber();
+		if (compare != 0) {
+			return base.toString() + String.valueOf(Math.min(v1.getFeatureNumber(), v2.getFeatureNumber()));
+		}
+		base.append(v1.getFeatureNumber());
+		base.append(".");
+		base.append(Math.min(v1.getPatchNumber(), v2.getPatchNumber()));
+		return base.toString().replaceAll("(\\.0)+$", "");
+	}
+
 
 }

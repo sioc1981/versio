@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { Patch } from './shared/Patch';
 import { PatchService } from './shared/patch.service';
 import {
@@ -9,6 +9,7 @@ import {
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -16,7 +17,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
     templateUrl: './patch.component.html',
     styleUrls: ['./patch.component.less']
 })
-export class PatchComponent implements OnInit {
+export class PatchComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createPatch') createPatchTemplate: TemplateRef<any>;
     @ViewChild('updatePatch') updatePatchTemplate: TemplateRef<any>;
@@ -38,6 +39,8 @@ export class PatchComponent implements OnInit {
     paginationConfig: PaginationConfig;
 
     issueIconStyleClass = ISSUE_CONSTANT.iconStyleClass;
+
+    private subscriptions: Subscription[] = [];
 
     constructor(private patchService: PatchService, private modalService: BsModalService) { }
 
@@ -93,10 +96,16 @@ export class PatchComponent implements OnInit {
         } as PaginationConfig;
 
     }
+   /**
+      * Clean up subscriptions
+      */
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
 
     getPatchs(): void {
-        this.patchService.getPatchs()
-            .subscribe(newPatchs => { this.patches = newPatchs; this.applyFilters(); });
+        this.subscriptions.push(this.patchService.getPatchs()
+            .subscribe(newPatchs => { this.patches = newPatchs; this.applyFilters(); }));
     }
 
     closeModal($event: WizardEvent): void {

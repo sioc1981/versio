@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CardConfig, UtilizationDonutChartConfig, DonutChartConfig } from 'patternfly-ng';
+import { CardConfig, UtilizationDonutChartConfig, DonutChartConfig, EmptyStateConfig } from 'patternfly-ng';
 import { ReleaseSummary } from 'src/app/release/shared/ReleaseSummary';
 import { PlatformSummary } from 'src/app/shared/PlatformSummary';
 
@@ -16,34 +16,22 @@ export class ReleaseCardComponent implements OnInit {
     config: CardConfig;
 
     packageConfig: UtilizationDonutChartConfig;
+    issueConfig: DonutChartConfig;
+    issueData: any[] = [
+        ['Release', 15],
+        ['Patch', 5]
+    ];
+
     qualificationConfig: DonutChartConfig;
-    qualificationData: any[] = [
-        ['missing', 0],
-        ['validated', 0],
-        ['deployed', 0],
-        ['available', 0]
-    ];
+    qualificationData: any[] = this.generateEmptyData();
     keyUserConfig: DonutChartConfig;
-    keyUserData: any[] = [
-        ['missing', 0],
-        ['validated', 0],
-        ['deployed', 0],
-        ['available', 0]
-    ];
+    keyUserData: any[] = this.generateEmptyData();
     pilotConfig: DonutChartConfig;
-    pilotData: any[] = [
-        ['missing', 0],
-        ['validated', 0],
-        ['deployed', 0],
-        ['available', 0]
-    ];
+    pilotData: any[] = this.generateEmptyData();
     productionConfig: DonutChartConfig;
-    productionData: any[] = [
-        ['missing', 0],
-        ['validated', 0],
-        ['deployed', 0],
-        ['available', 0]
-    ];
+    productionData: any[] = this.generateEmptyData();
+
+    emptyStateConfig: EmptyStateConfig;
 
     maxPatch: number;
 
@@ -62,7 +50,7 @@ export class ReleaseCardComponent implements OnInit {
             chartId: 'exampleUtilizationDonut' + this.item.id,
             centerLabelFormat: 'txt-func',
             outerLabelAlignment: 'right',
-            thresholds: { 'warning': 10, 'error': 20 },
+            thresholds: { 'warning': 40, 'error': 80 },
             total: this.maxPatch,
             units: 'patch',
             used: this.item.patchCount
@@ -74,39 +62,73 @@ export class ReleaseCardComponent implements OnInit {
             };
         };
 
-        this.qualificationConfig = this.geratateConfig('qualification', 'Qua');
+        this.issueConfig = {
+            chartId: 'IssueDonut' + this.item.id,
+            colors: {
+                release: '#3f9c35', // green
+                patch: '#ec7a08'     // orange
+            },
+            centerLabel: ' ',
+            chartHeight: 100,
+            data: {
+                names: {
+                    available: 'Available',
+                    validated: 'Deployed and validated',
+                    deployed: 'Deployed and need validation',
+                    missing: 'Not yet deployed'
+                }
+            },
+            legend: {
+                show: false
+            }
+        } as DonutChartConfig;
+
+        this.qualificationConfig = this.geratateConfig('qualification', this.item.qualification.deployed);
         if (this.item.qualification.deployed) {
             this.qualificationData = this.generateData(this.item.qualification);
         }
 
-        this.keyUserConfig = this.geratateConfig('keyUser', 'K.U.');
+        this.keyUserConfig = this.geratateConfig('keyUser', this.item.keyUser.deployed);
         if (this.item.keyUser.deployed) {
             this.keyUserData = this.generateData(this.item.keyUser);
         }
 
-        this.pilotConfig = this.geratateConfig('pilot', 'Pil');
+        this.pilotConfig = this.geratateConfig('pilot', this.item.pilot.deployed);
         if (this.item.pilot.deployed) {
             this.pilotData = this.generateData(this.item.pilot);
         }
 
-        this.productionConfig = this.geratateConfig('production', 'Prod');
+        this.productionConfig = this.geratateConfig('production', this.item.production.deployed);
         if (this.item.production.deployed) {
             this.productionData = this.generateData(this.item.production);
         }
 
+        this.emptyStateConfig = {
+            iconStyleClass: 'pficon-ok',
+            info: 'This version has no patch... yet!',
+            title: 'No Patch'
+        } as EmptyStateConfig;
     }
 
     generateData(summary: PlatformSummary): any[] {
         return [
             ['missing', this.item.patchCount - summary.deployedPatchCount],
             ['deployed', summary.deployedPatchCount - summary.validedPatchCount],
-            ['validated', summary.validedPatchCount],
-            ['available', this.maxPatch - this.item.patchCount]
+            ['validated', summary.validedPatchCount]
         ];
 
     }
 
-    geratateConfig(platform: string, shortname: string): DonutChartConfig {
+    generateEmptyData(): any[] {
+        return [
+            ['missing', 0],
+            ['validated', 0],
+            ['deployed', 0]
+        ];
+
+    }
+
+    geratateConfig(platform: string, isDeployed: boolean): DonutChartConfig {
         return {
             chartId: platform + 'Donut' + this.item.id,
             colors: {
@@ -115,7 +137,7 @@ export class ReleaseCardComponent implements OnInit {
                 deployed: '#ec7a08',     // orange
                 missing: '#cc0000'      // red
             },
-            centerLabel: shortname,
+            centerLabel: ' ',
             chartHeight: 100,
             data: {
                 names: {
@@ -123,6 +145,11 @@ export class ReleaseCardComponent implements OnInit {
                     validated: 'Deployed and validated',
                     deployed: 'Deployed and need validation',
                     missing: 'Not yet deployed'
+                },
+                empty: {
+                    label: {
+                        text: isDeployed ? 'No Patch' : 'Not deployed'
+                    }
                 }
             },
             legend: {

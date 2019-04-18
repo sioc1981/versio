@@ -1,5 +1,5 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="releaseComponent.closeModal($event)" (onNext)="nextClicked($event)"
-    (onStepChange)="stepChanged($event)">
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="releaseComponent.closeModal($event)"
+    (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <!-- Step 1A: Details -->
         <pfng-wizard-substep [config]="step1aConfig" [reviewTemplate]="step1aReviewTemplate">
@@ -44,13 +44,15 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Build Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.buildDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.buildDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Package Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.packageDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.packageDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -61,13 +63,16 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.qualification.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.qualification.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.qualification.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.qualification.validationDate"
+                            [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -78,13 +83,15 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.keyUser.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.keyUser.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.keyUser.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.keyUser.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -95,13 +102,15 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.pilot.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.pilot.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.pilot.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.pilot.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -112,13 +121,15 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.production.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.production.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.release.production.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.production.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -131,21 +142,20 @@
         </pfng-wizard-substep>
         <!-- Step 3B: Deploy -->
         <pfng-wizard-substep [config]="step3bConfig" (onShow)="startDeploy()">
-       <div class="wizard-pf-contents">
-            <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
-                <div class="spinner spinner-lg blank-slate-pf-icon"></div>
-                <h3 class="blank-slate-pf-main-action">Update in progress</h3>
+            <div class="wizard-pf-contents">
+                <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+                    <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+                    <h3 class="blank-slate-pf-main-action">Update in progress</h3>
+                </div>
+                <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
+                    <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
+                    <h3 class="blank-slate-pf-main-action">Update was successful</h3>
+                </div>
+                <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+                    <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+                    <h3 class="blank-slate-pf-main-action">Update failed</h3>
+                </div>
             </div>
-            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
-                <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
-                <h3 class="blank-slate-pf-main-action">Update was successful</h3>
-            </div>
-            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
-                <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
-                <h3 class="blank-slate-pf-main-action">Update failed</h3>
-            </div>
-        </div>
-
         </pfng-wizard-substep>
     </pfng-wizard-step>
 </pfng-wizard>
@@ -213,11 +223,11 @@
     <form class="form">
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Deploy Date:</span>
-            <span class="wizard-pf-review-item-value">{{data.pilot.deployDate | date}}</span>
+            <span class="wizard-pf-review-item-value">{{data.release.pilot.deployDate | date}}</span>
         </div>
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Validation Date:</span>
-            <span class="wizard-pf-review-item-value">{{data.pilot.validationDate | date}}</span>
+            <span class="wizard-pf-review-item-value">{{data.release.pilot.validationDate | date}}</span>
         </div>
     </form>
 </ng-template>
@@ -226,11 +236,11 @@
     <form class="form">
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Deploy Date:</span>
-            <span class="wizard-pf-review-item-value">{{data.production.deployDate | date}}</span>
+            <span class="wizard-pf-review-item-value">{{data.release.production.deployDate | date}}</span>
         </div>
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Validation Date:</span>
-            <span class="wizard-pf-review-item-value">{{data.production.validationDate | date}}</span>
+            <span class="wizard-pf-review-item-value">{{data.release.production.validationDate | date}}</span>
         </div>
     </form>
 </ng-template>

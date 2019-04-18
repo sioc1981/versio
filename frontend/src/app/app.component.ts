@@ -17,7 +17,6 @@ export class AppComponent {
 
     @HostListener('window:beforeunload', ['$event'])
     beforeunloadHandler(event: any) {
-        console.log('close sse');
         this.sseService.close();
     }
 

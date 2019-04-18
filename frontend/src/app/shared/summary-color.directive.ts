@@ -15,7 +15,7 @@ export class SummaryColorDirective implements OnInit {
     ngOnInit() {
         if (this.appSummaryType === 'release') {
             this.applyReleaseColor();
-        } else if (this.appSummaryType === 'release') {
+        } else if (this.appSummaryType === 'patch') {
             this.applyPatchColor();
         }
     }

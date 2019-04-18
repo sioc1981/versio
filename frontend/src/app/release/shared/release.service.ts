@@ -10,6 +10,7 @@ import { APP_CONSTANT } from '../../app.constants';
 import { ReleaseFull } from './ReleaseFull';
 import { Summary } from 'src/app/shared/Summary';
 import { ReleaseSummary } from './ReleaseSummary';
+import { ReleaseComparison } from './ReleaseComparison';
 
 export const RELEASE_CONSTANT = {
     backendUrl: APP_CONSTANT.backendUrlBase + '/release',
@@ -64,10 +65,17 @@ export class ReleaseService {
     }
 
     /** GET Release by id. Will 404 if id not found */
-    getRelease(id: number): Observable<ReleaseFull> {
+    getRelease(id: number): Observable<Release> {
         const url = `${RELEASE_CONSTANT.backendUrl}/${id}`;
-        return this.http.get<ReleaseFull>(url).pipe(
+        return this.http.get<Release>(url).pipe(
             catchError(this.logAndError(`getRelease id=${id}`))
+        );
+    }
+
+    getReleaseFull(id: number): Observable<ReleaseFull> {
+        const url = `${RELEASE_CONSTANT.backendUrl}/${id}/full`;
+        return this.http.get<ReleaseFull>(url).pipe(
+            catchError(this.logAndError(`getReleaseFull id=${id}`))
         );
     }
 
@@ -83,6 +91,13 @@ export class ReleaseService {
     updateRelease(release: ReleaseFull): Observable<any> {
         return this.http.put(RELEASE_CONSTANT.backendUrl, release, RELEASE_CONSTANT.httpOptions).pipe(
             catchError(this.logAndError('updateRelease'))
+        );
+    }
+
+    compare(fromVersion: string, toVersion: string): Observable<ReleaseComparison> {
+        const url = `${RELEASE_CONSTANT.backendUrl}/${fromVersion}/compare/${toVersion}`;
+        return this.http.get<ReleaseComparison>(url).pipe(
+            catchError(this.logAndError(`compare fromVersion=${fromVersion} toVersion=${toVersion}`))
         );
     }
 

@@ -1,0 +1,31 @@
+<h2>Release Comparison</h2>
+
+<div class="row">
+    <div class="col-sm-12">
+        <!-- <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)">
+            </pfng-toolbar> -->
+        <form class="form-horizontal" (ngSubmit)="compare()">
+            <div class="form-group required">
+                <label class="col-sm-1 control-label  required-pf" for="fromVersion">From Version</label>
+                <div class="col-sm-2">
+                    <input id="myList" [(ngModel)]="fromVersion" [ngModelOptions]="{standalone: true}"
+                        class="form-control" [typeahead]="releases" typeaheadOptionField="version.versionNumber"
+                        [typeaheadMinLength]="0" autocomplete="off">
+                </div>
+                <label class="col-sm-1 control-label  required-pf" for="toVersion">To Version</label>
+                <div class="col-sm-2">
+                    <input id="myList" [(ngModel)]="toVersion" [ngModelOptions]="{standalone: true}"
+                        class="form-control" [typeahead]="releases" typeaheadOptionField="version.versionNumber"
+                        [typeaheadMinLength]="0" autocomplete="off">
+                </div>
+                <button type="submit">Compare</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <app-version-graph [releaseComparison]="versionCompare" [config]="versionGrahConfig" ></app-version-graph>
+    </div>
+</div>

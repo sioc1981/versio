@@ -3,7 +3,8 @@ import {
     Host,
     OnInit,
     ViewChild,
-    ViewEncapsulation
+    ViewEncapsulation,
+    OnDestroy
 } from '@angular/core';
 
 import { PatchComponent } from './patch.component';
@@ -18,6 +19,7 @@ import { Release } from '../release/shared/Release';
 import { Issue } from '../issue/shared/Issue';
 import { IssueService } from '../issue/shared/issue.service';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
+import { Subscription } from 'rxjs';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -25,7 +27,7 @@ import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
     templateUrl: './patch-create.component.html',
     styleUrls: ['./patch-create.component.css']
 })
-export class PatchCreateComponent implements OnInit {
+export class PatchCreateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
 
     data: any = {};
@@ -50,6 +52,8 @@ export class PatchCreateComponent implements OnInit {
     wizardConfig: WizardConfig;
     patchComponent: PatchComponent;
 
+    private subscriptions: Subscription[] = [];
+
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
         @Host() patchComponent: PatchComponent) {
         this.patchComponent = patchComponent;
@@ -58,7 +62,6 @@ export class PatchCreateComponent implements OnInit {
     ngOnInit(): void {
         this.getVersions();
         this.getIssues();
-        console.log('PatchCreateComponent on init');
         // Step 1
         this.step1Config = {
             id: 'step1',
@@ -100,14 +103,21 @@ export class PatchCreateComponent implements OnInit {
         } as ListConfig;
     }
 
+    /**
+      * Clean up subscriptions
+      */
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
+
     getVersions(): void {
-        this.releaseService.getReleases()
-            .subscribe(newReleases => this.releases = newReleases);
+        this.subscriptions.push(this.releaseService.getReleases()
+            .subscribe(newReleases => this.releases = newReleases));
     }
 
     getIssues(): void {
-        this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = newIssues);
+        this.subscriptions.push(this.issueService.getIssues()
+            .subscribe(newIssues => this.issues = newIssues));
     }
 
 
@@ -123,7 +133,7 @@ export class PatchCreateComponent implements OnInit {
         this.deployComplete = false;
         this.wizardConfig.done = true;
         this.data.buildDate = new Date();
-        this.patchService.addPatch(this.data as Patch)
+        this.subscriptions.push(this.patchService.addPatch(this.data as Patch)
             .subscribe(_ => {
                 this.patchComponent.getPatchs();
                 this.deployComplete = true;
@@ -131,7 +141,7 @@ export class PatchCreateComponent implements OnInit {
             }, _ => {
                 this.deployComplete = true;
                 this.deploySuccess = false;
-            });
+            }));
     }
 
     stepChanged($event: WizardEvent) {
@@ -175,7 +185,6 @@ export class PatchCreateComponent implements OnInit {
 
     onSelect(event: TypeaheadMatch): void {
         this.data.release = event.item;
-        console.log('version' + this.data.release);
         this.updateVersion();
     }
 

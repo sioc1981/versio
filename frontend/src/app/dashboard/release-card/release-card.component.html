@@ -14,29 +14,42 @@
         </h2>
         <hr>
         <div class="row">
-            <div class="col-sm-6">
-                <pfng-utilization-donut-chart [config]="packageConfig">
-                </pfng-utilization-donut-chart>
-            </div>
-            <div class="col-sm-6 text-center">
+            <div *ngIf="item.patchCount > 0">
                 <div class="row">
+                    <div class="col-sm-6">
+                        <pfng-utilization-donut-chart [config]="packageConfig">
+                        </pfng-utilization-donut-chart>
+                    </div>
                     <div class="col-sm-6 text-center">
+                        <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
+                            appSummaryType="patch"></span>
+                        <pfng-donut-chart [chartData]="productionData" [config]="productionConfig">
+                        </pfng-donut-chart>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 text-center">
+                        <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
+                            appSummaryType="patch"></span>
                         <pfng-donut-chart [chartData]="qualificationData" [config]="qualificationConfig">
                         </pfng-donut-chart>
                     </div>
-                    <div class="col-sm-6 text-center">
+                    <div class="col-sm-4 text-center">
+                        <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
+                            appSummaryType="patch"></span>
                         <pfng-donut-chart [chartData]="keyUserData" [config]="keyUserConfig"></pfng-donut-chart>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6 text-center">
+                    <div class="col-sm-4 text-center">
+                        <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
+                            appSummaryType="patch"></span>
+
                         <pfng-donut-chart [chartData]="pilotData" [config]="pilotConfig">
                         </pfng-donut-chart>
                     </div>
-                    <div class="col-sm-6 text-center">
-                        <pfng-donut-chart [chartData]="productionData" [config]="productionConfig"></pfng-donut-chart>
-                    </div>
                 </div>
+            </div>
+            <div *ngIf="item.patchCount === 0">
+                <pfng-empty-state [config]="emptyStateConfig"></pfng-empty-state>
             </div>
         </div>
     </pfng-card>
