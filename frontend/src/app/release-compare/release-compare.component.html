@@ -4,7 +4,7 @@
     <div class="col-sm-12">
         <!-- <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)">
             </pfng-toolbar> -->
-        <form class="form-horizontal" (ngSubmit)="compare()">
+        <form class="form-horizontal" (ngSubmit)="startCompare()">
             <div class="form-group required">
                 <label class="col-sm-1 control-label  required-pf" for="fromVersion">From Version</label>
                 <div class="col-sm-2">
@@ -26,11 +26,37 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <app-version-graph [releaseComparison]="versionCompare" [config]="versionGrahConfig" ></app-version-graph>
+        <app-version-graph [releaseComparison]="versionCompare" [config]="versionGrahConfig"></app-version-graph>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12" *ngFor="let iri of issueItems">
-        <span>{{iri | json}}</span>
+<div class="row text">
+    <div class="col-sm-12">
+    <h2>Issue comparison</h2>
     </div>
+</div>
+
+<div class="padding-15">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="form-group">
+        <pfng-table
+            [columns]="columns"
+            [config]="tableConfig"
+            [rows]="rows"
+            (onFilterChange)="filterChanged($event)"
+            (onSortChange)="handleSortChanged($event)">
+        </pfng-table>
+        <!-- Column templates -->
+        <ng-template #issueTemplate let-row="row">
+          <span>{{row.issue.reference}} - {{row.issue.description}}</span>
+        </ng-template>
+        <ng-template #sourcesTemplate let-row="row">
+          <span *ngFor="let src of row.sourceReleases">{{src.version.versionNumber}}</span>
+        </ng-template>
+        <ng-template #destTemplate let-row="row">
+          <span *ngFor="let dest of row.destReleases">{{dest.version.versionNumber}}</span>
+        </ng-template>
+      </div>
+    </div>
+  </div>
 </div>

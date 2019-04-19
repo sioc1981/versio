@@ -1,8 +1,8 @@
 import { Issue } from '../issue/shared/Issue';
 
 export class IssueResultItem {
-    reference: string;
+    issueReference: string;
     issue: Issue;
-    releaseVersionNumber: string;
+    releaseVersion: string;
     patchSequence: string;
 }

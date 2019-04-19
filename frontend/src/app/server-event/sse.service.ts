@@ -63,18 +63,10 @@ export class SseService {
         return Observable.create(observer => {
             const eventSource = new EventSource(ISSUE_CONSTANT.backendUrl + '/search/releasecomparison?q='
                 + encodeURI( JSON.stringify(this.convertIntoIssueParam(releaseComparison))));
-            eventSource.onmessage = score => this.zone.run(() => observer.next(score.data));
+            eventSource.onmessage = score => this.zone.run(() => observer.next(JSON.parse(score.data)));
             eventSource.onerror = error => this.zone.run(() => observer.error(error));
             return () => eventSource.close();
         });
-
-        // return Observable.create(observer => {
-        //     const eventSource = new EventSource(ISSUE_CONSTANT.backendUrl + '/search/releasecomparison?q='
-        //         + encodeURI( JSON.stringify(this.convertIntoIssueParam(releaseComparison))));
-        //     eventSource.onmessage = score => this.zone.run(() => observer.next(score));
-        //     eventSource.onerror = error => this.zone.run(() => observer.error(error));
-        //     return () => eventSource.close();
-        // });
     }
 
     private convertIntoIssueParam(releaseComparison: ReleaseComparison): any {
