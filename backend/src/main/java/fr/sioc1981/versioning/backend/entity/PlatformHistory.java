@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -14,9 +15,11 @@ public class PlatformHistory implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Temporal(TemporalType.DATE)
+	@JsonbDateFormat
 	protected Date deployDate;
 
 	@Temporal(TemporalType.DATE)
+	@JsonbDateFormat
 	protected Date validationDate;
 
 	public Date getDeployDate() {

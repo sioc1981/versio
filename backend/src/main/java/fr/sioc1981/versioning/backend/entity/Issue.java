@@ -8,6 +8,8 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import fr.sioc1981.versioning.backend.data.IssueContainer;
+
 /**
  * Entity implementation class for Entity: Issue
  *

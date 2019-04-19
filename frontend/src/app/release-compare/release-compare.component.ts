@@ -5,6 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ReleaseComparison } from '../release/shared/ReleaseComparison';
 import { Subscription } from 'rxjs';
 import { VersionGraphConfig } from './version-graph-config';
+import { SseService } from '../server-event/sse.service';
+import { IssueResultItem } from './issue-result-item';
 
 @Component({
     selector: 'app-release-compare',
@@ -20,6 +22,9 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy {
     toVersion: string;
 
     private subscriptions: Subscription[] = [];
+    private itemIssuesSubscription: Subscription;
+
+    issueItems: IssueResultItem[] = [];
 
     versionGrahConfig: VersionGraphConfig = {
         chartId: 'versionGraph',
@@ -37,7 +42,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy {
         },
     };
 
-    constructor(private releaseService: ReleaseService, private route: ActivatedRoute) { }
+    constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private sseService: SseService) { }
 
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -71,6 +76,12 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy {
     compare(): void {
         this.subscriptions.push(this.releaseService.compare(this.fromVersion, this.toVersion).subscribe(res => {
             this.versionCompare = res;
+            if (this.itemIssuesSubscription) {
+                this.itemIssuesSubscription.unsubscribe();
+            }
+            this.itemIssuesSubscription = this.sseService.getIssueItems(res).subscribe(iri => {
+                this.issueItems.push(iri);
+            });
         }));
     }
 }

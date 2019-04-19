@@ -1,4 +1,4 @@
-package fr.sioc1981.versioning.backend.entity;
+package fr.sioc1981.versioning.backend.data;
 
 public class PlatformCount {
 	
@@ -49,6 +49,11 @@ public class PlatformCount {
 	public void setValidedPatchCount(long validedPatchCount) {
 		this.validedPatchCount = validedPatchCount;
 	}
-	
 
+	@Override
+	public String toString() {
+		return String.format("PlatformCount [deployeded=%s, validated=%s, deployedPatchCount=%s, validedPatchCount=%s]",
+				deployeded, validated, deployedPatchCount, validedPatchCount);
+	}
+	
 }

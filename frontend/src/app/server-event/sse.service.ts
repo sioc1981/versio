@@ -2,8 +2,9 @@ import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { APP_CONSTANT } from '../app.constants';
 import { Summary } from '../shared/Summary';
-
-//declare var EventSource;
+import { IssueResultItem } from '../release-compare/issue-result-item';
+import { ReleaseComparison } from '../release/shared/ReleaseComparison';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 
 @Injectable({
     providedIn: 'root'
@@ -57,4 +58,36 @@ export class SseService {
         return summary;
     }
 
+
+    getIssueItems(releaseComparison: ReleaseComparison): Observable<IssueResultItem> {
+        return Observable.create(observer => {
+            const eventSource = new EventSource(ISSUE_CONSTANT.backendUrl + '/search/releasecomparison?q='
+                + encodeURI( JSON.stringify(this.convertIntoIssueParam(releaseComparison))));
+            eventSource.onmessage = score => this.zone.run(() => observer.next(score.data));
+            eventSource.onerror = error => this.zone.run(() => observer.error(error));
+            return () => eventSource.close();
+        });
+
+        // return Observable.create(observer => {
+        //     const eventSource = new EventSource(ISSUE_CONSTANT.backendUrl + '/search/releasecomparison?q='
+        //         + encodeURI( JSON.stringify(this.convertIntoIssueParam(releaseComparison))));
+        //     eventSource.onmessage = score => this.zone.run(() => observer.next(score));
+        //     eventSource.onerror = error => this.zone.run(() => observer.error(error));
+        //     return () => eventSource.close();
+        // });
+    }
+
+    private convertIntoIssueParam(releaseComparison: ReleaseComparison): any {
+        const res = {
+            sourceReleases: [],
+            destReleases: []
+        };
+        releaseComparison.sourceReleases.forEach(r => {
+            res.sourceReleases.push(r.version.versionNumber);
+        });
+        releaseComparison.destReleases.forEach(r => {
+            res.destReleases.push(r.version.versionNumber);
+        });
+        return res;
+    }
 }

@@ -29,3 +29,8 @@
         <app-version-graph [releaseComparison]="versionCompare" [config]="versionGrahConfig" ></app-version-graph>
     </div>
 </div>
+<div class="row">
+    <div class="col-sm-12" *ngFor="let iri of issueItems">
+        <span>{{iri | json}}</span>
+    </div>
+</div>

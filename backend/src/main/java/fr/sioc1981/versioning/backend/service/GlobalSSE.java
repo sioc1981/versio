@@ -1,6 +1,5 @@
 package fr.sioc1981.versioning.backend.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

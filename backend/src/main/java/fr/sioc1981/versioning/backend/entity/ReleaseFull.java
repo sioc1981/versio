@@ -18,6 +18,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SqlResultSetMapping;
 
+import fr.sioc1981.versioning.backend.data.PlatformCount;
+import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
+
 /**
  * Entity implementation class for Entity: Patch
  *
@@ -144,14 +147,6 @@ public class ReleaseFull implements Serializable {
 	public void setRelease(Release release) {
 		this.release = release;
 	}
-
-//	public ReleaseFullPK getRelease() {
-//		return release;
-//	}
-//	
-//	public void setRelease(ReleaseFullPK release) {
-//		this.release = release;
-//	}
 
 	public Set<Issue> getIssues() {
 		return issues;

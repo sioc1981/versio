@@ -1,4 +1,4 @@
-package fr.sioc1981.versioning.backend.entity;
+package fr.sioc1981.versioning.backend.data;
 
 public class ReleaseFullSummary {
 
@@ -91,4 +91,13 @@ public class ReleaseFullSummary {
 		this.production = production;
 	}
 
+	@Override
+	public String toString() {
+		return String.format(
+				"ReleaseFullSummary [id=%s, versionNumber=%s, patchCount=%s, packagedPatches=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
+				id, versionNumber, patchCount, packagedPatches, qualification, keyUser, pilot, production);
+	}
+
+	
+	
 }

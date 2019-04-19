@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,10 +30,11 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.sioc1981.versioning.backend.entity.PlatformCount;
+import fr.sioc1981.versioning.backend.data.PlatformCount;
+import fr.sioc1981.versioning.backend.data.ReleaseComparison;
+import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 import fr.sioc1981.versioning.backend.entity.Release;
 import fr.sioc1981.versioning.backend.entity.ReleaseFull;
-import fr.sioc1981.versioning.backend.entity.ReleaseFullSummary;
 import fr.sioc1981.versioning.backend.entity.Version;
 
 @Path(ReleaseService.RELEASE_PATH)
@@ -174,10 +174,10 @@ public class ReleaseService {
 		Version v2 = new Version(dest);
 
 		final Version baseVersion = new Version(findVersionBase(v1, v2));
-		Map<String, List<Release>> result = new HashMap<>();
-		result.put("sourceReleases", findAllBetween(baseVersion, v1));
-		result.put("destReleases", findAllBetween(baseVersion, v2));
-		return Response.ok(result).build();
+		ReleaseComparison comparison = new ReleaseComparison();
+		comparison.setSourceReleases(findAllBetween(baseVersion, v1));
+		comparison.setDestReleases(findAllBetween(baseVersion, v2));
+		return Response.ok(comparison).build();
 	}
 
 	public List<Release> findAllBetween(Version baseVersion, Version v1) {
