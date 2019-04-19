@@ -186,7 +186,9 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
       */
     ngOnDestroy(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe);
-        this.itemIssuesSubscription.unsubscribe();
+        if (this.itemIssuesSubscription) {
+            this.itemIssuesSubscription.unsubscribe();
+        }
         this.itemIssuesSubscription = null;
 
     }
