@@ -1,20 +1,12 @@
-import { Injectable, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, Subscription } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { Issue } from './Issue';
 import { SseService } from '../../server-event/sse.service';
-import { APP_CONSTANT } from '../../app.constants';
-import { Summary } from 'src/app/shared/Summary';
-export const ISSUE_CONSTANT = {
-    backendUrl: APP_CONSTANT.backendUrlBase + '/issue',
-    httpOptions: APP_CONSTANT.httpOptions,
-    iconStyleClass: 'pficon pficon-security',
-    summary: new Summary(),
-    title: 'Issues',
-    url: '/issues'
-};
+import { ISSUE_CONSTANT } from './issue.constant';
+
 
 @Injectable({
     providedIn: 'root'

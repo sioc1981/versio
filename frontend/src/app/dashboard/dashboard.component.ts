@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { InfoStatusCardConfig, UtilizationDonutChartConfig } from 'patternfly-ng';
 import { RELEASE_CONSTANT } from '../release/shared/release.service';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { of, Subscription } from 'rxjs';
 import { ReleaseSummary } from '../release/shared/ReleaseSummary';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe);
     }
-    
+
     private getIssueCardConfig(): InfoStatusCardConfig {
         return {
             showTopBorder: true,

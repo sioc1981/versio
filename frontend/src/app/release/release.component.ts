@@ -8,10 +8,10 @@ import {
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { ReleaseFull } from './shared/ReleaseFull';
 import { Subscription } from 'rxjs';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 
 @Component({
     encapsulation: ViewEncapsulation.None,

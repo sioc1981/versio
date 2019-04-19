@@ -1,10 +1,10 @@
-import { Injectable, NgZone, OnDestroy } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { APP_CONSTANT } from '../app.constants';
 import { Summary } from '../shared/Summary';
 import { IssueResultItem } from '../release-compare/issue-result-item';
 import { ReleaseComparison } from '../release/shared/ReleaseComparison';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 
 @Injectable({
     providedIn: 'root'

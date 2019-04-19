@@ -123,11 +123,11 @@
                             <h4>Build</h4>
                             <div class="col-sm-4">
                                 <div><strong>Build Date</strong></div>
-                                <div>{{release.buildDate | date}}</div>
+                                <div *ngIf="release.buildDate">{{release.buildDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Package Date</strong></div>
-                                <div>{{release.packageDate | date}}</div>
+                                <div *ngIf="release.packageDate">{{release.packageDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -136,11 +136,11 @@
                             <h4>Qualification</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{release.qualification.deployDate | date}}</div>
+                                <div *ngIf="release.qualification.deployDate">{{release.qualification.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{release.qualification.validationDate | date}}</div>
+                                <div *ngIf="release.qualification.validationDate">{{release.qualification.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -149,11 +149,11 @@
                             <h4>Key User Qualification</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{release.keyuser.deployDate | date}}</div>
+                                <div *ngIf="release.keyuser.deployDate">{{release.keyuser.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{release.keyuser.validationDate | date}}</div>
+                                <div *ngIf="release.keyuser.validationDate">{{release.keyuser.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -162,11 +162,11 @@
                             <h4>Pilot</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{release.pilot.deployDate | date}}</div>
+                                <div *ngIf="release.pilot.deployDate">{{release.pilot.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{release.pilot.validationDate | date}}</div>
+                                <div *ngIf="release.pilot.validationDate">{{release.pilot.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -175,11 +175,11 @@
                             <h4>Production</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div>{{release.production.deployDate | date}}</div>
+                                <div *ngIf="release.production.deployDate">{{release.production.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div>{{release.production.validationDate | date}}</div>
+                                <div *ngIf="release.production.validationDate">{{release.production.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>

@@ -11,9 +11,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { VerticalNavigationItem } from 'patternfly-ng/navigation/vertical-navigation/vertical-navigation-item';
 import { VerticalNavigationComponent } from 'patternfly-ng';
 import { RELEASE_CONSTANT } from '../release/shared/release.service';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { Subscription } from 'rxjs';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 
 
 @Component({
