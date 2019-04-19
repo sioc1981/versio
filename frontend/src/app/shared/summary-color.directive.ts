@@ -6,8 +6,8 @@ import { PlatformSummary } from './PlatformSummary';
 })
 export class SummaryColorDirective implements OnInit {
     @Input('appSummaryColor') appSummaryColor: PlatformSummary;
-    @Input('appSummaryType') appSummaryType: string;
-    @Input('appSummaryPatch') appSummaryPatch: number = 0;
+    @Input() appSummaryType: string;
+    @Input() appSummaryPatch = 0;
 
     constructor(private renderer: Renderer2, private hostElement: ElementRef) {
     }

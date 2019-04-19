@@ -47,20 +47,20 @@
                                 </ng-template>
                             </pfng-list-expand-toggle>
                             <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
-                                <ng-template #keyuserTemplate  let-release="item.release">
+                                <ng-template #keyuserTemplate let-release="item.release">
                                     <span class="fas myApp myApp-cart-check" [appHistoryColor]="release.keyUser"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                             <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
-                                <ng-template #pilotTemplate>
-                                    <span class="fas myApp myApp-cash-register myApp-red"></span>
+                                <ng-template #pilotTemplate let-release="item.release">
+                                    <span class="fas myApp myApp-cash-register" [appHistoryColor]="release.pilot"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                             <pfng-list-expand-toggle [expandId]="'production'" [item]="item"
                                 [template]="productionTemplate">
-                                <ng-template #productionTemplate>
+                                <ng-template #productionTemplate let-release="item.release">
                                     <span class="fas myApp myApp-store"
-                                        [appHistoryColor]="item.release.production"></span>
+                                        [appHistoryColor]="release.production"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                         </div>
@@ -136,11 +136,11 @@
                             <h4>Qualification</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div *ngIf="release.qualification.deployDate">{{release.qualification.deployDate | date}}</div>
+                                <div *ngIf="release.qualification">{{release.qualification.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div *ngIf="release.qualification.validationDate">{{release.qualification.validationDate | date}}</div>
+                                <div *ngIf="release.qualification">{{release.qualification.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -149,11 +149,11 @@
                             <h4>Key User Qualification</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div *ngIf="release.keyuser.deployDate">{{release.keyuser.deployDate | date}}</div>
+                                <div *ngIf="release.keyuser">{{release.keyuser.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div *ngIf="release.keyuser.validationDate">{{release.keyuser.validationDate | date}}</div>
+                                <div *ngIf="release.keyuser">{{release.keyuser.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -162,11 +162,11 @@
                             <h4>Pilot</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div *ngIf="release.pilot.deployDate">{{release.pilot.deployDate | date}}</div>
+                                <div *ngIf="release.pilot">{{release.pilot.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div *ngIf="release.pilot.validationDate">{{release.pilot.validationDate | date}}</div>
+                                <div *ngIf="release.pilot">{{release.pilot.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -175,11 +175,11 @@
                             <h4>Production</h4>
                             <div class="col-sm-4">
                                 <div><strong>Deploy Date</strong></div>
-                                <div *ngIf="release.production.deployDate">{{release.production.deployDate | date}}</div>
+                                <div *ngIf="release.production">{{release.production.deployDate | date}}</div>
                             </div>
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
-                                <div *ngIf="release.production.validationDate">{{release.production.validationDate | date}}</div>
+                                <div *ngIf="release.production">{{release.production.validationDate | date}}</div>
                             </div>
                         </div>
                     </div>

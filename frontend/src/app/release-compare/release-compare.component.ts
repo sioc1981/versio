@@ -78,7 +78,6 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         this.route.paramMap.subscribe(params => {
             this.fromVersion = params.get('fromVersion');
             this.toVersion = params.get('toVersion');
-            this.generateTableConfig();
             if (params.has('fromVersion') && params.has('fromVersion')) {
                 this.startCompare();
             }
@@ -237,6 +236,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         this.toolbarConfig.filterConfig.totalCount = 0;
         this.subscriptions.push(this.releaseService.compare(this.fromVersion, this.toVersion).subscribe(res => {
             this.versionCompare = res;
+            this.generateTableConfig();
             this.filterConfig.fields[1].queries = this.generateFilterQueries(this.versionCompare ? this.versionCompare.sourceReleases : []);
             this.filterConfig.fields[2].queries = this.generateFilterQueries(this.versionCompare ? this.versionCompare.destReleases : []);
             if (this.itemIssuesSubscription) {

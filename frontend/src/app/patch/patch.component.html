@@ -77,11 +77,11 @@
                         <h4>Qualification</h4>
                         <div class="col-sm-4">
                             <div><strong>Deploy Date</strong></div>
-                            <div>{{item.qualification.deployDate | date}}</div>
+                            <div *ngIf="item.qualification">{{item.qualification.deployDate | date}}</div>
                         </div>
                         <div class="col-sm-4">
                             <div><strong>Validation Date</strong></div>
-                            <div>{{item.qualification.validationDate | date}}</div>
+                            <div *ngIf="item.qualification">{{item.qualification.validationDate | date}}</div>
                         </div>
                     </div>
                 </div>
@@ -90,11 +90,11 @@
                         <h4>Key User Qualification</h4>
                         <div class="col-sm-4">
                             <div><strong>Deploy Date</strong></div>
-                            <div>{{item.keyUser.deployDate | date}}</div>
+                            <div *ngIf="item.keyUser">{{item.keyUser.deployDate | date}}</div>
                         </div>
                         <div class="col-sm-4">
                             <div><strong>Validation Date</strong></div>
-                            <div>{{item.keyUser.validationDate | date}}</div>
+                            <div *ngIf="item.keyUser">{{item.keyUser.validationDate | date}}</div>
                         </div>
                     </div>
                 </div>
@@ -103,11 +103,11 @@
                         <h4>Pilot</h4>
                         <div class="col-sm-4">
                             <div><strong>Deploy Date</strong></div>
-                            <div>{{item.pilot.deployDate | date}}</div>
+                            <div *ngIf="item.pilot">{{item.pilot.deployDate | date}}</div>
                         </div>
                         <div class="col-sm-4">
                             <div><strong>Validation Date</strong></div>
-                            <div>{{item.pilot.validationDate | date}}</div>
+                            <div *ngIf="item.pilot">{{item.pilot.validationDate | date}}</div>
                         </div>
                     </div>
                 </div>
@@ -116,11 +116,11 @@
                         <h4>Production</h4>
                         <div class="col-sm-4">
                             <div><strong>Deploy Date</strong></div>
-                            <div>{{item.production.deployDate | date}}</div>
+                            <div *ngIf="item.production">{{item.production.deployDate | date}}</div>
                         </div>
                         <div class="col-sm-4">
                             <div><strong>Validation Date</strong></div>
-                            <div>{{item.production.validationDate | date}}</div>
+                            <div *ngIf="item.production">{{item.production.validationDate | date}}</div>
                         </div>
                     </div>
                 </div>
