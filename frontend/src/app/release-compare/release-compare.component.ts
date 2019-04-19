@@ -29,8 +29,8 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
 
     releases: Release[] = [];
     versionCompare: ReleaseComparison;
-    fromVersion: string;
-    toVersion: string;
+    fromVersion = 'From Version';
+    toVersion = 'To Version';
     private subscriptions: Subscription[] = [];
     private itemIssuesSubscription: Subscription;
 
@@ -73,8 +73,20 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
     ngOnInit() {
         this.getReleases();
 
+        this.generateTableConfig();
 
-        this.columns = [{
+        this.route.paramMap.subscribe(params => {
+            this.fromVersion = params.get('fromVersion');
+            this.toVersion = params.get('toVersion');
+            this.generateTableConfig();
+            if (params.has('fromVersion') && params.has('fromVersion')) {
+                this.startCompare();
+            }
+        });
+    }
+
+    generateTableConfig() {
+                this.columns = [{
             cellTemplate: this.issueTemplate,
             draggable: false,
             prop: 'issue',
@@ -85,14 +97,14 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
             cellTemplate: this.sourcesTemplate,
             draggable: false,
             prop: 'sourceReleases',
-            name: 'From Version',
+            name: 'From ' + this.fromVersion,
             resizeable: true,
             sortable: false // using sort menu
         }, {
             cellTemplate: this.destTemplate,
             draggable: false,
             prop: 'destReleases',
-            name: 'To Version',
+            name: 'To ' + this.toVersion,
             resizeable: true,
             sortable: false // using sort menu
         }];
@@ -117,16 +129,29 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 type: FilterType.TEXT
             }, {
                 id: 'sourceRelease',
-                title: 'From Release',
-                placeholder: 'Filter by From Releases...',
+                title: 'From ' + this.fromVersion,
+                placeholder: 'Filter by ' + this.fromVersion + '...',
                 type: FilterType.SELECT,
                 queries: this.generateFilterQueries(this.versionCompare ? this.versionCompare.sourceReleases : [])
             }, {
                 id: 'destRelease',
-                title: 'To Release',
-                placeholder: 'Filter by To Releases...',
+                title: 'To ' + this.toVersion,
+                placeholder: 'Filter by version ' + this.toVersion + '...',
                 type: FilterType.SELECT,
                 queries: this.generateFilterQueries(this.versionCompare ? this.versionCompare.destReleases : [])
+            }, {
+                id: 'missingRelease',
+                title: 'Only in',
+                placeholder: 'Filter if exists only in...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'sourceReleases',
+                    value: this.fromVersion
+                }, {
+                    id: 'destReleases',
+                    value: this.toVersion
+                }
+                ]
             }] as FilterField[],
             appliedFilters: [],
             resultsCount: this.rows.length,
@@ -141,11 +166,11 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 sortType: 'alpha'
             }, {
                 id: 'sourceRelease',
-                title: 'From Release',
+                title: 'From ' + this.fromVersion,
                 sortType: 'alpha'
             }, {
                 id: 'destRelease',
-                title: 'To Release',
+                title: 'To ' + this.toVersion,
                 sortType: 'alpha'
             }],
             isAscending: this.isAscendingSort
@@ -168,14 +193,6 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
             showCheckbox: false,
             toolbarConfig: this.toolbarConfig
         } as TableConfig;
-
-        this.route.paramMap.subscribe(params => {
-            this.fromVersion = params.get('fromVersion');
-            this.toVersion = params.get('toVersion');
-            if (params.has('fromVersion') && params.has('fromVersion')) {
-                this.startCompare();
-            }
-        });
     }
 
     ngAfterViewInit(): void {
@@ -291,15 +308,22 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
 
     matchesFilter(item: any, filter: Filter): boolean {
         let match = true;
-        console.log(item);
         const re = new RegExp(filter.value, 'i');
         if (filter.field.id === 'issue') {
             match = item.issue.reference.indexOf(filter.value) !== -1
                     || item.issue.description.indexOf(filter.value) !== -1;
         } else if (filter.field.id === 'sourceRelease') {
-            match = item.sourceReleases && item.sourceReleases.findIndex(r => r.version.versionNumber === filter.query.value) !== -1;
+            match = item.sourceReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1;
         } else if (filter.field.id === 'destRelease') {
-            match = item.destReleases && item.destReleases.findIndex(r => r.version.versionNumber === filter.query.value) !== -1;
+            match = item.destReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1;
+        } else if (filter.field.id === 'missingRelease') {
+            console.log('missingRelease: ' + filter.query.id);
+            if (filter.query.id === 'sourceReleases' ) {
+                match = item.destReleases.length === 0;
+            }
+            if (filter.query.id === 'destReleases' ) {
+                match = item.sourceReleases.length === 0;
+            }
         }
         return match;
     }
