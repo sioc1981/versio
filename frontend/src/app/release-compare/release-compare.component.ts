@@ -59,7 +59,6 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
     emptyStateConfig: EmptyStateConfig;
     filterConfig: FilterConfig;
     filteredRows: any[] = [];
-    filtersText = '';
     isAscendingSort = true;
     paginationConfig: PaginationConfig;
     rows: any[];
@@ -254,24 +253,26 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
             });
             if (sourceRelease) {
                 current.sourceReleases.push(sourceRelease);
+                current.sourceReleases = current.sourceReleases.sort(this.sortVersionNumber);
             }
             const destRelease = this.versionCompare.destReleases.find(value =>
                 value.version.versionNumber === iri.releaseVersion);
             if (destRelease) {
                 current.destReleases.push(destRelease);
+                current.destReleases = current.destReleases.sort(this.sortVersionNumber);
             }
-            this.toolbarConfig.filterConfig.totalCount = this.issueItems.length;
+            //this.toolbarConfig.filterConfig.totalCount = this.issueItems.length;
             this.updateRows(false);
         };
     }
 
     // Filter
 
-    applyFilters(filters: Filter[]): void {
+    applyFilters(): void {
         this.filteredRows = [];
-        if (filters && filters.length > 0) {
+        if (this.filterConfig.appliedFilters && this.filterConfig.appliedFilters.length > 0) {
             this.issueItems.forEach((item) => {
-                if (this.matchesFilters(item, filters)) {
+                if (this.matchesFilters(item, this.filterConfig.appliedFilters)) {
                     this.filteredRows.push(item);
                 }
             });
@@ -283,37 +284,42 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
 
     // Handle filter changes
     filterChanged($event: FilterEvent): void {
-        this.filtersText = '';
-        $event.appliedFilters.forEach((filter) => {
-            this.filtersText += filter.field.title + ' : ' + filter.value + '\n';
-        });
-        this.applyFilters($event.appliedFilters);
+        this.applyFilters();
     }
 
     matchesFilter(item: any, filter: Filter): boolean {
         let match = true;
+        console.log(item);
         const re = new RegExp(filter.value, 'i');
-        if (filter.field.id === 'name') {
-            match = item.name.match(re) !== null;
-        } else if (filter.field.id === 'address') {
-            match = item.address.match(re) !== null;
-        } else if (filter.field.id === 'birthMonth') {
-            match = item.birthMonth === filter.value;
-        } else if (filter.field.id === 'weekDay') {
-            match = item.weekDay === filter.value;
+        if (filter.field.id === 'issue') {
+            match = item.issue.reference.indexOf(filter.value) !== -1
+                    || item.issue.description.indexOf(filter.value) !== -1;
+        } else if (filter.field.id === 'sourceRelease') {
+            match = item.sourceReleases && item.sourceReleases.findIndex(r => r.version.versionNumber === filter.query.value) !== -1;
+        } else if (filter.field.id === 'destRelease') {
+            match = item.destReleases && item.destReleases.findIndex(r => r.version.versionNumber === filter.query.value) !== -1;
         }
         return match;
     }
 
     matchesFilters(item: any, filters: Filter[]): boolean {
+        if (filters.length === 0) {
+            return true;
+        }
         let matches = true;
+        let allMatches = new Map<string, boolean>();
         filters.forEach((filter) => {
-            if (!this.matchesFilter(item, filter)) {
-                matches = false;
-                return matches;
+            if (allMatches.has(filter.field.id)) {
+                allMatches = allMatches.set(filter.field.id, allMatches.get(filter.field.id) || this.matchesFilter(item, filter));
+            } else {
+                allMatches = allMatches.set(filter.field.id, this.matchesFilter(item, filter));
             }
         });
+        allMatches.forEach(value => {
+            matches = matches && value;
+        });
         return matches;
+
     }
 
     // Drag and drop
@@ -335,9 +341,32 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         if (this.currentSortField.id === 'issue') {
             compValue = item1.issue.reference.localeCompare(item2.issue.reference);
         } else if (this.currentSortField.id === 'sourceRelease') {
-            //compValue = item1.address.localeCompare(item2.address);
+            if (item1.sourceReleases.length > 0) {
+                if (item2.sourceReleases.length > 0) {
+                    compValue = item1.sourceReleases[item1.sourceReleases.length - 1].version.versionNumber
+                        .localeCompare(item2.sourceReleases[item2.sourceReleases.length - 1].version.versionNumber);
+                } else {
+                    compValue = 1;
+                }
+            } else if (item2.sourceReleases.length > 0) {
+                compValue = -1;
+            }
+        } else if (this.currentSortField.id === 'destRelease') {
+            if (item1.destReleases.length > 0) {
+                if (item2.destReleases.length > 0) {
+                    compValue = item1.destReleases[item1.destReleases.length - 1].version.versionNumber
+                        .localeCompare(item2.destReleases[item2.destReleases.length - 1].version.versionNumber);
+                 } else {
+                    compValue = 1;
+                }
+            } else if (item2.destReleases.length > 0) {
+                compValue = -1;
+            }
         }
-        compValue = item1.issue.reference.localeCompare(item2.issue.reference);
+
+        if (compValue === 0) {
+            compValue = item1.issue.reference.localeCompare(item2.issue.reference);
+        }
         if (!this.isAscendingSort) {
             compValue = compValue * -1;
         }
@@ -349,7 +378,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         this.currentSortField = $event.field;
         this.isAscendingSort = $event.isAscending;
         this.issueItems.sort((item1: any, item2: any) => this.compare(item1, item2));
-        this.applyFilters(this.filterConfig.appliedFilters || []);
+        this.applyFilters();
     }
 
     // Selection

@@ -145,7 +145,6 @@ export class PatchComponent implements OnInit, OnDestroy {
             match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
         }
         if (filter.field.id === 'issue') {
-            match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
             let issueMatch = false;
             item.issues.forEach(issue => {
                 issueMatch = issue.reference.indexOf(filter.value) !== -1
