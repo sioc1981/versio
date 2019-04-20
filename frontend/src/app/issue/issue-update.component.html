@@ -27,31 +27,35 @@
                 <label class="col-sm-4 control-label required-pf" for="container">Issue container</label>
                 <div class="col-sm-8">
                     <div class="col-sm-6">
-                        <input class="col-sm-2" type="radio" id="container" name="container" value="MANTIS" [(ngModel)]="data.container">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="MANTIS"
+                            [(ngModel)]="data.container">
                         <label class="col-sm-10" for="MANTIS">Mantis</label>
                         <img src="/src/assets/images/mantis_logo.png" class="col-sm-6" />
                     </div>
                     <div class="col-sm-6">
-                        <input class="col-sm-2" type="radio" id="container" name="container" value="JIRA" [(ngModel)]="data.container">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="JIRA"
+                            [(ngModel)]="data.container">
                         <label class="col-sm-10" for="JIRA">Jira</label>
                         <img src="/src/assets/images/jira.svg" class="col-sm-6" />
                     </div>
                 </div>
             </div>
+
         </form>
     </pfng-wizard-step>
     <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
         <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
             <div class="spinner spinner-lg blank-slate-pf-icon"></div>
-            <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
+            <h3 class="blank-slate-pf-main-action">Update in progress</h3>
         </div>
         <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
             <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
-            <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
+            <h3 class="blank-slate-pf-main-action">Update was successful</h3>
         </div>
         <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
             <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
-            <h3 class="blank-slate-pf-main-action">Creation failed</h3>
-        </div>
+            <h3 class="blank-slate-pf-main-action">Update failed</h3>
+        </div>s
     </pfng-wizard-step>
 </pfng-wizard>
+s

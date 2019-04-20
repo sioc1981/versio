@@ -33,6 +33,7 @@ import { ReleaseCardComponent } from './dashboard/release-card/release-card.comp
 import { SummaryColorDirective } from './shared/summary-color.directive';
 import { ReleaseCompareComponent } from './release-compare/release-compare.component';
 import { VersionGraphComponent } from './release-compare/version-graph.component';
+import { IssueUpdateComponent } from './issue/issue-update.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { VersionGraphComponent } from './release-compare/version-graph.component
     SummaryColorDirective,
     ReleaseCardComponent,
     ReleaseCompareComponent,
-    VersionGraphComponent
+    VersionGraphComponent,
+    IssueUpdateComponent
   ],
   imports: [
     AboutModalModule,

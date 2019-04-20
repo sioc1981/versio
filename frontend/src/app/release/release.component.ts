@@ -49,7 +49,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.getReleases();
-                this.filterConfig = {
+        this.filterConfig = {
             fields: [{
                 id: 'version',
                 title: 'Version',
@@ -142,12 +142,17 @@ export class ReleaseComponent implements OnInit, OnDestroy {
         if (filters.length === 0) {
             return true;
         }
-        let matches = false;
+        let matches = true;
+        let allMatches = new Map<string, boolean>();
         filters.forEach((filter) => {
-            if (this.matchesFilter(item, filter)) {
-                matches = true;
-                return matches;
+            if (allMatches.has(filter.field.id)) {
+                allMatches = allMatches.set(filter.field.id, allMatches.get(filter.field.id) || this.matchesFilter(item, filter));
+            } else {
+                allMatches = allMatches.set(filter.field.id, this.matchesFilter(item, filter));
             }
+        });
+        allMatches.forEach(value => {
+            matches = matches && value;
         });
         return matches;
     }

@@ -1,25 +1,17 @@
-import {
-    Component,
-    Host,
-    OnInit,
-    ViewChild,
-    ViewEncapsulation,
-    OnDestroy
-} from '@angular/core';
-
+import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
+import { WizardComponent, WizardStepConfig, WizardConfig, WizardStepComponent, WizardStep, WizardEvent } from 'patternfly-ng';
 import { IssueComponent } from './issue.component';
-import { WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
-import { Issue } from './shared/Issue';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
+import { Issue } from './shared/Issue';
+import { cloneDeep } from 'lodash';
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-    selector: 'app-issue-create',
-    templateUrl: './issue-create.component.html',
-    styleUrls: ['./issue-create.component.less']
+    selector: 'app-issue-update',
+    templateUrl: './issue-update.component.html',
+    styleUrls: ['./issue-update.component.less']
 })
-export class IssueCreateComponent implements OnInit, OnDestroy {
+export class IssueUpdateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
 
     data: any = {};
@@ -36,6 +28,7 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
     wizardConfig: WizardConfig;
     issueComponent: IssueComponent;
 
+
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, @Host() issueComponent: IssueComponent) {
@@ -43,23 +36,24 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.data = cloneDeep(this.issueComponent.selectedIssue);
         // Step 1
         this.step1Config = {
             id: 'step1',
             priority: 0,
-            title: 'Add new issue'
+            title: 'Edit issue'
         } as WizardStepConfig;
 
         // Step 3
         this.step3Config = {
             id: 'step3',
             priority: 1,
-            title: 'create'
+            title: 'Update'
         } as WizardStepConfig;
 
         // Wizard
         this.wizardConfig = {
-            //   title: 'Wizard Title',
+            title: 'Edit issue ' + this.issueComponent.selectedIssue.reference,
             //   sidebarStyleClass: 'example-wizard-sidebar',
             //   stepStyleClass: 'example-wizard-step'
         } as WizardConfig;
@@ -86,12 +80,7 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
         this.deployComplete = false;
         this.wizardConfig.done = true;
 
-        // // Simulate a delay
-        // setTimeout(() => {
-        //   this.deployComplete = true;
-        // }, 2500);
-        console.log('Saving ' + JSON.stringify(this.data));
-        this.subscriptions.push(this.issueService.addIssue(this.data as Issue)
+        this.subscriptions.push(this.issueService.updateIssue(this.data as Issue)
             .subscribe(_ => {
                 this.issueComponent.getIssues();
                 this.deployComplete = true;

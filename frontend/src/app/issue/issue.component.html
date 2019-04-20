@@ -3,7 +3,9 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="form-group">
-            <button (click)="openModal(createIssue)" class="btn btn-default">Add new Issue</button>
+            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)"
+                (onFilterChange)="filterChanged($event)">
+            </pfng-toolbar>
             <ng-template #createIssue>
                 <app-issue-create></app-issue-create>
             </ng-template>
@@ -14,9 +16,13 @@
 
 <div class="col-sm-12">
     <div class="form-group">
-        <pfng-list id="myList" [items]="issues" [itemTemplate]="itemTemplate">
+        <pfng-list id="myList" [items]="items" [itemTemplate]="itemTemplate" [actionTemplate]="actionTemplate">
             <ng-template #itemTemplate let-item="item" let-index="index">
-                <div class="list-pf-content-wrapper">
+           <div class="list-pf-left" [ngSwitch]="item.container">
+              <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'MANTIS'"/>
+              <img src="/src/assets/images/jira.svg" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'JIRA'"/>
+            </div>
+                 <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">
                         <div class="list-pf-title">{{item.reference}}</div>
                         <div class="list-pf-description">{{item.globalReference}}</div>
@@ -28,6 +34,17 @@
                     </div>
                 </div>
             </ng-template>
+            <ng-template #actionTemplate let-item="item" let-index="index">
+                <pfng-action class="list-pf-actions" [config]="issueActionConfig"
+                    (onActionSelect)="handleAction($event, item)">
+                </pfng-action>
+            </ng-template>
         </pfng-list>
+            <ng-template #updateIssue>
+                <app-issue-update></app-issue-update>
+            </ng-template>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+        
     </div>
 </div>

@@ -171,7 +171,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
         // Wizard
         this.wizardConfig = {
-            title: 'Wizard Title',
+            title: 'Edit Release : ' + this.release.release.version.versionNumber,
             sidebarStyleClass: 'example-wizard-sidebar',
             stepStyleClass: 'example-wizard-step'
         } as WizardConfig;

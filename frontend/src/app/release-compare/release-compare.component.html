@@ -54,7 +54,11 @@
         </pfng-table>
         <!-- Column templates -->
         <ng-template #issueTemplate let-row="row">
-          <span>{{row.issue.reference}} - {{row.issue.description}}</span>
+           <div class="list-pf-left" [ngSwitch]="row.issue.container">
+              <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small" *ngSwitchCase="'MANTIS'"/>
+              <img src="/src/assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'"/>
+              <span>{{row.issue.reference}} - {{row.issue.description}}</span>
+            </div>
         </ng-template>
         <ng-template #sourcesTemplate let-row="row">
           <span *ngFor="let src of row.sourceReleases">{{src.version.versionNumber}}</span>

@@ -175,7 +175,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
         // Wizard
         this.wizardConfig = {
-            title: 'Wizard Title : ' + this.patch.sequenceNumber,
+            title: 'Edit patch : ' + this.patch.sequenceNumber + ' / ' + this.patch.release.version.versionNumber,
             sidebarStyleClass: 'example-wizard-sidebar',
             stepStyleClass: 'example-wizard-step'
         } as WizardConfig;
