@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Release } from '../release/shared/Release';
 import { ReleaseService } from '../release/shared/release.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReleaseComparison } from '../release/shared/ReleaseComparison';
 import { Subscription } from 'rxjs';
 import { VersionGraphConfig } from './version-graph-config';
@@ -68,7 +68,8 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
     tableConfig: TableConfig;
     toolbarConfig: ToolbarConfig;
 
-    constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private sseService: SseService) { }
+    constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private router: Router,
+        private sseService: SseService) { }
 
     ngOnInit() {
         this.getReleases();
@@ -228,6 +229,10 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         return bVersion.localeCompare(aVersion);
     }
 
+    submit() {
+        this.router.navigate(['/compare', { fromVersion: this.fromVersion, toVersion: this.toVersion }]);
+    }
+
     startCompare(): void {
         this.issueItems.splice(0, this.issueItems.length);
         this.filteredRows.splice(0, this.issueItems.length);
@@ -280,7 +285,6 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 current.destReleases.push(destRelease);
                 current.destReleases = current.destReleases.sort(this.sortVersionNumber);
             }
-            //this.toolbarConfig.filterConfig.totalCount = this.issueItems.length;
             this.updateRows(false);
         };
     }

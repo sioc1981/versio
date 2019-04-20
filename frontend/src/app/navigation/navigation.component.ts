@@ -6,14 +6,15 @@ import {
     ViewChild,
     OnDestroy
 } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterEvent } from '@angular/router';
 
 import { VerticalNavigationItem } from 'patternfly-ng/navigation/vertical-navigation/vertical-navigation-item';
 import { VerticalNavigationComponent } from 'patternfly-ng';
 import { RELEASE_CONSTANT } from '../release/shared/release.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { map, filter } from 'rxjs/operators';
 
 
 @Component({
@@ -51,15 +52,28 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private chRef: ChangeDetectorRef, private router: Router, private activatedRoute: ActivatedRoute) {
+    url = '';
+
+    constructor(private router: Router, private route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
-        //   VERSION_CONSTANT.summary.count$.subscribe(c => this.navigationItems[1].badges[0].count = c);
+
+        this.subscriptions.push(this.router.events.pipe(
+            filter(e => e instanceof RouterEvent)
+        ).subscribe((e: RouterEvent) => {
+            this.url = e.url;
+            // to keep parameter when click on compare menu
+            if (this.url.startsWith('/compare')) {
+                this.navigationItems[4].url = e.url;
+            } else {
+                this.navigationItems[4].url = '/compare';
+            }
+        }));
         this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(c => this.navigationItems[1].badges[0].count = c));
         this.subscriptions.push(ISSUE_CONSTANT.summary.count$.subscribe(c => this.navigationItems[3].badges[0].count = c));
         this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(c => this.navigationItems[2].badges[0].count = c));
-        this.refreshItems();
+        this.navigationItems = this.getItems();
     }
 
     /**
@@ -67,12 +81,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
       */
     ngOnDestroy(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe);
-    }
-
-
-
-    refreshItems(): void {
-        this.navigationItems = this.getItems();
     }
 
     getItems(): VerticalNavigationItem[] {
@@ -118,7 +126,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
             {
                 title: 'Compare',
                 iconStyleClass: 'fa fa-columns',
-                url: '/compare',
+                url: '/compare'
             }
         ];
     }
