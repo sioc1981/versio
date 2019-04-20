@@ -1,0 +1,56 @@
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="issueComponent.closeModal($event)"
+    (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
+    <pfng-wizard-step [config]="step1Config">
+        <form class="form-horizontal">
+            <div class="form-group required">
+                <label class="col-sm-4 control-label required-pf" for="container">Issue container</label>
+                <div class="col-sm-8">
+                    <div class="col-sm-6">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="JSON"
+                            [(ngModel)]="fileFormat">
+                        <label class="col-sm-10" for="JSON">JSON</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="CSV"
+                            [(ngModel)]="fileFormat">
+                        <label class="col-sm-10" for="CSV">CSV</label>
+                    </div>
+                </div>
+            </div>
+            <div [ngSwitch]="fileFormat">
+                <div *ngSwitchCase="'JSON'">
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/issue/help/json-format.md'"></markdown>
+                    </div>
+                    <div class="col-sm-6">
+                         <markdown [src]="'src/app/issue/help/json-example.md'"></markdown>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'CSV'">
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/issue/help/csv-format.md'"></markdown>
+                    </div>
+                    <div class="col-sm-6">
+                         <markdown [src]="'src/app/issue/help/csv-example.md'"></markdown>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
+        <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+            <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+            <h3 class="blank-slate-pf-main-action">Update in progress</h3>
+        </div>
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
+            <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
+            <h3 class="blank-slate-pf-main-action">Update was successful</h3>
+        </div>
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+            <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+            <h3 class="blank-slate-pf-main-action">Update failed</h3>
+        </div>s
+    </pfng-wizard-step>
+</pfng-wizard>

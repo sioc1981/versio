@@ -19,6 +19,7 @@ import { Subscription } from 'rxjs';
 export class IssueComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createIssue') createIssueTemplate: TemplateRef<any>;
+    @ViewChild('importIssue') importIssueTemplate: TemplateRef<any>;
     @ViewChild('updateIssue') updateIssueTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
@@ -78,6 +79,10 @@ export class IssueComponent implements OnInit, OnDestroy {
                 id: 'addIssue',
                 title: 'Add new issue',
                 tooltip: 'Add a new issue'
+            }, {
+                id: 'importIssues',
+                title: 'Import issues',
+                tooltip: 'Import new issues'
             }]
         } as ActionConfig;
 
@@ -181,6 +186,8 @@ export class IssueComponent implements OnInit, OnDestroy {
         } else if (action.id === 'editIssue') {
             this.selectedIssue = item;
             this.openModal(this.updateIssueTemplate);
+        } else if (action.id === 'importIssues') {
+            this.openModal(this.importIssueTemplate);
         } else {
             console.log('handleAction: unknown action: ' + action.id);
         }

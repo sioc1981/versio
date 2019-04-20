@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 // NGX Bootstrap
@@ -8,6 +8,8 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { NgxUploadModule } from '@wkoza/ngx-upload';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
      ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule,
@@ -34,6 +36,7 @@ import { SummaryColorDirective } from './shared/summary-color.directive';
 import { ReleaseCompareComponent } from './release-compare/release-compare.component';
 import { VersionGraphComponent } from './release-compare/version-graph.component';
 import { IssueUpdateComponent } from './issue/issue-update.component';
+import { IssueImportComponent } from './issue/issue-import.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +57,8 @@ import { IssueUpdateComponent } from './issue/issue-update.component';
     ReleaseCardComponent,
     ReleaseCompareComponent,
     VersionGraphComponent,
-    IssueUpdateComponent
+    IssueUpdateComponent,
+    IssueImportComponent,
   ],
   imports: [
     AboutModalModule,
@@ -70,8 +74,10 @@ import { IssueUpdateComponent } from './issue/issue-update.component';
     HttpClientModule,
     InfoStatusCardModule,
     ListModule,
+    MarkdownModule.forRoot({ loader: HttpClient }),
     ModalModule.forRoot(),
     NgxDatatableModule,
+    NgxUploadModule.forRoot(),
     PaginationModule,
     TableModule,
     ToastNotificationListModule,
