@@ -11,9 +11,11 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxUploadModule } from '@wkoza/ngx-upload';
 import { MarkdownModule } from 'ngx-markdown';
 
-import { AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
-     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule,
-     PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule, EmptyStateModule } from 'patternfly-ng';
+import {
+    AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
+    ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule,
+    PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule, EmptyStateModule
+} from 'patternfly-ng';
 
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -37,57 +39,58 @@ import { ReleaseCompareComponent } from './release-compare/release-compare.compo
 import { VersionGraphComponent } from './release-compare/version-graph.component';
 import { IssueUpdateComponent } from './issue/issue-update.component';
 import { IssueImportComponent } from './issue/issue-import.component';
+import { ngxloggerOptions, ngxDropTargetOptions, LoggerOptions } from '@wkoza/ngx-upload/utils/configuration.model';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    IssueComponent,
-    IssueCreateComponent,
-    PatchComponent,
-    PatchCreateComponent,
-    PatchUpdateComponent,
-    ReleaseComponent,
-    ReleaseCreateComponent,
-    ReleaseUpdateComponent,
-    NavigationComponent,
-    DashboardComponent,
-    ServerEventComponent,
-    HistoryColorDirective,
-    SummaryColorDirective,
-    ReleaseCardComponent,
-    ReleaseCompareComponent,
-    VersionGraphComponent,
-    IssueUpdateComponent,
-    IssueImportComponent,
-  ],
-  imports: [
-    AboutModalModule,
-    ActionModule,
-    AppRoutingModule,
-    BsDatepickerModule.forRoot(),
-    BsDropdownModule.forRoot(),
-    BrowserModule,
-    CardModule,
-    DonutChartModule,
-    EmptyStateModule,
-    FormsModule,
-    HttpClientModule,
-    InfoStatusCardModule,
-    ListModule,
-    MarkdownModule.forRoot({ loader: HttpClient }),
-    ModalModule.forRoot(),
-    NgxDatatableModule,
-    NgxUploadModule.forRoot(),
-    PaginationModule,
-    TableModule,
-    ToastNotificationListModule,
-    ToolbarModule,
-    TypeaheadModule.forRoot(),
-    VerticalNavigationModule,
-    UtilizationDonutChartModule,
-    WizardModule
-  ],
-  providers: [BsDropdownConfig, NotificationService, SseService],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        IssueComponent,
+        IssueCreateComponent,
+        PatchComponent,
+        PatchCreateComponent,
+        PatchUpdateComponent,
+        ReleaseComponent,
+        ReleaseCreateComponent,
+        ReleaseUpdateComponent,
+        NavigationComponent,
+        DashboardComponent,
+        ServerEventComponent,
+        HistoryColorDirective,
+        SummaryColorDirective,
+        ReleaseCardComponent,
+        ReleaseCompareComponent,
+        VersionGraphComponent,
+        IssueUpdateComponent,
+        IssueImportComponent,
+    ],
+    imports: [
+        AboutModalModule,
+        ActionModule,
+        AppRoutingModule,
+        BsDatepickerModule.forRoot(),
+        BsDropdownModule.forRoot(),
+        BrowserModule,
+        CardModule,
+        DonutChartModule,
+        EmptyStateModule,
+        FormsModule,
+        HttpClientModule,
+        InfoStatusCardModule,
+        ListModule,
+        MarkdownModule.forRoot({ loader: HttpClient }),
+        ModalModule.forRoot(),
+        NgxDatatableModule,
+        NgxUploadModule.forRoot(),
+        PaginationModule,
+        TableModule,
+        ToastNotificationListModule,
+        ToolbarModule,
+        TypeaheadModule.forRoot(),
+        VerticalNavigationModule,
+        UtilizationDonutChartModule,
+        WizardModule
+    ],
+    providers: [BsDropdownConfig, NotificationService, SseService],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

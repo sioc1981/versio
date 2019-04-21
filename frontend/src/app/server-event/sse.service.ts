@@ -32,7 +32,6 @@ export class SseService {
         });
         this.es = new EventSource(APP_CONSTANT.backendUrlBase + '/subscribe');
         this.es.onmessage = (evt) => {
-            console.log('sse received: ', evt.data);
             const data: any = JSON.parse(evt.data);
             this.subscribers.forEach(obs => obs.next(data));
         };

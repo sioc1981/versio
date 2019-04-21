@@ -19,11 +19,9 @@ export class IssueService {
     }
 
     private sseCallback(data: any): void {
-        console.log('issue sse callback: ' + data);
         if (data['count'] !== undefined) {
             const count = Number(data['count']);
             ISSUE_CONSTANT.summary.count$.emit(count);
-
         }
     }
 

@@ -3,16 +3,16 @@
     <pfng-wizard-step [config]="step1Config">
         <form class="form-horizontal">
             <div class="form-group required">
-                <label class="col-sm-4 control-label required-pf" for="container">Issue container</label>
+                <label class="col-sm-4 control-label required-pf" for="container">Format</label>
                 <div class="col-sm-8">
                     <div class="col-sm-6">
                         <input class="col-sm-2" type="radio" id="container" name="container" value="JSON"
-                            [(ngModel)]="fileFormat">
+                            [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()">
                         <label class="col-sm-10" for="JSON">JSON</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="col-sm-2" type="radio" id="container" name="container" value="CSV"
-                            [(ngModel)]="fileFormat">
+                            [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()">
                         <label class="col-sm-10" for="CSV">CSV</label>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                         <markdown [src]="'src/app/issue/help/json-format.md'"></markdown>
                     </div>
                     <div class="col-sm-6">
-                         <markdown [src]="'src/app/issue/help/json-example.md'"></markdown>
+                        <markdown [src]="'src/app/issue/help/json-example.md'"></markdown>
                     </div>
                 </div>
                 <div *ngSwitchCase="'CSV'">
@@ -31,12 +31,79 @@
                         <markdown [src]="'src/app/issue/help/csv-format.md'"></markdown>
                     </div>
                     <div class="col-sm-6">
-                         <markdown [src]="'src/app/issue/help/csv-example.md'"></markdown>
+                        <markdown [src]="'src/app/issue/help/csv-example.md'"></markdown>
                     </div>
 
                 </div>
             </div>
+        </form>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="step2Config">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-4 control-label required-pf" for="container">File Selection</label>
+            </div>
+            <div class="form-group" [ngSwitch]="uploader.queue.length">
+                <div *ngSwitchCase="0">
+                    <div class="well my-drop-zone" [ngxDragAndDrop]="dndOptions" *ngxInputFile="optionsInput">
+                        <h5>Drop files here to upload</h5>
+                        <h6>Or click here to select local files.</h6>
+                    </div>
+                </div>
+                <div *ngSwitchDefault>
+                    <div class="card" style="margin-top: 20px">
 
+                        <table class="table" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th width="40%">Name</th>
+                                    <th>Size</th>
+                                    <th>Progress</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let itemFile of uploader.queue"
+                                    [ngClass]="{'table-success' : itemFile.isSuccess, 'table-danger' : itemFile.isError, 'table-warning' : itemFile.isUploading  }">
+                                    <td>
+                                        <div [ngxThumbnail]="itemFile"></div>
+                                        <div style="text-align: center">name: {{ itemFile.formData.get('name') }}</div>
+                                    </td>
+                                    <td style="padding-left: 10px;">{{ itemFile.file.name }}</td>
+                                    <td>{{ itemFile.file.size/1024/1024 | number:'1.0-2' }} MB</td>
+                                    <td>
+                                        <div>
+                                            <!-- <ngb-progressbar type="success" showValue="true"
+                                                     [striped]="true" [animated]="true"
+                                                     [value]="itemFile.progress">
+
+                                    </ngb-progressbar> -->
+                                            {{itemFile.progress}}
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center">
+                                        <button type="button" class="btn btn-outline-success btn-sm"
+                                            (click)="upload(itemFile)" [disabled]="!itemFile.isReady">
+                                            Upload
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning btn-sm"
+                                            (click)="itemFile.cancel()"
+                                            [disabled]="!itemFile.uploadInProgress || itemFile.isCancel">
+                                            Cancel
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            (click)="itemFile.remove()"
+                                            [disabled]="itemFile.isSuccess || itemFile.uploadInProgress">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </form>
     </pfng-wizard-step>
     <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">

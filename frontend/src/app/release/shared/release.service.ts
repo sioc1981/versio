@@ -34,10 +34,8 @@ export class ReleaseService {
      }
 
     private sseCallback(data: any): void {
-        console.log('release sse callback: ' + data);
         if (data['count'] !== undefined) {
             const count = Number(data['count']);
-            console.log('release count: ' + count);
             RELEASE_CONSTANT.summary.count$.emit(count);
         } else if (data['summary'] !== undefined) {
             Object.entries(data['summary']).forEach( entry => {
