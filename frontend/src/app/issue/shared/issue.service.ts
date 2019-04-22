@@ -33,10 +33,10 @@ export class IssueService {
     }
 
     /** GET Issue by id. Will 404 if id not found */
-    getIssue(id: number): Observable<Issue> {
-        const url = `${ISSUE_CONSTANT.backendUrl}/${id}`;
+    getIssue(reference: string): Observable<Issue> {
+        const url = `${ISSUE_CONSTANT.backendUrl}/${reference}`;
         return this.http.get<Issue>(url).pipe(
-            catchError(this.logAndError(`getIssue id=${id}`))
+            catchError(this.logAndError(`getIssue id=${reference}`))
         );
     }
 

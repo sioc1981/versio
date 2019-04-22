@@ -22,6 +22,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 export class ReleaseComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createRelease') createReleaseTemplate: TemplateRef<any>;
+    @ViewChild('importRelease') importReleaseTemplate: TemplateRef<any>;
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
@@ -65,6 +66,10 @@ export class ReleaseComponent implements OnInit, OnDestroy {
                 id: 'addRelease',
                 title: 'Add new release',
                 tooltip: 'Add a new release'
+            }, {
+                id: 'importRelease',
+                title: 'Import releases',
+                tooltip: 'Import releases'
             }]
         } as ActionConfig;
 
@@ -163,6 +168,8 @@ export class ReleaseComponent implements OnInit, OnDestroy {
         } else if (action.id === 'editRelease') {
             this.selectedRelease = item;
             this.openModal(this.updateReleaseTemplate);
+        } else if (action.id === 'importRelease') {
+            this.openModal(this.importReleaseTemplate);
         } else {
             console.log('handleAction: unknown action: ' + action.id);
         }

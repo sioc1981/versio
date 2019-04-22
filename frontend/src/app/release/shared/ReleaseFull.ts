@@ -11,4 +11,7 @@ export class ReleaseFull {
 
     patches: Patch[];
 
+    selected?: boolean;
+    deploy?: string;
+
 }

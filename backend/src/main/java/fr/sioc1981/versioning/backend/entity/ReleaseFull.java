@@ -18,6 +18,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SqlResultSetMapping;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import fr.sioc1981.versioning.backend.data.PlatformCount;
 import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 
@@ -113,6 +115,7 @@ import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 				})
 
 })
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class ReleaseFull implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -125,7 +128,7 @@ public class ReleaseFull implements Serializable {
 	@MapsId
 	private Release release;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
 	private Set<Issue> issues;
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

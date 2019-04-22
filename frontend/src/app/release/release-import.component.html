@@ -1,0 +1,243 @@
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="releaseComponent.closeModal($event)"
+    (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
+    <pfng-wizard-step [config]="step1Config">
+        <form class="form-horizontal">
+            <div class="form-group required">
+                <label class="col-sm-4 control-label required-pf" for="container">Format</label>
+                <div class="col-sm-8">
+                    <div class="col-sm-6">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="CSV"
+                            [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()">
+                        <label class="col-sm-10" for="CSV">CSV</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- <input class="col-sm-2" type="radio" id="container" name="container" value="JSON"
+                            [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()" disabled="true"> -->
+                        <label class="col-sm-10" for="JSON">JSON (experimental)</label>
+                    </div>
+                </div>
+            </div>
+            <div [ngSwitch]="fileFormat">
+                <div *ngSwitchCase="'CSV'">
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/release/help/csv-format.md'"></markdown>
+                    </div>
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/release/help/csv-example.md'"></markdown>
+                    </div>
+                </div>
+                <div *ngSwitchCase="'JSON'">
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/release/help/json-format.md'"></markdown>
+                    </div>
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/release/help/json-example.md'"></markdown>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="step2Config">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-4 control-label required-pf" for="container">File Selection</label>
+            </div>
+            <div class="form-group" [ngSwitch]="uploader.queue.length">
+                <div *ngSwitchCase="0">
+                    <div class="well my-drop-zone" [ngxDragAndDrop]="dndOptions" *ngxInputFile="optionsInput">
+                        <h5>Drop files here to upload</h5>
+                        <h6>Or click here to select local files.</h6>
+                    </div>
+                </div>
+                <div *ngSwitchDefault>
+                    <div class="col-sm-12" *ngIf="itemFile">
+                        <div class="col-sm-4">Name: {{ itemFile.file.name }}</div>
+                        <div class="col-sm-4">
+                            <button type="button" class="btn btn-outline-danger btn-sm" (click)="itemFile.remove()">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" *ngIf="errorMessage && errorMessage !== ''">
+                        <div> Error: {{ errorMessage }}</div>
+                        <markdown ngPreserveWhitespaces lineHighlight [line]="errorLine">
+                            ```
+                            {{ fileReader.result }}
+                            ```
+                        </markdown>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="step3Config">
+        <div class="form-group">
+            <pfng-list id="myList" [expandTemplate]="expandTemplate" [items]="releasesToDisplay"
+                [itemTemplate]="releaseTemplate" [config]="listConfig"
+                (onSelectionChange)="handleSelectionChange($event)">
+                <ng-template #releaseTemplate let-item="item" let-index="index">
+                    <div class="list-pf-content-wrapper">
+                        <div class="list-pf-main-content">
+                            <div class="list-pf-title" style="display: inline-flex;justify-content:space-between">
+                                <span>{{item.release.version.versionNumber}}</span>
+                                <pfng-list-expand-toggle [expandId]="'issues'" [item]="item" [template]="issueTemplate">
+                                    <ng-template #issueTemplate>
+                                        <span class="fas {{issueIconStyleClass}}"></span>
+                                    </ng-template>
+                                </pfng-list-expand-toggle>
+                                <div style="justify-content:flex-end; display: inline-flex;">
+                                    <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
+                                        <ng-template #buildTemplate let-release="item.release">
+                                            <span class="fas myApp myApp-laptop-code" [class.myApp-green]="release.packageDate"
+                                                [class.myApp-orange]="!release.packageDate"></span>
+                                        </ng-template>
+                                    </pfng-list-expand-toggle>
+                                    <pfng-list-expand-toggle [expandId]="'qualification'" [item]="item"
+                                        [template]="qualificationTemplate">
+                                        <ng-template #qualificationTemplate let-release="item.release">
+                                            <span class="fas myApp myApp-user-shield"
+                                                [appHistoryColor]="release.qualification"></span>
+                                        </ng-template>
+                                    </pfng-list-expand-toggle>
+                                    <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
+                                        <ng-template #keyuserTemplate let-release="item.release">
+                                            <span class="fas myApp myApp-cart-check" [appHistoryColor]="release.keyUser"></span>
+                                        </ng-template>
+                                    </pfng-list-expand-toggle>
+                                    <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
+                                        <ng-template #pilotTemplate let-release="item.release">
+                                            <span class="fas myApp myApp-cash-register"
+                                                [appHistoryColor]="release.pilot"></span>
+                                        </ng-template>
+                                    </pfng-list-expand-toggle>
+                                    <pfng-list-expand-toggle [expandId]="'production'" [item]="item"
+                                        [template]="productionTemplate">
+                                        <ng-template #productionTemplate let-release="item.release">
+                                            <span class="fas myApp myApp-store" [appHistoryColor]="release.production"></span>
+                                        </ng-template>
+                                    </pfng-list-expand-toggle>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template #expandTemplate let-item="item" let-index="index" let-release="item.release">
+                    <div *ngIf="item.expandId === 'issues'">
+                        <div class="margin-left-20">
+                            <h4>Issues</h4>
+                            <pfng-list id="myList" [items]="item.issues" [itemTemplate]="issueTemplate">
+                                <ng-template #issueTemplate let-item="item" let-index="index">
+                                    <div class="list-pf-content-wrapper">
+                                        <div class="list-pf-main-content">
+                                            <div class="list-pf-title">{{item.reference}}</div>
+                                            <div class="list-pf-description">{{item.globalReference}}</div>
+                                        </div>
+                                        <div class="list-pf-additional-content">
+                                            <div>
+                                                <div class="list-pf-description">{{item.description}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </pfng-list>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'build'">
+                        <div class="margin-left-20">
+                            <h4>Build</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Build Date</strong></div>
+                                <div *ngIf="release.buildDate">{{release.buildDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Package Date</strong></div>
+                                <div *ngIf="release.packageDate">{{release.packageDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'qualification'">
+                        <div class="margin-left-20">
+                            <h4>Qualification</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.qualification">{{release.qualification.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.qualification">{{release.qualification.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'keyuser'">
+                        <div class="margin-left-20">
+                            <h4>Key User Qualification</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.keyuser">{{release.keyuser.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.keyuser">{{release.keyuser.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'pilot'">
+                        <div class="margin-left-20">
+                            <h4>Pilot</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.pilot">{{release.pilot.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.pilot">{{release.pilot.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="item.expandId === 'production'">
+                        <div class="margin-left-20">
+                            <h4>Production</h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.production">{{release.production.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.production">{{release.production.validationDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </pfng-list>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+
+        </div>
+    </pfng-wizard-step>
+
+    <pfng-wizard-step [config]="stepFinaleConfig" (onShow)="startDeploy()">
+        <pfng-list id="myList" [items]="selectReleases" [itemTemplate]="itemDeployTemplate" [config]="listConfig"
+            (onSelectionChange)="handleSelectionChange($event)">
+            <ng-template #itemDeployTemplate let-item="item" let-index="index">
+                <div class="list-pf-content-wrapper" [ngSwitch]="item.container">
+                    <div class="list-pf-main-content">
+                        <div class="list-pf-title">{{item.release.version.versionNumber}}</div>
+                    </div>
+                    <div class="list-pf-additional-content" style="justify-content: flex-end" [ngSwitch]="item.deploy">
+                        <div *ngSwitchDefault>
+                            <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+                        </div>
+                        <div *ngSwitchCase="'SUCCESS'">
+                            <span class="list-pf-icon-small glyphicon glyphicon-ok-circle"></span>
+                        </div>
+                        <div *ngSwitchCase="'FAILURE'">
+                            <span class="list-pf-icon-small pficon pficon-error-circle-o"></span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </pfng-list>
+        <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+            (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+    </pfng-wizard-step>
+</pfng-wizard>

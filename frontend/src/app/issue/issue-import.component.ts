@@ -1,5 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
-import { WizardComponent, WizardStepConfig, WizardConfig, WizardStepComponent, WizardStep, WizardEvent, ListConfig, PaginationConfig, PaginationEvent, ListEvent } from 'patternfly-ng';
+import {
+    WizardComponent, WizardStepConfig, WizardConfig, WizardStepComponent, WizardStep, WizardEvent, ListConfig,
+    PaginationConfig, PaginationEvent, ListEvent
+} from 'patternfly-ng';
 import { IssueComponent } from './issue.component';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
@@ -148,7 +151,7 @@ export class IssueImportComponent implements OnInit, OnDestroy {
                 this.errorMessage = null;
                 if (!this.currentAcceptMimeType.some((type: string) => type === data.file.type)
                     && !data.file.name.toLocaleUpperCase().endsWith('.' + this.fileFormat)) {
-                    this.removeCurrentFileItem()
+                    this.removeCurrentFileItem();
                     return;
                 }
                 this.fileReader.readAsText(data.file);
@@ -207,9 +210,6 @@ export class IssueImportComponent implements OnInit, OnDestroy {
     stepChanged($event: WizardEvent) {
         const flatSteps = flattenWizardSteps(this.wizard);
         const currentStep = flatSteps.filter(step => step.config.id === $event.step.config.id);
-        // if (currentStep && currentStep.length > 0) {
-        //     currentStep[0].config.nextEnabled = true;
-        // }
         if ($event.step.config.id === 'step1') {
             this.updateFormatFile();
         } else if ($event.step.config.id === 'stepFinale') {
@@ -232,21 +232,15 @@ export class IssueImportComponent implements OnInit, OnDestroy {
 
     updateFormatFile(): void {
         this.step1Config.nextEnabled = ['JSON', 'CSV'].indexOf(this.fileFormat) !== -1;
+        this.removeCurrentFileItem();
         if (this.step1Config.nextEnabled) {
-            this.currentAcceptMimeType = this.fileFormat === 'CVS' ? this.cvsMimeType : this.jsonMimeType;
+            this.currentAcceptMimeType = this.fileFormat === 'CSV' ? this.cvsMimeType : this.jsonMimeType;
             this.dndOptions.accept = this.currentAcceptMimeType;
             this.optionsInput.accept = this.currentAcceptMimeType;
         }
     }
 
     // Private
-
-    upload(item: FileItem) {
-        // item.upload({
-        //     method: 'POST',
-        //     url: 'ngx_upload_mock'
-        // });
-    }
 
     parseFile() {
         if (this.fileFormat === 'CSV') {

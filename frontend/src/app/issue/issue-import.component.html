@@ -50,35 +50,6 @@
                     </div>
                 </div>
                 <div *ngSwitchDefault>
-                    <!-- <table class="table" style="font-size: 14px">
-                             <thead>
-                                <tr>
-                                    <th></th>
-                                    <th width="20%">Name</th>
-                                    <th>Nb of read issues</th>
-                                    <th>Error</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngIf="itemFile"
-                                    [ngClass]="{'table-success' : itemFile.isSuccess, 'table-danger' : itemFile.isError, 'table-warning' : itemFile.isUploading  }">
-                                    <td>
-                                        <div style="text-align: center">name: {{ itemFile.formData.get('name') }}</div>
-                                    </td>
-                                    <td style="padding-left: 10px;">{{ itemFile.file.name }}</td>
-                                    <td>{{ issuesList.length }}</td>
-                                    <td>{{ errorMessage }}</td>
-                                    <td style="text-align: center">
-                                        <button type="button" class="btn btn-outline-danger btn-sm"
-                                            (click)="itemFile.remove()"
-                                            [disabled]="itemFile.isSuccess || itemFile.uploadInProgress">
-                                            Remove
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table> -->
                     <div class="col-sm-12" *ngIf="itemFile">
                         <div class="col-sm-4">Name: {{ itemFile.file.name }}</div>
                         <div class="col-sm-4">
@@ -130,18 +101,6 @@
     </pfng-wizard-step>
 
     <pfng-wizard-step [config]="stepFinaleConfig" (onShow)="startDeploy()">
-        <!-- <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
-            <div class="spinner spinner-lg blank-slate-pf-icon"></div>
-            <h3 class="blank-slate-pf-main-action">Update in progress</h3>
-        </div>
-        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
-            <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
-            <h3 class="blank-slate-pf-main-action">Update was successful</h3>
-        </div>
-        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
-            <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
-            <h3 class="blank-slate-pf-main-action">Update failed</h3>
-        </div> -->
         <pfng-list id="myList" [items]="selectIssues" [itemTemplate]="itemDeployTemplate" [config]="listConfig"
             (onSelectionChange)="handleSelectionChange($event)">
             <ng-template #itemDeployTemplate let-item="item" let-index="index">
