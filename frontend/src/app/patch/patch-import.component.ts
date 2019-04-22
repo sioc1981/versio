@@ -1,33 +1,30 @@
 import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
-import {
-    WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardEvent, PaginationEvent, ListEvent,
-    WizardStep, WizardStepComponent, WizardConfig
-} from 'patternfly-ng';
-import { ReleaseFull } from './shared/ReleaseFull';
+import { WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardConfig, WizardEvent, PaginationEvent, ListEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
+import { Patch } from './shared/Patch';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { FileItem, MineTypeEnum, InputFileOptions, DropTargetOptions, HttpClientUploadService } from '@wkoza/ngx-upload';
+import { PatchComponent } from './patch.component';
 import { Subscription, Observable, forkJoin } from 'rxjs';
-import { ReleaseService } from './shared/release.service';
-import { ReleaseComponent } from './release.component';
+import { PatchService } from './shared/patch.service';
 import { IssueService } from '../issue/shared/issue.service';
-import { Release } from './shared/Release';
-import { Version } from '../version/shared/Version';
+import { ReleaseService } from '../release/shared/release.service';
 import { PlatformHistory } from '../shared/PlatformHistory';
 import { Issue } from '../issue/shared/Issue';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { Release } from '../release/shared/Release';
 
 @Component({
-    selector: 'app-release-import',
-    templateUrl: './release-import.component.html',
-    styleUrls: ['./release-import.component.less']
+  selector: 'app-patch-import',
+  templateUrl: './patch-import.component.html',
+  styleUrls: ['./patch-import.component.less']
 })
-export class ReleaseImportComponent implements OnInit, OnDestroy {
+export class PatchImportComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
 
     data: any = {};
 
-    releasesList: ReleaseFull[] = [];
-    releasesToDisplay: ReleaseFull[] = [];
-    selectReleases: ReleaseFull[] = [];
+    patchesList: Patch[] = [];
+    patchesToDisplay: Patch[] = [];
+    selectPatches: Patch[] = [];
 
     issueIconStyleClass = ISSUE_CONSTANT.iconStyleClass;
 
@@ -37,6 +34,8 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
     errorLine = '0';
     lineToParse: string[] = null;
     currentLine = 0;
+
+    releases: Release[];
 
     fileFormat: string;
 
@@ -57,7 +56,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    releaseComponent: ReleaseComponent;
+    patchComponent: PatchComponent;
 
     fileReader = new FileReader();
 
@@ -78,16 +77,16 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private releaseService: ReleaseService, private issueService: IssueService, @Host() releaseComponent: ReleaseComponent,
-        public uploader: HttpClientUploadService) {
-        this.releaseComponent = releaseComponent;
+    constructor(private patchService: PatchService, private issueService: IssueService, private releaseService: ReleaseService,
+        @Host() patchComponent: PatchComponent, public uploader: HttpClientUploadService) {
+        this.patchComponent = patchComponent;
     }
 
     ngOnInit(): void {
-
+        this.getVersions();
         this.data = {};
         this.itemFile = null;
-        this.releasesList = [];
+        this.patchesList = [];
         this.errorMessage = null;
 
         this.fileReader.onload = (e) => this.parseFile();
@@ -124,7 +123,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
         // Wizard
         this.wizardConfig = {
-            title: 'Import releases'
+            title: 'Import patches'
         } as WizardConfig;
 
         this.setNavAway(false);
@@ -156,7 +155,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
             (data: any) => {
                 console.log(`reset of our form`, data);
                 this.itemFile = data;
-                this.releasesList = [];
+                this.patchesList = [];
                 this.errorMessage = null;
                 if (!this.currentAcceptMimeType.some((type: string) => type === data.file.type)
                     && !data.file.name.toLocaleUpperCase().endsWith('.' + this.fileFormat)) {
@@ -188,14 +187,19 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach(sub => sub.unsubscribe);
     }
 
-    // Methods
+     getVersions(): void {
+        this.subscriptions.push(this.releaseService.getReleases()
+            .subscribe(newReleases => this.releases = newReleases));
+    }
+
+   // Methods
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'stepFinale') {
             if (this.deploySuccess) {
-                this.releaseComponent.getReleases();
+                this.patchComponent.getPatchs();
             }
-            this.releaseComponent.closeModal($event);
+            this.patchComponent.closeModal($event);
         }
     }
 
@@ -204,13 +208,13 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
         this.wizardConfig.done = true;
         this.deploySuccess = false;
 
-        this.selectReleases.forEach((i, index) => {
-            this.subscriptions.push(this.releaseService.addRelease(i)
+        this.selectPatches.forEach((i, index) => {
+            this.subscriptions.push(this.patchService.addPatch(i)
                 .subscribe(_ => {
                     this.deploySuccess = true;
-                    this.releasesList[index].deploy = 'SUCCESS';
+                    this.patchesList[index].deploy = 'SUCCESS';
                 }, _ => {
-                    this.releasesList[index].deploy = 'FAILURE';
+                    this.patchesList[index].deploy = 'FAILURE';
                 }));
         }
         );
@@ -289,43 +293,46 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
         if (this.lineToParse.length === 0) {
             this.step2Config.nextEnabled = true;
-            this.releasesToDisplay = this.releasesList;
-            this.selectReleases = this.releasesList;
+            this.patchesToDisplay = this.patchesList;
+            this.selectPatches = this.patchesList;
             this.paginationConfig.pageNumber = 1;
-            this.paginationConfig.totalItems = this.releasesList.length;
+            this.paginationConfig.totalItems = this.patchesList.length;
             return;
         }
 
         const data = l.split(';');
-        let res = data.length === 8;
+        let res = data.length === 9;
         if (res) {
-            const release = new ReleaseFull();
+            const patch = new Patch();
             res = data.every((value, index) => {
                 let added = false;
                 switch (index) {
                     case 0:
-                        added = this.addVersionNumber(value.trim(), release);
+                        added = this.retrieveVersion(value.trim(), patch);
                         break;
                     case 1:
-                        added = this.addBuildDate(value.trim(), release);
+                        added = this.addSequenceNumber(value.trim(), patch);
                         break;
                     case 2:
-                        added = this.addPackageDate(value.trim(), release);
+                        added = this.addBuildDate(value.trim(), patch);
                         break;
                     case 3:
-                        added = this.addPlatformHistory(value.trim(), release, 'QUALIFICATION');
+                        added = this.addPackageDate(value.trim(), patch);
                         break;
                     case 4:
-                        added = this.addPlatformHistory(value.trim(), release, 'KEYUSER');
+                        added = this.addPlatformHistory(value.trim(), patch, 'QUALIFICATION');
                         break;
                     case 5:
-                        added = this.addPlatformHistory(value.trim(), release, 'PILOT');
+                        added = this.addPlatformHistory(value.trim(), patch, 'KEYUSER');
                         break;
                     case 6:
-                        added = this.addPlatformHistory(value.trim(), release, 'PRODUCTION');
+                        added = this.addPlatformHistory(value.trim(), patch, 'PILOT');
                         break;
                     case 7:
-                        added = this.addIssues(value.trim(), release);
+                        added = this.addPlatformHistory(value.trim(), patch, 'PRODUCTION');
+                        break;
+                    case 8:
+                        added = this.addIssues(value.trim(), patch);
                         break;
                 }
                 return added;
@@ -338,27 +345,44 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
     }
 
-    addVersionNumber(versionNumber: string, release: ReleaseFull): boolean {
-        const res = versionNumber.length > 0;
+    retrieveVersion(versionNumber: string, patch: Patch): boolean {
+        let res = versionNumber.length > 0;
         if (res) {
-            release.release = new Release();
-            release.release.version = new Version();
-            release.release.version.versionNumber = versionNumber;
+            const release = this.releases.find(r => r.version.versionNumber === versionNumber);
+            res = release !== undefined;
+            if (res) {
+                patch.release = release;
+            }
         }
 
         if (!res) {
             this.errorLine = '' + this.currentLine;
-            this.errorMessage = 'Wrong Version number at Line: ' + this.currentLine;
+            this.errorMessage = 'Wrong sequence number at Line: ' + this.currentLine;
+        }
+
+        return res;
+
+    }
+
+    addSequenceNumber(sequenceNumber: string, patch: Patch): boolean {
+        const res = sequenceNumber.length > 0;
+        if (res) {
+            patch.sequenceNumber = sequenceNumber;
+        }
+
+        if (!res) {
+            this.errorLine = '' + this.currentLine;
+            this.errorMessage = 'Wrong sequence number at Line: ' + this.currentLine;
         }
 
         return res;
     }
 
-    addBuildDate(value: string, release: ReleaseFull): boolean {
+    addBuildDate(value: string, patch: Patch): boolean {
         const buildDate = Date.parse(value);
         const res = !isNaN(buildDate);
         if (res) {
-            release.release.buildDate = new Date(buildDate);
+            patch.buildDate = new Date(buildDate);
         }
 
         if (!res) {
@@ -369,14 +393,11 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
         return res;
     }
 
-    addPackageDate(value: string, release: ReleaseFull): boolean {
-        if (value.length === 0) {
-            return true;
-        }
+    addPackageDate(value: string, patch: Patch): boolean {
         const buildDate = Date.parse(value);
         const res = !isNaN(buildDate);
         if (res) {
-            release.release.packageDate = new Date(buildDate);
+            patch.packageDate = new Date(buildDate);
         }
 
         if (!res) {
@@ -387,7 +408,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
         return res;
     }
 
-    addPlatformHistory(value: string, release: ReleaseFull, targetPlatform: string): boolean {
+    addPlatformHistory(value: string, patch: Patch, targetPlatform: string): boolean {
         if (value.length === 0) {
             return true;
         }
@@ -412,16 +433,16 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
             if (res) {
                 switch (targetPlatform) {
                     case 'QUALIFICATION':
-                        release.release.qualification = platformHistory;
+                        patch.qualification = platformHistory;
                         break;
                     case 'KEYUSER':
-                        release.release.keyUser = platformHistory;
+                        patch.keyUser = platformHistory;
                         break;
                     case 'PILOT':
-                        release.release.pilot = platformHistory;
+                        patch.pilot = platformHistory;
                         break;
                     case 'PRODUCTION':
-                        release.release.production = platformHistory;
+                        patch.production = platformHistory;
                         break;
                     default:
                         res = false;
@@ -437,7 +458,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
         return res;
     }
 
-    addIssues(value: string, release: ReleaseFull): boolean {
+    addIssues(value: string, patch: Patch): boolean {
         const parts = value.split(',');
         const observables: Observable<Issue>[] = [];
         parts.forEach(ref =>
@@ -446,9 +467,9 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
         const allResult = forkJoin(observables);
         allResult.subscribe(
             issues => {
-                release.issues = issues;
-                release.selected = true;
-                this.releasesList.push(release);
+                patch.issues = issues;
+                patch.selected = true;
+                this.patchesList.push(patch);
                 this.parseNextCSVLine();
             },
             error => {
@@ -477,12 +498,12 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
     }
 
     handleSelectionChange($event: ListEvent): void {
-        this.selectReleases = this.releasesList.filter(i => i.selected);
-        this.step3Config.nextEnabled = this.selectReleases.length > 0;
+        this.selectPatches = this.patchesList.filter(i => i.selected);
+        this.step3Config.nextEnabled = this.selectPatches.length > 0;
     }
 
     updateItems() {
-        this.releasesToDisplay = this.releasesList.slice((this.paginationConfig.pageNumber - 1) * this.paginationConfig.pageSize,
+        this.patchesToDisplay = this.patchesList.slice((this.paginationConfig.pageNumber - 1) * this.paginationConfig.pageSize,
             this.paginationConfig.totalItems).slice(0, this.paginationConfig.pageSize);
     }
 

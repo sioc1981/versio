@@ -20,6 +20,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 export class PatchComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createPatch') createPatchTemplate: TemplateRef<any>;
+    @ViewChild('importPatch') importPatchTemplate: TemplateRef<any>;
     @ViewChild('updatePatch') updatePatchTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
@@ -72,6 +73,10 @@ export class PatchComponent implements OnInit, OnDestroy {
                 id: 'addPatch',
                 title: 'Add new patch',
                 tooltip: 'Add a new patch'
+            }, {
+                id: 'importPatch',
+                title: 'Import patches',
+                tooltip: 'Import patches'
             }]
         } as ActionConfig;
 
@@ -180,6 +185,8 @@ export class PatchComponent implements OnInit, OnDestroy {
         } else if (action.id === 'editPatch') {
             this.selectedPatch = item;
             this.openModal(this.updatePatchTemplate);
+        } else if (action.id === 'importPatch') {
+            this.openModal(this.importPatchTemplate);
         } else {
             console.log('handleAction: unknown action: ' + action.id);
         }

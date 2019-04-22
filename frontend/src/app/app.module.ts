@@ -41,6 +41,7 @@ import { IssueUpdateComponent } from './issue/issue-update.component';
 import { IssueImportComponent } from './issue/issue-import.component';
 import { ngxloggerOptions, ngxDropTargetOptions, LoggerOptions } from '@wkoza/ngx-upload/utils/configuration.model';
 import { ReleaseImportComponent } from './release/release-import.component';
+import { PatchImportComponent } from './patch/patch-import.component';
 
 @NgModule({
     declarations: [
@@ -64,6 +65,7 @@ import { ReleaseImportComponent } from './release/release-import.component';
         IssueUpdateComponent,
         IssueImportComponent,
         ReleaseImportComponent,
+        PatchImportComponent,
     ],
     imports: [
         AboutModalModule,
