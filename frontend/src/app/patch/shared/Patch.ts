@@ -18,4 +18,7 @@ export class Patch {
     pilot: PlatformHistory;
     production: PlatformHistory;
 
+    selected?: boolean;
+    deploy?: string;
+
 }

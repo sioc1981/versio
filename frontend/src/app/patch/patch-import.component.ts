@@ -394,6 +394,9 @@ export class PatchImportComponent implements OnInit, OnDestroy {
     }
 
     addPackageDate(value: string, patch: Patch): boolean {
+        if (value.length === 0) {
+            return true;
+        }
         const buildDate = Date.parse(value);
         const res = !isNaN(buildDate);
         if (res) {
