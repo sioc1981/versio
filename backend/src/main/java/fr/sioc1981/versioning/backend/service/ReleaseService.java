@@ -2,7 +2,6 @@ package fr.sioc1981.versioning.backend.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,19 +39,18 @@ import fr.sioc1981.versioning.backend.entity.Version;
 @Path(ReleaseService.RELEASE_PATH)
 @Stateless
 public class ReleaseService {
-	
+
 	static final String RELEASE_PATH = "/release";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseService.class);
 	@Inject
 	private EntityManager entityManager;
-	
+
 	@EJB
-	private GlobalSSE globalSSE; 
+	private GlobalSSE globalSSE;
 
 	@Context
 	private HttpServletRequest request;
-	
 
 	@POST
 	@Consumes("application/json")
@@ -61,7 +59,7 @@ public class ReleaseService {
 		this.entityManager.persist(newRelease);
 		URI uri = null;
 		try {
-			uri = new URI(RELEASE_PATH + "/" /* + newRelease.getRelease().getRelease().getId()*/);
+			uri = new URI(RELEASE_PATH + "/" /* + newRelease.getRelease().getRelease().getId() */);
 			getCount();
 			getSummary(newRelease.getId());
 		} catch (URISyntaxException e) {
@@ -86,7 +84,7 @@ public class ReleaseService {
 		try {
 			this.entityManager.remove(release);
 			getCount();
-			
+
 		} catch (Exception e) {
 			throw new RuntimeException("Could not delete release.", e);
 		}
@@ -106,8 +104,7 @@ public class ReleaseService {
 	public Response findAllFull() {
 		return Response.ok(this.entityManager.createQuery("from ReleaseFull r").getResultList()).build();
 	}
-	
-	
+
 	@GET
 	@Produces("application/json")
 	@Path("/summary")
@@ -116,11 +113,12 @@ public class ReleaseService {
 	}
 
 	public Long getCount() {
-		Long count =  this.entityManager.createQuery("select count(1) as count from Release", Long.class).getSingleResult();
+		Long count = this.entityManager.createQuery("select count(1) as count from Release", Long.class)
+				.getSingleResult();
 		globalSSE.broadcast("release_count", count);
 		return count;
 	}
-	
+
 	@GET
 	@Produces("application/json")
 	@Path("{id}/summary")
@@ -131,24 +129,25 @@ public class ReleaseService {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
-	
+
 	public ReleaseFullSummary getSummary(long id) throws NoResultException {
-		Object[] res = (Object[]) this.entityManager.createNamedQuery("releaseFullSummaryById").setParameter("id", id).getSingleResult();
+		Object[] res = (Object[]) this.entityManager.createNamedQuery("releaseFullSummaryById").setParameter("id", id)
+				.getSingleResult();
 		return convert(res);
 	}
-	
+
 	public List<ReleaseFullSummary> getSummary() throws NoResultException {
 		Stream<?> stream = this.entityManager.createNamedQuery("releaseFullSummary").getResultStream();
 		return stream.map(o -> (Object[]) o).map(this::convert).collect(Collectors.toList());
 	}
-	
+
 	private ReleaseFullSummary convert(Object[] res) {
 		ReleaseFullSummary releaseFullSummary = (ReleaseFullSummary) res[0];
 		releaseFullSummary.setQualification((PlatformCount) res[1]);
 		releaseFullSummary.setKeyUser((PlatformCount) res[2]);
 		releaseFullSummary.setPilot((PlatformCount) res[3]);
 		releaseFullSummary.setProduction((PlatformCount) res[4]);
-		globalSSE.broadcast("release_summary_"+releaseFullSummary.getId(), releaseFullSummary);
+		globalSSE.broadcast("release_summary_" + releaseFullSummary.getId(), releaseFullSummary);
 		return releaseFullSummary;
 	}
 
@@ -165,7 +164,7 @@ public class ReleaseService {
 
 		return Response.ok(result.get(0)).build();
 	}
-	
+
 	@GET
 	@Produces("application/json")
 	@Path("{source}/compare/{dest}")
@@ -175,38 +174,41 @@ public class ReleaseService {
 
 		final Version baseVersion = new Version(findVersionBase(v1, v2));
 		ReleaseComparison comparison = new ReleaseComparison();
-		comparison.setSourceReleases(findAllBetween(baseVersion, v1));
-		comparison.setDestReleases(findAllBetween(baseVersion, v2));
+		if (!v2.equals(v1)) {
+			comparison.setSourceReleases(findAllBetween(baseVersion, v1));
+			comparison.setDestReleases(findAllBetween(baseVersion, v2));
+		}
 		return Response.ok(comparison).build();
 	}
 
 	public List<Release> findAllBetween(Version baseVersion, Version v1) {
-		if (baseVersion.equals(v1)) {
-			return Collections.emptyList();
-		}
-
-		String qlString = "SELECT r FROM Release r join fetch r.version v where v.baseNumber = :baseNumber and v.interimNumber = :interimNumber and ";
+		String qlString = "SELECT r FROM Release r join fetch r.version v where v.baseNumber = :baseNumber and v.interimNumber = :interimNumber";
 		HashMap<String, Integer> params = new HashMap<String, Integer>();
 		params.put("baseNumber", baseVersion.getBaseNumber());
 		params.put("interimNumber", baseVersion.getInterimNumber());
 		boolean featureSearch = false;
 		int compare = baseVersion.getFeatureNumber() - v1.getFeatureNumber();
 		if (compare != 0) {
-			qlString += "(v.featureNumber BETWEEN :baseFeatureNumber AND :versionFeatureNumber and v.patchNumber = 0)";
+			qlString += " and (v.featureNumber BETWEEN :baseFeatureNumber AND :versionFeatureNumber and v.patchNumber = 0)";
 			params.put("baseFeatureNumber", baseVersion.getFeatureNumber());
 			params.put("versionFeatureNumber", v1.getFeatureNumber());
 			featureSearch = true;
-		}
+		} 
 		if (v1.getPatchNumber() != 0) {
 			params.put("featureNumber", v1.getFeatureNumber());
 			int basePatch = baseVersion.getPatchNumber();
 			if (featureSearch) {
 				qlString += " OR ";
 				basePatch = 0;
+			} else {
+				qlString += " and ";
 			}
 			qlString += "(v.featureNumber = :featureNumber and v.patchNumber BETWEEN :basePatchNumber AND :versionPatchNumber)";
 			params.put("basePatchNumber", basePatch);
 			params.put("versionPatchNumber", v1.getPatchNumber());
+		} else if (!featureSearch) {
+			qlString += " and v.featureNumber = :featureNumber";
+			params.put("featureNumber", v1.getFeatureNumber());
 		}
 		qlString += " order by v.versionNumber";
 		TypedQuery<Release> query = this.entityManager.createQuery(qlString, Release.class);
@@ -237,6 +239,5 @@ public class ReleaseService {
 		base.append(Math.min(v1.getPatchNumber(), v2.getPatchNumber()));
 		return base.toString().replaceAll("(\\.0)+$", "");
 	}
-
 
 }

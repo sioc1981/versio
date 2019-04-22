@@ -86,7 +86,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     generateTableConfig() {
-                this.columns = [{
+        this.columns = [{
             cellTemplate: this.issueTemplate,
             draggable: false,
             prop: 'issue',
@@ -265,7 +265,15 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
             if (current === undefined) {
                 current = {
                     issue: iri.issue,
+                    sourcePatches: {
+                        release: this.fromVersion,
+                        patches: []
+                    },
                     sourceReleases: [],
+                    destPatches: {
+                        release: this.toVersion,
+                        patches: []
+                    },
                     destReleases: []
                 };
                 this.issueList[iri.issueReference] = current;
@@ -276,14 +284,24 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 return value.version.versionNumber === iri.releaseVersion;
             });
             if (sourceRelease) {
-                current.sourceReleases.push(sourceRelease);
-                current.sourceReleases = current.sourceReleases.sort(this.sortVersionNumber);
+                if (!iri.patchSequence) {
+                    current.sourceReleases.push(sourceRelease);
+                    current.sourceReleases = current.sourceReleases.sort(this.sortVersionNumber);
+                } else if(iri.releaseVersion === this.fromVersion){
+                    current.sourcePatches.patches.push(iri.patchSequence);
+                    current.sourcePatches.patches = current.sourcePatches.patches.sort();
+                }
             }
             const destRelease = this.versionCompare.destReleases.find(value =>
                 value.version.versionNumber === iri.releaseVersion);
             if (destRelease) {
-                current.destReleases.push(destRelease);
-                current.destReleases = current.destReleases.sort(this.sortVersionNumber);
+                if (!iri.patchSequence) {
+                    current.destReleases.push(destRelease);
+                    current.destReleases = current.destReleases.sort(this.sortVersionNumber);
+                } else if(iri.releaseVersion === this.toVersion) {
+                    current.destPatches.patches.push(iri.patchSequence);
+                    current.destPatches.patches = current.destPatches.patches.sort();
+                }
             }
             this.updateRows(false);
         };
@@ -315,18 +333,20 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         const re = new RegExp(filter.value, 'i');
         if (filter.field.id === 'issue') {
             match = item.issue.reference.indexOf(filter.value) !== -1
-                    || item.issue.description.indexOf(filter.value) !== -1;
+                || item.issue.description.indexOf(filter.value) !== -1;
         } else if (filter.field.id === 'sourceRelease') {
-            match = item.sourceReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1;
+            match = item.sourceReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1
+                || item.sourcePatches.release === filter.query.id;
         } else if (filter.field.id === 'destRelease') {
-            match = item.destReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1;
+            match = item.destReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1
+                || item.destPatches.release === filter.query.id;
         } else if (filter.field.id === 'missingRelease') {
             console.log('missingRelease: ' + filter.query.id);
-            if (filter.query.id === 'sourceReleases' ) {
-                match = item.destReleases.length === 0;
+            if (filter.query.id === 'sourceReleases') {
+                match = item.destReleases.length === 0 && item.destPatches.patches.length === 0;
             }
-            if (filter.query.id === 'destReleases' ) {
-                match = item.sourceReleases.length === 0;
+            if (filter.query.id === 'destReleases') {
+                match = item.sourceReleases.length === 0 && item.sourcePatches.patches.length === 0;
             }
         }
         return match;
@@ -371,10 +391,13 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         if (this.currentSortField.id === 'issue') {
             compValue = item1.issue.reference.localeCompare(item2.issue.reference);
         } else if (this.currentSortField.id === 'sourceRelease') {
-            if (item1.sourceReleases.length > 0) {
-                if (item2.sourceReleases.length > 0) {
-                    compValue = item1.sourceReleases[item1.sourceReleases.length - 1].version.versionNumber
-                        .localeCompare(item2.sourceReleases[item2.sourceReleases.length - 1].version.versionNumber);
+            const sourceRelease1 = item1.sourcePatches.patches.length > 0 ? item1.sourcePatches.release :
+                item1.sourceReleases.length > 0 ? item1.sourceReleases[item1.sourceReleases.length - 1].version.versionNumber : undefined;
+            const sourceRelease2 = item2.sourcePatches.patches.length > 0 ? item2.sourcePatches.release :
+                item2.sourceReleases.length > 0 ? item2.sourceReleases[item2.sourceReleases.length - 1].version.versionNumber : undefined;
+            if (sourceRelease1) {
+                if (sourceRelease2) {
+                    compValue = sourceRelease1.localeCompare(sourceRelease2);
                 } else {
                     compValue = 1;
                 }
@@ -382,11 +405,14 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 compValue = -1;
             }
         } else if (this.currentSortField.id === 'destRelease') {
-            if (item1.destReleases.length > 0) {
-                if (item2.destReleases.length > 0) {
-                    compValue = item1.destReleases[item1.destReleases.length - 1].version.versionNumber
-                        .localeCompare(item2.destReleases[item2.destReleases.length - 1].version.versionNumber);
-                 } else {
+            const destRelease1 = item1.destPatches.patches.length > 0 ? item1.destPatches.release :
+                item1.destReleases.length > 0 ? item1.destReleases[item1.destReleases.length - 1].version.versionNumber : undefined;
+            const destRelease2 = item2.destPatches.patches.length > 0 ? item2.destPatches.release :
+                item2.destReleases.length > 0 ? item2.destReleases[item2.destReleases.length - 1].version.versionNumber : undefined;
+            if (destRelease1) {
+                if (destRelease2) {
+                    compValue = destRelease1.localeCompare(destRelease2);
+                } else {
                     compValue = 1;
                 }
             } else if (item2.destReleases.length > 0) {
