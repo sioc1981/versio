@@ -10,30 +10,6 @@
             "request": "launch",
             "url": "http://localhost:4200/#",
             "webRoot": "${workspaceFolder}"
-        },
-        {
-            "name": "Launch Chrome frontend on Angular CLI Server (1)",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceFolder}",
-            "port": 9283
-        },
-        {
-            "name": "Launch Chrome frontend on Angular CLI Server (2)",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceFolder}",
-            "port": 9271
-        },
-        {
-            "name": "Launch Chrome frontend on Angular CLI Server (3)",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:4200/#",
-            "webRoot": "${workspaceFolder}",
-            "port": 9213
         }
     ]
 }

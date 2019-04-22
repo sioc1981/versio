@@ -5,13 +5,13 @@ The file must provide an array of Issue structure.
     {
         // if there is a parent reference
         // not currently used
-        globalReference: string,
+        "globalReference": string,
         // a simple description / the issue title
-        description: string,
+        "description": string,
         // the mantis or the jira key
-        reference: string,
+        "reference": string,
         // container is case-sensitive
-        container: 'JIRA' | 'MANTIS'
+        "container": "JIRA" | "MANTIS"
     }, {
         ...
     }, ...

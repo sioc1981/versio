@@ -4,4 +4,5 @@ export class Issue {
     reference: string;
     container: string;
     selected?: boolean;
+    deploy?: string;
 }

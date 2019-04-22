@@ -6,26 +6,18 @@
                 <label class="col-sm-4 control-label required-pf" for="container">Format</label>
                 <div class="col-sm-8">
                     <div class="col-sm-6">
-                        <input class="col-sm-2" type="radio" id="container" name="container" value="JSON"
-                            [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()">
-                        <label class="col-sm-10" for="JSON">JSON</label>
-                    </div>
-                    <div class="col-sm-6">
                         <input class="col-sm-2" type="radio" id="container" name="container" value="CSV"
                             [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()">
                         <label class="col-sm-10" for="CSV">CSV</label>
                     </div>
+                    <div class="col-sm-6">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="JSON"
+                            [(ngModel)]="fileFormat" (ngModelChange)="updateFormatFile()">
+                        <label class="col-sm-10" for="JSON">JSON (experimental)</label>
+                    </div>
                 </div>
             </div>
             <div [ngSwitch]="fileFormat">
-                <div *ngSwitchCase="'JSON'">
-                    <div class="col-sm-6">
-                        <markdown [src]="'src/app/issue/help/json-format.md'"></markdown>
-                    </div>
-                    <div class="col-sm-6">
-                        <markdown [src]="'src/app/issue/help/json-example.md'"></markdown>
-                    </div>
-                </div>
                 <div *ngSwitchCase="'CSV'">
                     <div class="col-sm-6">
                         <markdown [src]="'src/app/issue/help/csv-format.md'"></markdown>
@@ -33,7 +25,14 @@
                     <div class="col-sm-6">
                         <markdown [src]="'src/app/issue/help/csv-example.md'"></markdown>
                     </div>
-
+                </div>
+                <div *ngSwitchCase="'JSON'">
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/issue/help/json-format.md'"></markdown>
+                    </div>
+                    <div class="col-sm-6">
+                        <markdown [src]="'src/app/issue/help/json-example.md'"></markdown>
+                    </div>
                 </div>
             </div>
         </form>
@@ -51,47 +50,26 @@
                     </div>
                 </div>
                 <div *ngSwitchDefault>
-                    <div class="card" style="margin-top: 20px">
-
-                        <table class="table" style="font-size: 14px">
-                            <thead>
+                    <!-- <table class="table" style="font-size: 14px">
+                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th width="40%">Name</th>
-                                    <th>Size</th>
-                                    <th>Progress</th>
+                                    <th width="20%">Name</th>
+                                    <th>Nb of read issues</th>
+                                    <th>Error</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let itemFile of uploader.queue"
+                                <tr *ngIf="itemFile"
                                     [ngClass]="{'table-success' : itemFile.isSuccess, 'table-danger' : itemFile.isError, 'table-warning' : itemFile.isUploading  }">
                                     <td>
-                                        <div [ngxThumbnail]="itemFile"></div>
                                         <div style="text-align: center">name: {{ itemFile.formData.get('name') }}</div>
                                     </td>
                                     <td style="padding-left: 10px;">{{ itemFile.file.name }}</td>
-                                    <td>{{ itemFile.file.size/1024/1024 | number:'1.0-2' }} MB</td>
-                                    <td>
-                                        <div>
-                                            <!-- <ngb-progressbar type="success" showValue="true"
-                                                     [striped]="true" [animated]="true"
-                                                     [value]="itemFile.progress">
-
-                                    </ngb-progressbar> -->
-                                            {{itemFile.progress}}
-                                        </div>
-                                    </td>
+                                    <td>{{ issuesList.length }}</td>
+                                    <td>{{ errorMessage }}</td>
                                     <td style="text-align: center">
-                                        <button type="button" class="btn btn-outline-success btn-sm"
-                                            (click)="upload(itemFile)" [disabled]="!itemFile.isReady">
-                                            Upload
-                                        </button>
-                                        <button type="button" class="btn btn-outline-warning btn-sm"
-                                            (click)="itemFile.cancel()"
-                                            [disabled]="!itemFile.uploadInProgress || itemFile.isCancel">
-                                            Cancel
-                                        </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm"
                                             (click)="itemFile.remove()"
                                             [disabled]="itemFile.isSuccess || itemFile.uploadInProgress">
@@ -100,14 +78,59 @@
                                     </td>
                                 </tr>
                             </tbody>
-                        </table>
+                        </table> -->
+                    <div class="col-sm-12" *ngIf="itemFile">
+                        <div class="col-sm-4">Name: {{ itemFile.file.name }}</div>
+                        <div class="col-sm-4">
+                            <button type="button" class="btn btn-outline-danger btn-sm" (click)="itemFile.remove()">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" *ngIf="errorMessage && errorMessage !== ''">
+                        <div> Error: {{ errorMessage }}</div>
+                        <markdown ngPreserveWhitespaces lineHighlight [line]="errorLine">
+                            ```
+                            {{ fileReader.result }}
+                            ```
+                        </markdown>
                     </div>
                 </div>
             </div>
         </form>
     </pfng-wizard-step>
-    <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
-        <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+    <pfng-wizard-step [config]="step3Config">
+        <div class="form-group">
+            <pfng-list id="myList" [items]="issuesToDisplay" [itemTemplate]="itemTemplate" [config]="listConfig"
+                (onSelectionChange)="handleSelectionChange($event)">
+                <ng-template #itemTemplate let-item="item" let-index="index">
+                    <div class="list-pf-left" [ngSwitch]="item.container">
+                        <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small"
+                            *ngSwitchCase="'MANTIS'" />
+                        <img src="/src/assets/images/jira.svg" class="list-pf-icon list-pf-icon-small"
+                            *ngSwitchCase="'JIRA'" />
+                    </div>
+                    <div class="list-pf-content-wrapper">
+                        <div class="list-pf-main-content">
+                            <div class="list-pf-title">{{item.reference}}</div>
+                            <div class="list-pf-description">{{item.globalReference}}</div>
+                        </div>
+                        <div class="list-pf-additional-content">
+                            <div>
+                                <div class="list-pf-description">{{item.description}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </pfng-list>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+
+        </div>
+    </pfng-wizard-step>
+
+    <pfng-wizard-step [config]="stepFinaleConfig" (onShow)="startDeploy()">
+        <!-- <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
             <div class="spinner spinner-lg blank-slate-pf-icon"></div>
             <h3 class="blank-slate-pf-main-action">Update in progress</h3>
         </div>
@@ -118,6 +141,36 @@
         <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
             <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
             <h3 class="blank-slate-pf-main-action">Update failed</h3>
-        </div>s
+        </div> -->
+        <pfng-list id="myList" [items]="selectIssues" [itemTemplate]="itemDeployTemplate" [config]="listConfig"
+            (onSelectionChange)="handleSelectionChange($event)">
+            <ng-template #itemDeployTemplate let-item="item" let-index="index">
+                <div class="list-pf-left" [ngSwitch]="item.container">
+                    <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small"
+                        *ngSwitchCase="'MANTIS'" />
+                    <img src="/src/assets/images/jira.svg" class="list-pf-icon list-pf-icon-small"
+                        *ngSwitchCase="'JIRA'" />
+                </div>
+                <div class="list-pf-content-wrapper" [ngSwitch]="item.container">
+                    <div class="list-pf-main-content">
+                        <div class="list-pf-title">{{item.reference}}</div>
+                        <div class="list-pf-description">{{item.globalReference}}</div>
+                    </div>
+                    <div class="list-pf-additional-content" style="justify-content: flex-end" [ngSwitch]="item.deploy">
+                        <div *ngSwitchDefault>
+                            <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+                        </div>
+                        <div *ngSwitchCase="'SUCCESS'">
+                            <span class="list-pf-icon-small glyphicon glyphicon-ok-circle"></span>
+                        </div>
+                        <div *ngSwitchCase="'FAILURE'">
+                            <span class="list-pf-icon-small pficon pficon-error-circle-o"></span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </pfng-list>
+        <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+            (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
     </pfng-wizard-step>
 </pfng-wizard>

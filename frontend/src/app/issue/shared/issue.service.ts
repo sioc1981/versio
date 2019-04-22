@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { Issue } from './Issue';
@@ -36,14 +36,14 @@ export class IssueService {
     getIssue(id: number): Observable<Issue> {
         const url = `${ISSUE_CONSTANT.backendUrl}/${id}`;
         return this.http.get<Issue>(url).pipe(
-            catchError(this.handleError<Issue>(`getIssue id=${id}`))
+            catchError(this.logAndError(`getIssue id=${id}`))
         );
     }
 
     /** POST: add a new issue to the server */
     addIssue(hero: Issue): Observable<Issue> {
         return this.http.post<Issue>(ISSUE_CONSTANT.backendUrl, hero, ISSUE_CONSTANT.httpOptions).pipe(
-            catchError(this.handleError<Issue>('addIssue'))
+            catchError(this.logAndError('addIssue'))
         );
     }
 
@@ -51,7 +51,7 @@ export class IssueService {
     /** PUT: update the issue on the server */
     updateIssue(issue: Issue): Observable<any> {
         return this.http.put(ISSUE_CONSTANT.backendUrl, issue, ISSUE_CONSTANT.httpOptions).pipe(
-            catchError(this.handleError<any>('updatePatch'))
+            catchError(this.logAndError('updatePatch'))
         );
     }
 
@@ -71,4 +71,22 @@ export class IssueService {
             return of(result as T);
         };
     }
+
+    /**
+   * Handle Http operation that failed.
+   * Let the app continue.
+   * @param operation - name of the operation that failed
+   * @param result - optional value to return as the observable result
+   */
+    private logAndError(operation = 'operation') {
+        return (error: any): Observable<never> => {
+            // TODO: send the error to remote logging infrastructure
+            console.error(error); // log to console instead
+            // TODO: better job of transforming error for user consumption
+            // this.log(`${operation} failed: ${error.message}`);
+            // Let the app keep running by returning an empty result.
+            return throwError(error);
+        };
+    }
+
 }
