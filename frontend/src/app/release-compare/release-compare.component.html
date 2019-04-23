@@ -24,8 +24,8 @@
 
 <div class="row text">
     <div class="col-sm-12">
-    <h2>Version Tree
-    </h2>
+        <h2>Version Tree
+        </h2>
     </div>
 </div>
 <div class="row">
@@ -35,38 +35,40 @@
 </div>
 <div class="row text">
     <div class="col-sm-12">
-    <h2>Issue comparison</h2>
+        <h2>Issue comparison</h2>
     </div>
 </div>
 
 <div class="padding-15">
-  <div class="row">
-    <div class="col-sm-12">
-      <div class="form-group">
-        <pfng-table
-            [columns]="columns"
-            [config]="tableConfig"
-            [rows]="rows"
-            (onFilterChange)="filterChanged($event)"
-            (onSortChange)="handleSortChanged($event)">
-        </pfng-table>
-        <!-- Column templates -->
-        <ng-template #issueTemplate let-row="row">
-           <div class="list-pf-left" [ngSwitch]="row.issue.container">
-              <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small" *ngSwitchCase="'MANTIS'"/>
-              <img src="/src/assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'"/>
-              <span>{{row.issue.reference}} - {{row.issue.description}}</span>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <pfng-table [columns]="columns" [config]="tableConfig" [rows]="rows"
+                    (onFilterChange)="filterChanged($event)" (onPageNumberChange)="handlePageNumber($event)"
+                    (onPageSizeChange)="handlePageSize($event)" (onSortChange)="handleSortChanged($event)">
+                </pfng-table>
+                <!-- Column templates -->
+                <ng-template #issueTemplate let-row="row">
+                    <div class="list-pf-left" [ngSwitch]="row.issue.container">
+                        <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
+                            *ngSwitchCase="'MANTIS'" />
+                        <img src="/src/assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'" />
+                        <span>{{row.issue.reference}} - {{row.issue.description}}</span>
+                    </div>
+                </ng-template>
+                <ng-template #sourcesTemplate let-row="row">
+                    <span *ngFor="let src of row.sourcePatches.patches" class="col-sm-12"> {{row.sourcePatches.release}}
+                        - {{src}} </span>
+                    <span *ngFor="let src of row.sourceReleases" class="col-sm-12"> {{src.version.versionNumber}}
+                    </span>
+                </ng-template>
+                <ng-template #destTemplate let-row="row">
+                    <span *ngFor="let src of row.destPatches.patches" class="col-sm-12"> {{row.destPatches.release}} -
+                        {{src}} </span>
+                    <span *ngFor="let dest of row.destReleases" class="col-sm-12"> {{dest.version.versionNumber}}
+                    </span>
+                </ng-template>
             </div>
-        </ng-template>
-        <ng-template #sourcesTemplate let-row="row">
-          <span *ngFor="let src of row.sourcePatches.patches" class="col-sm-12"> {{row.sourcePatches.release}} - {{src}} </span>
-          <span *ngFor="let src of row.sourceReleases" class="col-sm-12"> {{src.version.versionNumber}} </span>
-        </ng-template>
-        <ng-template #destTemplate let-row="row">
-          <span *ngFor="let src of row.destPatches.patches" class="col-sm-12"> {{row.destPatches.release}} - {{src}} </span>
-          <span *ngFor="let dest of row.destReleases" class="col-sm-12"> {{dest.version.versionNumber}} </span>
-        </ng-template>
-      </div>
+        </div>
     </div>
-  </div>
 </div>

@@ -207,9 +207,10 @@ public class ReleaseService {
 			params.put("basePatchNumber", basePatch);
 			params.put("versionPatchNumber", v1.getPatchNumber());
 		} else if (!featureSearch) {
-			qlString += " and v.featureNumber = :featureNumber";
+			qlString += " and v.featureNumber = :featureNumber and v.patchNumber = 0";
 			params.put("featureNumber", v1.getFeatureNumber());
 		}
+		
 		qlString += " order by v.versionNumber";
 		TypedQuery<Release> query = this.entityManager.createQuery(qlString, Release.class);
 		params.forEach((name, value) -> query.setParameter(name, value));

@@ -9,7 +9,7 @@ import { SseService } from '../server-event/sse.service';
 import {
     ToolbarConfig, TableConfig, SortConfig, PaginationConfig, FilterConfig, EmptyStateConfig,
     SortField, SortEvent, Filter, FilterEvent,
-    FilterField, FilterType
+    FilterField, FilterType, PaginationEvent
 } from 'patternfly-ng';
 
 @Component({
@@ -287,7 +287,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 if (!iri.patchSequence) {
                     current.sourceReleases.push(sourceRelease);
                     current.sourceReleases = current.sourceReleases.sort(this.sortVersionNumber);
-                } else if(iri.releaseVersion === this.fromVersion){
+                } else if (iri.releaseVersion === this.fromVersion) {
                     current.sourcePatches.patches.push(iri.patchSequence);
                     current.sourcePatches.patches = current.sourcePatches.patches.sort();
                 }
@@ -298,7 +298,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 if (!iri.patchSequence) {
                     current.destReleases.push(destRelease);
                     current.destReleases = current.destReleases.sort(this.sortVersionNumber);
-                } else if(iri.releaseVersion === this.toVersion) {
+                } else if (iri.releaseVersion === this.toVersion) {
                     current.destPatches.patches.push(iri.patchSequence);
                     current.destPatches.patches = current.destPatches.patches.sort();
                 }
@@ -372,10 +372,16 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
 
     }
 
-    // Drag and drop
+    handlePageSize($event: PaginationEvent): void {
+        this.updateRows();
+    }
+
+    handlePageNumber($event: PaginationEvent): void {
+        this.updateRows();
+    }
 
     // ngx-datatable
-    updateRows(reset: boolean): void {
+    updateRows(reset: boolean = false): void {
         if (reset) {
             this.paginationConfig.pageNumber = 1;
         }

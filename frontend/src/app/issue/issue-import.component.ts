@@ -254,8 +254,12 @@ export class IssueImportComponent implements OnInit, OnDestroy {
         const lines = value.toString().split(/\r\n|\n/);
         let i = 1;
         const isOk = lines.every(l => {
-            let res = l.length > 4;
+            if (l.length === 0) {
+                i++;
+                return true;
+            }
             const data = l.split(';');
+            let res = data.length >= 4;
             if (res) {
                 const issue = new Issue();
                 const container = data.shift();
@@ -268,17 +272,20 @@ export class IssueImportComponent implements OnInit, OnDestroy {
                     issue.description = data.join(';');
                     issue.selected = true;
                     this.issuesList.push(issue);
+                } else {
+                    this.errorLine = '' + i;
+                    this.errorMessage = 'Wrong container at Line: ' + i;
                 }
+            } else {
+                this.errorLine = '' + i;
+                this.errorMessage = 'Wrong number of columns (' + data.length + ') at Line: ' + i;
             }
             if (res) {
                 i++;
             }
             return res;
         });
-        if (!isOk) {
-            this.errorLine = '' + i;
-            this.errorMessage = 'Error at Line: ' + i;
-        } else {
+        if (isOk) {
             this.step2Config.nextEnabled = true;
             this.issuesToDisplay = this.issuesList;
             this.selectIssues = this.issuesList;

@@ -289,9 +289,10 @@ export class PatchImportComponent implements OnInit, OnDestroy {
         let l = '';
         while (l.length === 0 && this.lineToParse.length > 0) {
             l = this.lineToParse.shift();
+            this.currentLine++;
         }
 
-        if (this.lineToParse.length === 0) {
+        if (l.length === 0 && this.lineToParse.length === 0) {
             this.step2Config.nextEnabled = true;
             this.patchesToDisplay = this.patchesList;
             this.selectPatches = this.patchesList;
@@ -341,7 +342,6 @@ export class PatchImportComponent implements OnInit, OnDestroy {
             this.errorLine = '' + this.currentLine;
             this.errorMessage = 'Wrong number of columns (' + data.length + ') at Line: ' + this.currentLine;
         }
-
 
     }
 

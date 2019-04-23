@@ -128,10 +128,10 @@ export class VersionGraphComponent extends ChartBase implements OnInit, DoCheck 
 
     private getTooltipValueFormat() {
         return (value, ratio, id, index) => {
-                return id === this.releaseCompareComponent.fromVersion ?
+            return id === this.releaseCompareComponent.fromVersion ?
                 this.releaseComparison.sourceReleases[index].version.versionNumber :
                 this.releaseComparison.destReleases[index].version.versionNumber;
-            };
+        };
     }
 
     protected getChartData(): any {
@@ -163,7 +163,12 @@ export class VersionGraphComponent extends ChartBase implements OnInit, DoCheck 
         const res: any[] = [];
         const releases = isFrom ? this.releaseComparison.sourceReleases : this.releaseComparison.destReleases;
         res.push(this.addQuote(isFrom ? this.releaseCompareComponent.fromVersion : this.releaseCompareComponent.toVersion));
-        releases.forEach(r => res.push(r.version.versionNumber.split('.').length === 3 ? 0 : (isFrom ? -1 : 1)));
+        if (this.releaseCompareComponent.fromVersion.substring(0, this.releaseCompareComponent.fromVersion.lastIndexOf('.')) ===
+            this.releaseCompareComponent.toVersion.substring(0, this.releaseCompareComponent.toVersion.lastIndexOf('.'))) {
+            releases.forEach(_ => res.push(1));
+        } else {
+            releases.forEach(r => res.push(r.version.versionNumber.split('.').length === 3 ? 0 : (isFrom ? -1 : 1)));
+        }
         return res;
     }
 
