@@ -20,29 +20,35 @@ public abstract class Deployable implements Serializable {
 	protected Date buildDate;
 	@Temporal(TemporalType.DATE)
 	protected Date packageDate;
+	
+	protected Boolean undeployed;
 
 	@Embedded
 	// rename the basic mappings
-	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "QUALIFICATION_DEPLOY_DATE")),
-			@AttributeOverride(name = "validationDate", column = @Column(name = "QUALIFICATION_VALIDATION_DATE")) })
+	@AttributeOverride(name = "deployDate", column = @Column(name = "QUALIFICATION_DEPLOY_DATE"))
+	@AttributeOverride(name = "validationDate", column = @Column(name = "QUALIFICATION_VALIDATION_DATE"))
+	@AttributeOverride(name = "undeployDate", column = @Column(name = "QUALIFICATION_UNDEPLOY_DATE"))
 	protected PlatformHistory qualification;
 
 	@Embedded
 	// rename the basic mappings
-	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "KEYUSER_DEPLOY_DATE")),
-			@AttributeOverride(name = "validationDate", column = @Column(name = "KEYUSER_VALIDATION_DATE")) })
+	@AttributeOverride(name = "deployDate", column = @Column(name = "KEYUSER_DEPLOY_DATE"))
+	@AttributeOverride(name = "validationDate", column = @Column(name = "KEYUSER_VALIDATION_DATE"))
+	@AttributeOverride(name = "undeployDate", column = @Column(name = "KEYUSER_UNDEPLOY_DATE"))
 	protected PlatformHistory keyUser;
 
 	@Embedded
 	// rename the basic mappings
-	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "PILOT_DEPLOY_DATE")),
-			@AttributeOverride(name = "validationDate", column = @Column(name = "PILOT_VALIDATION_DATE")) })
+	@AttributeOverride(name = "deployDate", column = @Column(name = "PILOT_DEPLOY_DATE"))
+	@AttributeOverride(name = "validationDate", column = @Column(name = "PILOT_VALIDATION_DATE"))
+	@AttributeOverride(name = "undeployDate", column = @Column(name = "PILOT_UNDEPLOY_DATE"))
 	protected PlatformHistory pilot;
 
 	@Embedded
 	// rename the basic mappings
-	@AttributeOverrides({ @AttributeOverride(name = "deployDate", column = @Column(name = "PRODUCTION_DEPLOY_DATE")),
-			@AttributeOverride(name = "validationDate", column = @Column(name = "PRODUCTION_VALIDATION_DATE")) })
+	@AttributeOverride(name = "deployDate", column = @Column(name = "PRODUCTION_DEPLOY_DATE"))
+	@AttributeOverride(name = "validationDate", column = @Column(name = "PRODUCTION_VALIDATION_DATE"))
+	@AttributeOverride(name = "undeployDate", column = @Column(name = "PRODUCTION_UNDEPLOY_DATE"))
 	protected PlatformHistory production;
 
 	public Deployable() {
@@ -63,6 +69,14 @@ public abstract class Deployable implements Serializable {
 
 	public void setPackageDate(Date packageDate) {
 		this.packageDate = packageDate;
+	}
+
+	public Boolean getUndeployed() {
+		return undeployed;
+	}
+
+	public void setUndeployed(Boolean undeployed) {
+		this.undeployed = undeployed;
 	}
 
 	public PlatformHistory getQualification() {
@@ -99,7 +113,7 @@ public abstract class Deployable implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(buildDate, keyUser, packageDate, pilot, production, qualification);
+		return Objects.hash(buildDate, keyUser, packageDate, pilot, production, qualification, undeployed);
 	}
 
 	@Override
@@ -113,14 +127,15 @@ public abstract class Deployable implements Serializable {
 		Deployable other = (Deployable) obj;
 		return Objects.equals(buildDate, other.buildDate) && Objects.equals(keyUser, other.keyUser)
 				&& Objects.equals(packageDate, other.packageDate) && Objects.equals(pilot, other.pilot)
-				&& Objects.equals(production, other.production) && Objects.equals(qualification, other.qualification);
+				&& Objects.equals(production, other.production) && Objects.equals(qualification, other.qualification)
+				&& undeployed == other.undeployed;
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Deployable [buildDate=%s, packageDate=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
-				buildDate, packageDate, qualification, keyUser, pilot, production);
+				"Deployable [buildDate=%s, packageDate=%s, undeployed=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
+				buildDate, packageDate, undeployed, qualification, keyUser, pilot, production);
 	}
 
 }

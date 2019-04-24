@@ -23,6 +23,7 @@
     "@wkoza/ngx-upload": "^6.4.0",
     "core-js": "^2.5.4",
     "ngx-markdown": "^7.1.5",
+    "ngx-toggle-switch": "^2.0.5",
     "patternfly": "^3.59.1",
     "patternfly-ng": "^4.5.1",
     "rxjs": "~6.2.0",

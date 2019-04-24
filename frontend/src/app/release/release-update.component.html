@@ -11,6 +11,12 @@
                             [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
+                <div class="form-group required">
+                    <label class="col-sm-4 control-label" for="Undeploy">Undeploy</label>
+                    <div class="col-sm-8">
+                            <ui-switch [(ngModel)]="data.release.undeployed" [ngModelOptions]="{standalone: true}"></ui-switch>
+                    </div>
+                </div>
             </form>
         </pfng-wizard-substep>
         <!-- Step 1B: Settings -->
@@ -75,6 +81,13 @@
                             [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.qualification.undeployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
             </form>
         </pfng-wizard-substep>
         <!-- Step 2C: Settings -->
@@ -92,6 +105,13 @@
                     <div class="col-sm-8">
                         <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
                             [(ngModel)]="data.release.keyUser.validationDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.keyUser.undeployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -113,6 +133,13 @@
                             [(ngModel)]="data.release.pilot.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.pilot.undeployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
             </form>
         </pfng-wizard-substep>
         <!-- Step 2E: Settings -->
@@ -130,6 +157,13 @@
                     <div class="col-sm-8">
                         <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
                             [(ngModel)]="data.release.production.validationDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.production.undeployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -203,6 +237,10 @@
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.release.qualification.validationDate | date}}</span>
         </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.qualification.undeployDate | date}}</span>
+        </div>
     </form>
 </ng-template>
 <!-- Step 2C: Settings -->
@@ -215,6 +253,10 @@
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.release.keyUser.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.keyUser.undeployDate | date}}</span>
         </div>
     </form>
 </ng-template>
@@ -229,6 +271,10 @@
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.release.pilot.validationDate | date}}</span>
         </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.pilot.undeployDate | date}}</span>
+        </div>
     </form>
 </ng-template>
 <!-- Step 2E: Settings -->
@@ -241,6 +287,10 @@
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.release.production.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.production.undeployDate | date}}</span>
         </div>
     </form>
 </ng-template>

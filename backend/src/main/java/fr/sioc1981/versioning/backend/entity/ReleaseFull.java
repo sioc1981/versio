@@ -29,52 +29,61 @@ import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
  */
 @Entity
 @NamedNativeQuery(name = "releaseFullSummaryById", resultSetMapping = "releaseFullSummary", query = "SELECT "
-		+ "r.id as id, v.versionnumber as version_number, COALESCE(p.patchcount,0) as patch_count, COALESCE(p.packagedpatchcount,0) as packaged_patch_count " +", "
+		+ "r.id as id, v.versionnumber as version_number, r.undeployed as undeployed, COALESCE(p.patchcount,0) as patch_count, COALESCE(p.packagedpatchcount,0) as packaged_patch_count " +", "
 		+ "CASE WHEN r.QUALIFICATION_DEPLOY_DATE IS NULL THEN false ELSE true END as qualification_deployed, "
 		+ "CASE WHEN r.QUALIFICATION_VALIDATION_DATE IS NULL THEN false ELSE true END as qualification_validated, "
+		+ "CASE WHEN r.QUALIFICATION_UNDEPLOY_DATE IS NULL THEN false ELSE true END as qualification_undeployed, "
 		+ "COALESCE(p.qualificationdeployedpatches, 0) as qualification_deployed_patches, COALESCE(p.qualificationvalidatedpatches, 0) as qualification_validated_patches, "
 		+ "CASE WHEN r.KEYUSER_DEPLOY_DATE IS NULL THEN false ELSE true END as keyuser_deployed, "
 		+ "CASE WHEN r.KEYUSER_VALIDATION_DATE IS NULL THEN false ELSE true END as keyuser_validated, "
+		+ "CASE WHEN r.KEYUSER_UNDEPLOY_DATE IS NULL THEN false ELSE true END as keyuser_undeployed, "
 		+ "COALESCE(p.keyuserdeployedpatches, 0) as keyuser_deployed_patches, COALESCE(p.keyuservalidatedpatches, 0) as keyuser_validated_patches, "
 		+ "CASE WHEN r.PILOT_DEPLOY_DATE IS NULL THEN false ELSE true END as pilot_deployed, "
 		+ "CASE WHEN r.PILOT_VALIDATION_DATE IS NULL THEN false ELSE true END as pilot_validated, "
+		+ "CASE WHEN r.PILOT_UNDEPLOY_DATE IS NULL THEN false ELSE true END as pilot_undeployed, "
 		+ "COALESCE(p.pilotdeployedpatches, 0) as pilot_deployed_patches, COALESCE(p.pilotvalidatedpatches, 0) as pilot_validated_patches, "
 		+ "CASE WHEN r.PRODUCTION_DEPLOY_DATE IS NULL THEN false ELSE true END as prodution_deployed, "
 		+ "CASE WHEN r.PRODUCTION_VALIDATION_DATE IS NULL THEN false ELSE true END as prodution_validated, "
+		+ "CASE WHEN r.PRODUCTION_UNDEPLOY_DATE IS NULL THEN false ELSE true END as prodution_undeployed, "
 		+ "COALESCE(p.produtiondeployedpatches, 0) as prodution_deployed_patches, COALESCE(p.produtionvalidatedpatches, 0) as prodution_validated_patches "
 		+ "FROM release as r join version as v on r.version_id=v.id "
 		+ "left join (select release_id as release_id, count(id) as patchcount, count(packagedate) as packagedpatchcount, "
-		+ "count(QUALIFICATION_DEPLOY_DATE) as qualificationdeployedpatches, count(QUALIFICATION_VALIDATION_DATE) as qualificationvalidatedpatches, "
-		+ "count(KEYUSER_DEPLOY_DATE) as keyuserdeployedpatches, count(KEYUSER_VALIDATION_DATE) as keyuservalidatedpatches, "
-		+ "count(PILOT_DEPLOY_DATE) as pilotdeployedpatches, count(PILOT_VALIDATION_DATE) as pilotvalidatedpatches, "
-		+ "count(PRODUCTION_DEPLOY_DATE) as produtiondeployedpatches, count(PRODUCTION_VALIDATION_DATE) as produtionvalidatedpatches "
-		+ "from patch group by release_id) as p on p.release_id = r.id "
+		+ "count(QUALIFICATION_DEPLOY_DATE) - count(QUALIFICATION_UNDEPLOY_DATE) as qualificationdeployedpatches, count(QUALIFICATION_VALIDATION_DATE) - count(QUALIFICATION_UNDEPLOY_DATE) as qualificationvalidatedpatches, "
+		+ "count(KEYUSER_DEPLOY_DATE) - count(KEYUSER_UNDEPLOY_DATE) as keyuserdeployedpatches, count(KEYUSER_VALIDATION_DATE) - count(KEYUSER_UNDEPLOY_DATE) as keyuservalidatedpatches, "
+		+ "count(PILOT_DEPLOY_DATE) - count(PILOT_UNDEPLOY_DATE) as pilotdeployedpatches, count(PILOT_VALIDATION_DATE) - count(PILOT_UNDEPLOY_DATE) as pilotvalidatedpatches, "
+		+ "count(PRODUCTION_DEPLOY_DATE) - count(PRODUCTION_UNDEPLOY_DATE) as produtiondeployedpatches, count(PRODUCTION_VALIDATION_DATE) - count(PRODUCTION_UNDEPLOY_DATE) as produtionvalidatedpatches "
+		+ "from patch where undeployed <> true group by release_id) as p on p.release_id = r.id "
 		+ "WHERE r.id=:id")
 @NamedNativeQuery(name = "releaseFullSummary", resultSetMapping = "releaseFullSummary", query = "SELECT "
-		+ "r.id as id, v.versionnumber as version_number, COALESCE(p.patchcount,0) as patch_count, COALESCE(p.packagedpatchcount,0) as packaged_patch_count " +", "
+		+ "r.id as id, v.versionnumber as version_number, r.undeployed as undeployed, COALESCE(p.patchcount,0) as patch_count, COALESCE(p.packagedpatchcount,0) as packaged_patch_count " +", "
 		+ "CASE WHEN r.QUALIFICATION_DEPLOY_DATE IS NULL THEN false ELSE true END as qualification_deployed, "
 		+ "CASE WHEN r.QUALIFICATION_VALIDATION_DATE IS NULL THEN false ELSE true END as qualification_validated, "
+		+ "CASE WHEN r.QUALIFICATION_UNDEPLOY_DATE IS NULL THEN false ELSE true END as qualification_undeployed, "
 		+ "COALESCE(p.qualificationdeployedpatches, 0) as qualification_deployed_patches, COALESCE(p.qualificationvalidatedpatches, 0) as qualification_validated_patches, "
 		+ "CASE WHEN r.KEYUSER_DEPLOY_DATE IS NULL THEN false ELSE true END as keyuser_deployed, "
 		+ "CASE WHEN r.KEYUSER_VALIDATION_DATE IS NULL THEN false ELSE true END as keyuser_validated, "
+		+ "CASE WHEN r.KEYUSER_UNDEPLOY_DATE IS NULL THEN false ELSE true END as keyuser_undeployed, "
 		+ "COALESCE(p.keyuserdeployedpatches, 0) as keyuser_deployed_patches, COALESCE(p.keyuservalidatedpatches, 0) as keyuser_validated_patches, "
 		+ "CASE WHEN r.PILOT_DEPLOY_DATE IS NULL THEN false ELSE true END as pilot_deployed, "
 		+ "CASE WHEN r.PILOT_VALIDATION_DATE IS NULL THEN false ELSE true END as pilot_validated, "
+		+ "CASE WHEN r.PILOT_UNDEPLOY_DATE IS NULL THEN false ELSE true END as pilot_undeployed, "
 		+ "COALESCE(p.pilotdeployedpatches, 0) as pilot_deployed_patches, COALESCE(p.pilotvalidatedpatches, 0) as pilot_validated_patches, "
 		+ "CASE WHEN r.PRODUCTION_DEPLOY_DATE IS NULL THEN false ELSE true END as prodution_deployed, "
 		+ "CASE WHEN r.PRODUCTION_VALIDATION_DATE IS NULL THEN false ELSE true END as prodution_validated, "
+		+ "CASE WHEN r.PRODUCTION_UNDEPLOY_DATE IS NULL THEN false ELSE true END as prodution_undeployed, "
 		+ "COALESCE(p.produtiondeployedpatches, 0) as prodution_deployed_patches, COALESCE(p.produtionvalidatedpatches, 0) as prodution_validated_patches "
 		+ "FROM release as r join version as v on r.version_id=v.id "
 		+ "left join (select release_id as release_id, count(id) as patchcount, count(packagedate) as packagedpatchcount, "
-		+ "count(QUALIFICATION_DEPLOY_DATE) as qualificationdeployedpatches, count(QUALIFICATION_VALIDATION_DATE) as qualificationvalidatedpatches, "
-		+ "count(KEYUSER_DEPLOY_DATE) as keyuserdeployedpatches, count(KEYUSER_VALIDATION_DATE) as keyuservalidatedpatches, "
-		+ "count(PILOT_DEPLOY_DATE) as pilotdeployedpatches, count(PILOT_VALIDATION_DATE) as pilotvalidatedpatches, "
-		+ "count(PRODUCTION_DEPLOY_DATE) as produtiondeployedpatches, count(PRODUCTION_VALIDATION_DATE) as produtionvalidatedpatches "
-		+ "from patch group by release_id) as p on p.release_id = r.id ")
+		+ "count(QUALIFICATION_DEPLOY_DATE) - count(QUALIFICATION_UNDEPLOY_DATE) as qualificationdeployedpatches, count(QUALIFICATION_VALIDATION_DATE) - count(QUALIFICATION_UNDEPLOY_DATE) as qualificationvalidatedpatches, "
+		+ "count(KEYUSER_DEPLOY_DATE) - count(KEYUSER_UNDEPLOY_DATE) as keyuserdeployedpatches, count(KEYUSER_VALIDATION_DATE) - count(KEYUSER_UNDEPLOY_DATE) as keyuservalidatedpatches, "
+		+ "count(PILOT_DEPLOY_DATE) - count(PILOT_UNDEPLOY_DATE) as pilotdeployedpatches, count(PILOT_VALIDATION_DATE) - count(PILOT_UNDEPLOY_DATE) as pilotvalidatedpatches, "
+		+ "count(PRODUCTION_DEPLOY_DATE) - count(PRODUCTION_UNDEPLOY_DATE) as produtiondeployedpatches, count(PRODUCTION_VALIDATION_DATE) - count(PRODUCTION_UNDEPLOY_DATE) as produtionvalidatedpatches "
+		+ "from patch where undeployed <> true group by release_id) as p on p.release_id = r.id ")
 @SqlResultSetMapping(name = "releaseFullSummary", classes = {
 		@ConstructorResult(targetClass = ReleaseFullSummary.class, columns = {
 				@ColumnResult(name = "id", type = Long.class),
 				@ColumnResult(name = "version_number", type = String.class),
+				@ColumnResult(name = "undeployed", type = Boolean.class),
 				@ColumnResult(name = "patch_count", type = Integer.class),
 				@ColumnResult(name = "packaged_patch_count", type = Integer.class) })
     ,
@@ -83,6 +92,7 @@ import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
             columns = {
                 @ColumnResult(name = "qualification_deployed", type = Boolean.class),
                 @ColumnResult(name = "qualification_validated", type = Boolean.class),
+                @ColumnResult(name = "qualification_undeployed", type = Boolean.class),
                 @ColumnResult(name = "qualification_deployed_patches", type = Long.class),
                 @ColumnResult(name = "qualification_validated_patches", type = Long.class)
             })
@@ -92,6 +102,7 @@ import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 				columns = {
 						@ColumnResult(name = "keyuser_deployed", type = Boolean.class),
 						@ColumnResult(name = "keyuser_validated", type = Boolean.class),
+						@ColumnResult(name = "keyuser_undeployed", type = Boolean.class),
 						@ColumnResult(name = "keyuser_deployed_patches", type = Long.class),
 						@ColumnResult(name = "keyuser_validated_patches", type = Long.class)
 				})
@@ -101,6 +112,7 @@ import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 				columns = {
 						@ColumnResult(name = "pilot_deployed", type = Boolean.class),
 						@ColumnResult(name = "pilot_validated", type = Boolean.class),
+						@ColumnResult(name = "pilot_undeployed", type = Boolean.class),
 						@ColumnResult(name = "pilot_deployed_patches", type = Long.class),
 						@ColumnResult(name = "pilot_validated_patches", type = Long.class)
 				})
@@ -110,6 +122,7 @@ import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 				columns = {
 						@ColumnResult(name = "prodution_deployed", type = Boolean.class),
 						@ColumnResult(name = "prodution_validated", type = Boolean.class),
+						@ColumnResult(name = "prodution_undeployed", type = Boolean.class),
 						@ColumnResult(name = "prodution_deployed_patches", type = Long.class),
 						@ColumnResult(name = "prodution_validated_patches", type = Long.class)
 				})

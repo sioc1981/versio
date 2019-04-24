@@ -6,9 +6,11 @@ public class ReleaseFullSummary {
 
 	private String versionNumber;
 
+	private boolean undeployed;
+	
 	private int patchCount;
 	private int packagedPatches;
-
+	
 	private PlatformCount qualification;
 	private PlatformCount keyUser;
 	private PlatformCount pilot;
@@ -19,10 +21,11 @@ public class ReleaseFullSummary {
 		super();
 	}
 
-	public ReleaseFullSummary(Long id, String versionNumber, int patchCount, int packagedPatches) {
+	public ReleaseFullSummary(Long id, String versionNumber, Boolean undeployed, Integer patchCount, Integer packagedPatches) {
 		super();
 		this.id = id;
 		this.versionNumber = versionNumber;
+		this.undeployed = undeployed != null && undeployed;
 		this.patchCount = patchCount;
 		this.packagedPatches = packagedPatches;
 	}
@@ -41,6 +44,14 @@ public class ReleaseFullSummary {
 
 	public void setVersionNumber(String versionNumber) {
 		this.versionNumber = versionNumber;
+	}
+
+	public boolean isUndeployed() {
+		return undeployed;
+	}
+
+	public void setUndeployed(boolean undeployed) {
+		this.undeployed = undeployed;
 	}
 
 	public int getPatchCount() {
@@ -94,10 +105,8 @@ public class ReleaseFullSummary {
 	@Override
 	public String toString() {
 		return String.format(
-				"ReleaseFullSummary [id=%s, versionNumber=%s, patchCount=%s, packagedPatches=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
-				id, versionNumber, patchCount, packagedPatches, qualification, keyUser, pilot, production);
+				"ReleaseFullSummary [id=%s, versionNumber=%s, undeployed=%s, patchCount=%s, packagedPatches=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
+				id, versionNumber, undeployed, patchCount, packagedPatches, qualification, keyUser, pilot, production);
 	}
 
-	
-	
 }

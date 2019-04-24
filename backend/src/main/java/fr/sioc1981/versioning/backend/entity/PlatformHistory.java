@@ -11,7 +11,7 @@ import javax.persistence.TemporalType;
 
 @Embeddable
 public class PlatformHistory implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	@Temporal(TemporalType.DATE)
@@ -21,6 +21,10 @@ public class PlatformHistory implements Serializable {
 	@Temporal(TemporalType.DATE)
 	@JsonbDateFormat
 	protected Date validationDate;
+
+	@Temporal(TemporalType.DATE)
+	@JsonbDateFormat
+	protected Date undeployDate;
 
 	public Date getDeployDate() {
 		return deployDate;
@@ -38,9 +42,17 @@ public class PlatformHistory implements Serializable {
 		this.validationDate = validationDate;
 	}
 
+	public Date getUndeployDate() {
+		return undeployDate;
+	}
+
+	public void setUndeployDate(Date undeployDate) {
+		this.undeployDate = undeployDate;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(deployDate, validationDate);
+		return Objects.hash(deployDate, undeployDate, validationDate);
 	}
 
 	@Override
@@ -52,12 +64,14 @@ public class PlatformHistory implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PlatformHistory other = (PlatformHistory) obj;
-		return Objects.equals(deployDate, other.deployDate) && Objects.equals(validationDate, other.validationDate);
+		return Objects.equals(deployDate, other.deployDate) && Objects.equals(undeployDate, other.undeployDate)
+				&& Objects.equals(validationDate, other.validationDate);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("[deployDate=%s, validationDate=%s]", deployDate, validationDate);
+		return String.format("PlatformHistory [deployDate=%s, validationDate=%s, undeployDate=%s]", deployDate,
+				validationDate, undeployDate);
 	}
 
 }

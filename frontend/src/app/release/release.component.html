@@ -17,7 +17,7 @@
 
     <div class="col-sm-12">
         <div class="form-group">
-            <pfng-list id="myList" [expandTemplate]="expandTemplate" [actionTemplate]="actionTemplate" [items]="items"
+            <pfng-list id="myList" [expandTemplate]="expandTemplate" [actionTemplate]="actionTemplate" [items]="items | skipUndeploy"
                 [itemTemplate]="releaseTemplate">
                 <ng-template #releaseTemplate let-item="item" let-index="index">
                     <div class="list-pf-content-wrapper">
@@ -27,12 +27,12 @@
                         <div class="list-pf-additional-content" style="justify-content:flex-start; flex-basis: 16%">
                             <pfng-list-expand-toggle [expandId]="'issues'" [item]="item" [template]="issueTemplate">
                                 <ng-template #issueTemplate>
-                                    <span class="fas {{issueIconStyleClass}}"></span>
+                                    <span class="fa list-pf-title">{{item.issues.length}}</span> <span class="fas {{issueIconStyleClass}}"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                             <pfng-list-expand-toggle [expandId]="'patches'" [item]="item" [template]="patchTemplate">
                                 <ng-template #patchTemplate>
-                                    <span class="fas {{patchIconStyleClass}}"></span>
+                                    <span class="fa list-pf-title">{{item.patches.length}}</span> <span class="fas {{patchIconStyleClass}}"></span>
                                 </ng-template>
                             </pfng-list-expand-toggle>
                         </div>
@@ -98,7 +98,7 @@
                     <div *ngIf="item.expandId === 'patches'">
                         <div class="margin-left-20">
                             <h4>Patches</h4>
-                            <pfng-list id="myList" [items]="item.patches" [itemTemplate]="patchTemplate">
+                            <pfng-list id="myList" [items]="item.patches | skipUndeploy" [itemTemplate]="patchTemplate">
                                 <ng-template #patchTemplate let-item="item" let-index="index">
                                     <div class="list-pf-content-wrapper">
                                         <div class="list-pf-main-content">
@@ -145,6 +145,10 @@
                                 <div><strong>Validation Date</strong></div>
                                 <div *ngIf="release.qualification">{{release.qualification.validationDate | date}}</div>
                             </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.qualification">{{release.qualification.undeployDate | date}}</div>
+                            </div>
                         </div>
                     </div>
                     <div *ngIf="item.expandId === 'keyuser'">
@@ -159,7 +163,11 @@
                                 <div *ngIf="release.keyuser">{{release.keyuser.validationDate | date}}</div>
                             </div>
                         </div>
-                    </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.keyuser">{{release.keyuser.undeployDate | date}}</div>
+                            </div>
+                   </div>
                     <div *ngIf="item.expandId === 'pilot'">
                         <div class="margin-left-20">
                             <h4>Pilot</h4>
@@ -170,6 +178,10 @@
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
                                 <div *ngIf="release.pilot">{{release.pilot.validationDate | date}}</div>
+                            </div>
+                           <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.pilot">{{release.pilot.undeployDate | date}}</div>
                             </div>
                         </div>
                     </div>
@@ -183,6 +195,10 @@
                             <div class="col-sm-4">
                                 <div><strong>Validation Date</strong></div>
                                 <div *ngIf="release.production">{{release.production.validationDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.production">{{release.production.undeployDate | date}}</div>
                             </div>
                         </div>
                     </div>

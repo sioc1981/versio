@@ -10,6 +10,7 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxUploadModule } from '@wkoza/ngx-upload';
 import { MarkdownModule } from 'ngx-markdown';
+import { UiSwitchModule } from 'ngx-toggle-switch';
 
 import {
     AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
@@ -42,6 +43,7 @@ import { IssueImportComponent } from './issue/issue-import.component';
 import { ngxloggerOptions, ngxDropTargetOptions, LoggerOptions } from '@wkoza/ngx-upload/utils/configuration.model';
 import { ReleaseImportComponent } from './release/release-import.component';
 import { PatchImportComponent } from './patch/patch-import.component';
+import { SkipUndeployPipe } from './shared/skip-undeploy.pipe';
 
 @NgModule({
     declarations: [
@@ -66,6 +68,7 @@ import { PatchImportComponent } from './patch/patch-import.component';
         IssueImportComponent,
         ReleaseImportComponent,
         PatchImportComponent,
+        SkipUndeployPipe,
     ],
     imports: [
         AboutModalModule,
@@ -91,6 +94,7 @@ import { PatchImportComponent } from './patch/patch-import.component';
         ToolbarModule,
         TypeaheadModule.forRoot(),
         VerticalNavigationModule,
+        UiSwitchModule,
         UtilizationDonutChartModule,
         WizardModule
     ],
