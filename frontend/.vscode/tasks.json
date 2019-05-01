@@ -40,6 +40,11 @@
                     "node_modules_ready"
                 ]
             }
+        },
+        {
+            "type": "npm",
+            "script": "build",
+            "problemMatcher": []
         }
     ]
 }

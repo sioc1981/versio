@@ -193,7 +193,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'stepFinale') {
             if (this.deploySuccess) {
-                this.releaseComponent.getReleases();
+                this.releaseComponent.reloadData();
             }
             this.releaseComponent.closeModal($event);
         }

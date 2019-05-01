@@ -22,13 +22,20 @@ export class SummaryColorDirective implements OnInit {
 
     applyReleaseColor(): void {
         if (!this.appSummaryColor || !this.appSummaryColor.deployed) {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+        } else if (this.appSummaryColor.undeployed) {
+            this.renderer.addClass(this.hostElement.nativeElement, 'myApp-gray');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
         } else if (this.appSummaryColor.validated) {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
         } else {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-orange');
         }

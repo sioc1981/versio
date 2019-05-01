@@ -22,7 +22,7 @@
                 <ng-template #releaseTemplate let-item="item" let-index="index">
                     <div class="list-pf-content-wrapper">
                         <div class="list-pf-main-content">
-                            <div class="list-pf-title">{{item.release.version.versionNumber}}</div>
+                            <div class="list-pf-title"><a routerLink="/release/{{item.release.version.versionNumber}}">{{item.release.version.versionNumber}}</a></div>
                         </div>
                         <div class="list-pf-additional-content" style="justify-content:flex-start; flex-basis: 16%">
                             <pfng-list-expand-toggle [expandId]="'issues'" [item]="item" [template]="issueTemplate">

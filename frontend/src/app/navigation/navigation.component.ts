@@ -65,11 +65,18 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.subscriptions.push(this.router.events.pipe(
             filter(e => e instanceof RouterEvent)
         ).subscribe((e: RouterEvent) => {
+            //console.log('url: ', e.url);
             // to keep parameter when click on compare menu
             if (e.url.startsWith('/compare')) {
                 this.navigationItems[this.COMPARE_INDEX].url = e.url;
             } else {
                 this.navigationItems[this.COMPARE_INDEX].url = '/compare';
+            }
+            // to keep parameter when click on releases menu
+            if (e.url.startsWith('/release')) {
+                this.navigationItems[this.RELEASES_INDEX].url = e.url;
+            } else {
+                this.navigationItems[this.RELEASES_INDEX].url = '/releases';
             }
         }));
         this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(c =>

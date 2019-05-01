@@ -155,7 +155,7 @@ public class ReleaseService {
 	@Path("{id}/full")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") String id) {
-		List<Release> result = this.entityManager.createQuery("from ReleaseFull where release = :id", Release.class)
+		List<ReleaseFull> result = this.entityManager.createQuery("from ReleaseFull rf where rf.release.version.versionNumber = :id", ReleaseFull.class)
 				.setParameter("id", id).getResultList();
 
 		if (result.isEmpty()) {

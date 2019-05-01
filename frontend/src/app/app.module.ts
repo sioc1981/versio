@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -8,6 +8,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxUploadModule } from '@wkoza/ngx-upload';
 import { MarkdownModule } from 'ngx-markdown';
 import { UiSwitchModule } from 'ngx-toggle-switch';
@@ -40,10 +41,19 @@ import { ReleaseCompareComponent } from './release-compare/release-compare.compo
 import { VersionGraphComponent } from './release-compare/version-graph.component';
 import { IssueUpdateComponent } from './issue/issue-update.component';
 import { IssueImportComponent } from './issue/issue-import.component';
-import { ngxloggerOptions, ngxDropTargetOptions, LoggerOptions } from '@wkoza/ngx-upload/utils/configuration.model';
 import { ReleaseImportComponent } from './release/release-import.component';
 import { PatchImportComponent } from './patch/patch-import.component';
 import { SkipUndeployPipe } from './shared/skip-undeploy.pipe';
+import { ReleaseDetailComponent } from './release/release-detail.component';
+
+import { registerLocaleData } from '@angular/common';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import localeFr from '@angular/common/locales/fr';
+import { frLocale } from 'ngx-bootstrap/locale';
+
+// the second parameter 'fr' is optional
+registerLocaleData(localeFr, 'fr');
+defineLocale('fr', frLocale); 
 
 @NgModule({
     declarations: [
@@ -55,6 +65,7 @@ import { SkipUndeployPipe } from './shared/skip-undeploy.pipe';
         PatchUpdateComponent,
         ReleaseComponent,
         ReleaseCreateComponent,
+        ReleaseDetailComponent,
         ReleaseUpdateComponent,
         NavigationComponent,
         DashboardComponent,
@@ -90,6 +101,7 @@ import { SkipUndeployPipe } from './shared/skip-undeploy.pipe';
         NgxUploadModule.forRoot(),
         PaginationModule,
         TableModule,
+        TabsModule.forRoot(),
         ToastNotificationListModule,
         ToolbarModule,
         TypeaheadModule.forRoot(),
@@ -98,7 +110,8 @@ import { SkipUndeployPipe } from './shared/skip-undeploy.pipe';
         UtilizationDonutChartModule,
         WizardModule
     ],
-    providers: [BsDropdownConfig, NotificationService, SseService],
+    providers: [BsDropdownConfig, NotificationService, SseService,
+        { provide: LOCALE_ID, useValue: 'fr' }],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

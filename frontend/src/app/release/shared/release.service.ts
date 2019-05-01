@@ -18,6 +18,7 @@ export const RELEASE_CONSTANT = {
     iconStyleClass: 'pficon pficon-bundle',
     summary: new Summary(),
     releaseSummaries: [] as ReleaseSummary[],
+    releaseSummariesNotifier$: new EventEmitter<boolean>(false),
     title: 'Releases',
     url: '/releases'
 };
@@ -39,9 +40,10 @@ export class ReleaseService {
             RELEASE_CONSTANT.summary.count$.emit(count);
         } else if (data['summary'] !== undefined) {
             Object.entries(data['summary']).forEach( entry => {
-                const i: number = eval(entry[0]);
+                const i: number = +entry[0];
                 RELEASE_CONSTANT.releaseSummaries[i] = entry[1] as ReleaseSummary;
             });
+            RELEASE_CONSTANT.releaseSummariesNotifier$.emit(true);
         }
     }
     getReleases(): Observable<Release[]> {
@@ -74,6 +76,13 @@ export class ReleaseService {
         const url = `${RELEASE_CONSTANT.backendUrl}/${id}/full`;
         return this.http.get<ReleaseFull>(url).pipe(
             catchError(this.logAndError(`getReleaseFull id=${id}`))
+        );
+    }
+
+    searchReleaseFull(versionNumber: string): Observable<ReleaseFull> {
+        const url = `${RELEASE_CONSTANT.backendUrl}/${versionNumber}/full`;
+        return this.http.get<ReleaseFull>(url).pipe(
+            catchError(this.logAndError(`searchReleaseFull versionNumber=${versionNumber}`))
         );
     }
 

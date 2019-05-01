@@ -12,6 +12,7 @@ import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { ReleaseFull } from './shared/ReleaseFull';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { ReleaseModalContainer } from './release-modal-container';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -19,7 +20,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
     templateUrl: './release.component.html',
     styleUrls: ['./release.component.less']
 })
-export class ReleaseComponent implements OnInit, OnDestroy {
+export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContainer {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createRelease') createReleaseTemplate: TemplateRef<any>;
     @ViewChild('importRelease') importReleaseTemplate: TemplateRef<any>;
@@ -49,7 +50,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
     constructor(private releaseService: ReleaseService, private modalService: BsModalService) { }
 
     ngOnInit() {
-        this.getReleases();
+        this.reloadData();
         this.filterConfig = {
             fields: [{
                 id: 'version',
@@ -102,7 +103,11 @@ export class ReleaseComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach(sub => sub.unsubscribe);
     }
 
-    getReleases(): void {
+    getRelease(): ReleaseFull {
+        return this.selectedRelease;
+    }
+
+    reloadData(): void {
         this.subscriptions.push(this.releaseService.getFullReleases()
             .subscribe(newReleases => { this.releases = newReleases; this.applyFilters(); }));
     }

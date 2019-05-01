@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     patchConfig: InfoStatusCardConfig = this.getPatchCardConfig();
     releaseConfig: InfoStatusCardConfig = this.getReleaseCardConfig();
 
-    releaseSummaries: ReleaseSummary[] = RELEASE_CONSTANT.releaseSummaries;
+    releaseSummaries: ReleaseSummary[] = []; //RELEASE_CONSTANT.releaseSummaries;
 
     packageConfig: UtilizationDonutChartConfig = {
         chartId: 'exampleUtilizationDonut',
@@ -35,9 +35,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     constructor() { }
 
     ngOnInit() {
-        this.subscriptions.push(ISSUE_CONSTANT.summary.count$.subscribe(_ => this.issueConfig = this.getIssueCardConfig()));
-        this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(_ => this.patchConfig = this.getPatchCardConfig()));
-        this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(_ => this.releaseConfig = this.getReleaseCardConfig()));
+        this.subscriptions.push(ISSUE_CONSTANT.summary.count$.subscribe(() => this.issueConfig = this.getIssueCardConfig()));
+        this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(() => this.patchConfig = this.getPatchCardConfig()));
+        this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(() => this.releaseConfig = this.getReleaseCardConfig()));
+        this.subscriptions.push(RELEASE_CONSTANT.releaseSummariesNotifier$.subscribe(() => {
+             this.releaseSummaries = [].concat(RELEASE_CONSTANT.releaseSummaries);
+        }));
     }
     /**
       * Clean up subscriptions

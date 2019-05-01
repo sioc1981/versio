@@ -31,7 +31,7 @@ export class PatchService {
 
     private sseCallback(data: any): void {
         if (data['count'] !== undefined) {
-            const count = Number(data['count']);
+            const count = +data['count'];
             PATCH_CONSTANT.summary.count$.emit(count);
 
         }

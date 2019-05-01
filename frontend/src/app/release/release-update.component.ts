@@ -5,9 +5,9 @@ import {
     ViewChild,
     ViewEncapsulation,
     OnDestroy,
+    Optional,
 } from '@angular/core';
 
-import { ReleaseComponent } from './release.component';
 import {
     WizardStepComponent, WizardStep, WizardComponent, WizardEvent, WizardStepConfig, WizardConfig,
     ListConfig, ListEvent
@@ -20,6 +20,9 @@ import { cloneDeep } from 'lodash';
 import { ReleaseFull } from './shared/ReleaseFull';
 import { PlatformHistory } from '../shared/PlatformHistory';
 import { Subscription } from 'rxjs';
+import { ReleaseModalContainer } from './release-modal-container';
+import { ReleaseComponent } from './release.component';
+import { ReleaseDetailComponent } from './release-detail.component';
 
 
 @Component({
@@ -55,7 +58,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    releaseComponent: ReleaseComponent;
+    releaseComponent: ReleaseModalContainer;
 
     releases: Release[];
     releaseListConfig: ListConfig;
@@ -70,12 +73,12 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private releaseService: ReleaseService,
-        @Host() releaseComponent: ReleaseComponent) {
-        this.releaseComponent = releaseComponent;
+        @Optional() @Host() releaseComponent: ReleaseComponent, @Optional() @Host() releaseDetailComponent: ReleaseDetailComponent) {
+        this.releaseComponent = releaseComponent ? releaseComponent : releaseDetailComponent;
     }
 
     ngOnInit(): void {
-        this.release = this.releaseComponent.selectedRelease;
+        this.release = this.releaseComponent.getRelease();
         this.data = cloneDeep(this.release);
         this.data.release.buildDate = new Date(this.release.release.buildDate);
         this.data.release.packageDate = this.initDate(this.release.release.packageDate);
@@ -248,7 +251,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.wizardConfig.done = true;
         this.subscriptions.push(this.releaseService.updateRelease(this.data as ReleaseFull)
             .subscribe(_ => {
-                this.releaseComponent.getReleases();
+                this.releaseComponent.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {

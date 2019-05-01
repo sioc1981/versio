@@ -1,0 +1,217 @@
+<div class="col-lg-12">
+    <ol class="fas breadcrumb">
+        <li class="breadcrumb-item">
+            <a [routerLink]="['/releases']">
+                Releases
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            {{versionNumber}}
+        </li>
+        <span style="float: right">
+            <pfng-action class="my-actions" [config]="actionConfig" (onActionSelect)="handleAction($event)">
+            </pfng-action>
+        </span>
+    </ol>
+</div>
+<div class="col-lg-12">
+    <div class="loading-container" *ngIf="loading; else loaded">
+        <div class="loading">
+            <div class="spinner spinner-lg"></div>
+            <span>Loading</span>
+        </div>
+    </div>
+
+    <ng-template #loaded>
+        <div *ngIf="release; else error">
+            <tabset>
+                <tab>
+                    <ng-template tabHeading>
+                        <span>Dates</span>
+                    </ng-template>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4><span class="fas myApp myApp-laptop-code" [class.myApp-green]="release.packageDate"
+                                    [class.myApp-orange]="!release.packageDate"></span><span>Build</span></h4>
+                            <div class="col-sm-4">
+                                <div><strong>Build Date</strong></div>
+                                <div *ngIf="release.buildDate">{{release.buildDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Package Date</strong></div>
+                                <div *ngIf="release.packageDate">{{release.packageDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4><span class="fas myApp myApp-user-shield"
+                                    [appHistoryColor]="release.qualification"></span>
+                                <span>Test platform</span></h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.qualification">{{release.qualification.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.qualification">{{release.qualification.validationDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.qualification">{{release.qualification.undeployDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4><span class="fas myApp myApp-cart-check" [appHistoryColor]="release.keyUser"></span>
+                                <span>Qualification platform</span></h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.keyUser">{{release.keyUser.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.keyUser">{{release.keyUser.validationDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.keyUser">{{release.keyUser.undeployDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4><span class="fas myApp myApp-cash-register" [appHistoryColor]="release.pilot"></span>
+                                <span>Pilot platform</span></h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.pilot">{{release.pilot.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.pilot">{{release.pilot.validationDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.pilot">{{release.pilot.undeployDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4><span class="fas myApp myApp-store" [appHistoryColor]="release.production"></span>
+                                <span>Production platform</span></h4>
+                            <div class="col-sm-4">
+                                <div><strong>Deploy Date</strong></div>
+                                <div *ngIf="release.production">{{release.production.deployDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Validation Date</strong></div>
+                                <div *ngIf="release.production">{{release.production.validationDate | date}}</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div><strong>Undeploy Date</strong></div>
+                                <div *ngIf="release.production">{{release.production.undeployDate | date}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab>
+                    <ng-template tabHeading>
+                        <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Issues
+                            ({{releaseFull.issues.length}})</span>
+                    </ng-template>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <pfng-toolbar [config]="issueToolbarConfig"
+                                    (onFilterChange)="filterChanged($event, true)">
+                                </pfng-toolbar>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <pfng-list id="myList" [items]="issues" [itemTemplate]="issueTemplate">
+                            <ng-template #issueTemplate let-item="item" let-index="index">
+                                <div class="list-pf-left" [ngSwitch]="item.container">
+                                    <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
+                                        *ngSwitchCase="'MANTIS'" />
+                                    <img src="/src/assets/images/jira.svg" class="list-pf-icon-small"
+                                        *ngSwitchCase="'JIRA'" />
+                                </div>
+                                <div class="list-pf-content-wrapper">
+                                    <div class="list-pf-main-content">
+                                        <div class="list-pf-title">{{item.reference}}</div>
+                                        <div class="list-pf-description">{{item.globalReference}}</div>
+                                    </div>
+                                    <div class="list-pf-additional-content">
+                                        <div>
+                                            <div class="list-pf-description">{{item.description}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </pfng-list>
+                        <pfng-pagination [config]="issuePaginationConfig"
+                            (onPageNumberChange)="handlePageNumber($event, true)"
+                            (onPageSizeChange)="handlePageSize($event, true)"></pfng-pagination>
+
+                    </div>
+                </tab>
+                <tab>
+                    <ng-template tabHeading>
+                        <span class="fas {{patchIconStyleClass}}"></span> <span class="padding-left-5">Patches
+                            ({{releaseFull.patches.length}})</span>
+                    </ng-template>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <pfng-toolbar [config]="patchToolbarConfig"
+                                    (onFilterChange)="filterChanged($event, false)">
+                                </pfng-toolbar>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                                            <pfng-list id="myList" [items]="patches | skipUndeploy" [itemTemplate]="patchTemplate">
+                        <ng-template #patchTemplate let-item="item" let-index="index">
+                            <div class="list-pf-content-wrapper">
+                                <div class="list-pf-main-content">
+                                    <div class="list-pf-main-content">
+                                        <div class="list-pf-title">{{item.sequenceNumber}}</div>
+                                    </div>
+                                </div>
+                                <div class="list-pf-additional-content">
+                                    <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate"
+                                        [class.myApp-orange]="!item.packageDate"></span>
+                                    <span class="fas fa myApp myApp-user-shield"
+                                        [appHistoryColor]="item.qualification"></span>
+                                    <span class="fas fa myApp myApp-cart-check" [appHistoryColor]="item.keyUser"></span>
+                                    <span class="fas fa myApp myApp-cash-register"
+                                        [appHistoryColor]="item.pilot"></span>
+                                    <span class="fas fa myApp myApp-store" [appHistoryColor]="item.production"></span>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </pfng-list>
+                                            <pfng-pagination [config]="patchPaginationConfig"
+                            (onPageNumberChange)="handlePageNumber($event, false)"
+                            (onPageSizeChange)="handlePageSize($event, false)"></pfng-pagination>
+
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </ng-template>
+
+    <ng-template #error>
+        <pfng-empty-state [config]="errorConfig"></pfng-empty-state>
+    </ng-template>
+    <ng-template #updateRelease>
+        <app-release-update></app-release-update>
+    </ng-template>
+</div>

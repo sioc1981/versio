@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class SkipUndeployPipe implements PipeTransform {
 
   transform(values: any[]): any {
-    return values.filter(value => !value.undeployed);
+    return values ? values.filter(value => !value.undeployed) : [];
   }
 
 }

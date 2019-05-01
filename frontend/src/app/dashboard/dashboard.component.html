@@ -15,7 +15,7 @@
     </div>
     <hr />
     <div class="row  row-cards-pf">
-        <div *ngFor="let item of releaseSummaries | skipUndeploy">
+        <div *ngFor="let item of (releaseSummaries | skipUndeploy)">
             <div *ngIf="item">
                 <app-release-card [item]="item"></app-release-card>
             </div>
