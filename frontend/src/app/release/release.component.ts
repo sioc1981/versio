@@ -3,7 +3,9 @@ import { ReleaseService } from './shared/release.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
     PaginationConfig,
-    PaginationEvent
+    PaginationEvent,
+    SortEvent,
+    SortField
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -28,17 +30,17 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
 
     actionConfig: ActionConfig;
     releaseActionConfig: ActionConfig;
-    isAscendingSort = true;
+    isAscendingSort = false;
     filterConfig: FilterConfig;
     sortConfig: SortConfig;
     toolbarConfig: ToolbarConfig;
+    currentSortField: SortField;
 
     releases: ReleaseFull[] = [];
     filteredReleases: ReleaseFull[] = [];
     items: ReleaseFull[] = [];
 
     selectedRelease: ReleaseFull;
-
     paginationConfig: PaginationConfig;
 
     issueIconStyleClass = ISSUE_CONSTANT.iconStyleClass;
@@ -82,6 +84,38 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
             }]
         } as ActionConfig;
 
+        this.sortConfig = {
+            fields: [{
+                id: 'version',
+                title: 'Version',
+                sortType: 'alpha'
+            }, {
+                id: 'buildDate',
+                title: 'Build Date',
+                sortType: 'alpha'
+            }, {
+                id: 'qualificationDate',
+                title: 'Qualification Deploy Date',
+                sortType: 'alpha'
+            }, {
+                id: 'keyUserDate',
+                title: 'KeyUser Deploy Date',
+                sortType: 'alpha'
+            }, {
+                id: 'pilotDate',
+                title: 'Pilot Deploy Date',
+                sortType: 'alpha'
+            }, {
+                id: 'productionDate',
+                title: 'Production Deploy Date',
+                sortType: 'alpha'
+            }],
+            isAscending: this.isAscendingSort
+        } as SortConfig;
+
+
+        this.currentSortField = this.sortConfig.fields[0];
+
         this.releaseActionConfig = {
             primaryActions: [{
                 id: 'editRelease',
@@ -92,7 +126,8 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
 
         this.toolbarConfig = {
             filterConfig: this.filterConfig,
-            actionConfig: this.actionConfig
+            actionConfig: this.actionConfig,
+            sortConfig: this.sortConfig
         } as ToolbarConfig;
 
         this.paginationConfig = {
@@ -117,7 +152,11 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
 
     reloadData(): void {
         this.subscriptions.push(this.releaseService.getFullReleases()
-            .subscribe(newReleases => { this.releases = newReleases; this.applyFilters(); }));
+            .subscribe(newReleases => {
+                this.releases = newReleases;
+                this.releases = this.releases.sort((item1: any, item2: any) => this.compare(item1, item2));
+                this.applyFilters();
+            }));
     }
 
     closeModal($event: WizardEvent): void {
@@ -128,7 +167,7 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
         this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
     }
 
-     applyFilters(): void {
+    applyFilters(): void {
         this.filteredReleases = [];
         if (this.filterConfig.appliedFilters && this.filterConfig.appliedFilters.length > 0) {
             this.releases.forEach((item) => {
@@ -196,6 +235,64 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
 
     handlePageNumber($event: PaginationEvent) {
         this.updateItems();
+    }
+
+    compare(item1: any, item2: any): number {
+        let compValue = 0;
+        if (this.currentSortField.id === 'version') {
+            compValue = this.compareVersion(item1, item2);
+        } else if (this.currentSortField.id === 'buildDate') {
+            compValue = this.compareBuildDate(item1, item2);
+        } else if (this.currentSortField.id === 'qualificationDate') {
+            compValue = this.compareDeployDate(item1, item2, 'qualification');
+        } else if (this.currentSortField.id === 'keyUserDate') {
+            compValue = this.compareDeployDate(item1, item2, 'keyUser');
+        } else if (this.currentSortField.id === 'pilotDate') {
+            compValue = this.compareDeployDate(item1, item2, 'pilot');
+        } else if (this.currentSortField.id === 'productionDate') {
+            compValue = this.compareDeployDate(item1, item2, 'production');
+        }
+
+        if (compValue === 0) {
+            compValue = this.compareVersion(item1, item2);
+        }
+        if (!this.isAscendingSort) {
+            compValue = compValue * -1;
+        }
+        return compValue;
+    }
+
+    compareVersion(item1: any, item2: any): number {
+        let compValue = 0;
+        const sourceRelease1 = item1.release.version.versionNumber;
+        const sourceRelease2 = item2.release.version.versionNumber;
+        compValue = sourceRelease1.localeCompare(sourceRelease2);
+        return compValue;
+    }
+
+    compareBuildDate(item1: any, item2: any): number {
+        let compValue = 0;
+        const sourceRelease1 = item1.release.buildDate;
+        const sourceRelease2 = item2.release.buildDate;
+        compValue = sourceRelease1 - sourceRelease2;
+        return compValue;
+    }
+
+    compareDeployDate(item1: any, item2: any, platform: string): number {
+        let compValue = 0;
+        const sourceRelease1 = item1.release[platform] ? item1.release[platform].deployDate : 0;
+        const sourceRelease2 = item2.release[platform] ? item2.release[platform].deployDate : 0;
+        compValue = sourceRelease1 - sourceRelease2;
+        return compValue;
+    }
+
+
+    // Handle sort changes
+    handleSortChanged($event: SortEvent): void {
+        this.currentSortField = $event.field;
+        this.isAscendingSort = $event.isAscending;
+        this.releases.sort((item1: any, item2: any) => this.compare(item1, item2));
+        this.applyFilters();
     }
 
     updateItems() {
