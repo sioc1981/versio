@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     patchConfig: InfoStatusCardConfig = this.getPatchCardConfig();
     releaseConfig: InfoStatusCardConfig = this.getReleaseCardConfig();
 
-    releaseSummaries: ReleaseSummary[] = RELEASE_CONSTANT.releaseSummaries;
+    releaseSummaries: ReleaseSummary[] = this.loadReleases();
 
     packageConfig: UtilizationDonutChartConfig = {
         chartId: 'exampleUtilizationDonut',
@@ -39,8 +39,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(() => this.patchConfig = this.getPatchCardConfig()));
         this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(() => this.releaseConfig = this.getReleaseCardConfig()));
         this.subscriptions.push(RELEASE_CONSTANT.releaseSummariesNotifier$.subscribe(() => {
-             this.releaseSummaries = [].concat(RELEASE_CONSTANT.releaseSummaries);
+             this.releaseSummaries = this.loadReleases();
         }));
+    }
+
+    private loadReleases(): ReleaseSummary[] {
+        return Array.from(RELEASE_CONSTANT.releaseSummaries).sort((ra, rb) => rb.versionNumber.localeCompare(ra.versionNumber));
     }
     /**
       * Clean up subscriptions
