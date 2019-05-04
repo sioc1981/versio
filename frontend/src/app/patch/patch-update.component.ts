@@ -12,16 +12,16 @@ import {
     WizardStepComponent, WizardStep, WizardComponent, WizardEvent, WizardStepConfig, WizardConfig,
     ListConfig, ListEvent
 } from 'patternfly-ng';
-import { Patch } from './shared/Patch';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
-import { Release } from '../release/shared/Release';
 import { PatchService } from './shared/patch.service';
 import { ReleaseService } from '../release/shared/release.service';
 import { IssueService } from '../issue/shared/issue.service';
-import { Issue } from '../issue/shared/Issue';
 import { cloneDeep } from 'lodash';
-import { PlatformHistory } from '../shared/PlatformHistory';
 import { Subscription } from 'rxjs';
+import { Release } from '../release/shared/release.model';
+import { Issue } from '../issue/shared/issue.model';
+import { Patch } from './shared/patch.model';
+import { PlatformHistory } from '../shared/platform.model';
 
 
 @Component({
@@ -66,8 +66,6 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
     issues: Issue[];
 
     issuesListConfig: ListConfig;
-
-
 
     patch: Patch;
 
@@ -212,6 +210,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         if (platformHistory) {
             platformHistory.deployDate = this.initDate(platformHistory.deployDate);
             platformHistory.validationDate = this.initDate(platformHistory.validationDate);
+            platformHistory.undeployDate = this.initDate(platformHistory.undeployDate);
         } else {
             platformHistory = new PlatformHistory();
         }

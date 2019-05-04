@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Version } from './Version';
 import { APP_CONSTANT } from '../../app.constants';
+import { Version } from './version.model';
 
 export const VERSION_CONSTANT = {
     backendUrl: APP_CONSTANT.backendUrlBase + '/version',

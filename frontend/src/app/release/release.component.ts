@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { Release } from './shared/Release';
 import { ReleaseService } from './shared/release.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
@@ -9,10 +8,10 @@ import {
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
-import { ReleaseFull } from './shared/ReleaseFull';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { ReleaseModalContainer } from './release-modal-container';
+import { ReleaseFull } from './shared/release.model';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -57,6 +56,15 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
                 title: 'Version',
                 placeholder: 'Filter by Version...',
                 type: FilterType.TEXT
+            }, {
+                id: 'onlyDeployed',
+                title: 'Only deployed',
+                placeholder: 'Only deployed on any platform',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'onlyDeployed',
+                    value: 'True'
+                }]
             }],
             resultsCount: this.filteredReleases.length,
             appliedFilters: []
@@ -144,6 +152,8 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
         let match = true;
         if (filter.field.id === 'version') {
             match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
+        } else if (filter.field.id === 'onlyDeployed') {
+            match = !item.release.undeployed;
         }
         return match;
     }

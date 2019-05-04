@@ -1,6 +1,6 @@
-import { Issue } from '../../issue/shared/Issue';
-import { Release } from '../../release/shared/Release';
-import { PlatformHistory } from 'src/app/shared/PlatformHistory';
+import { Release } from 'src/app/release/shared/release.model';
+import { Issue } from 'src/app/issue/shared/issue.model';
+import { PlatformHistory } from 'src/app/shared/platform.model';
 
 export class Patch {
     id: number;

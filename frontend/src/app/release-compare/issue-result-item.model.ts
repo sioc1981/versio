@@ -1,4 +1,4 @@
-import { Issue } from '../issue/shared/Issue';
+import { Issue } from '../issue/shared/issue.model';
 
 export class IssueResultItem {
     issueReference: string;

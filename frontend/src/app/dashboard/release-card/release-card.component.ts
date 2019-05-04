@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CardConfig, UtilizationDonutChartConfig, DonutChartConfig, EmptyStateConfig } from 'patternfly-ng';
-import { ReleaseSummary } from 'src/app/release/shared/ReleaseSummary';
-import { PlatformSummary } from 'src/app/shared/PlatformSummary';
+import { ReleaseSummary } from 'src/app/release/shared/release.model';
+import { PlatformSummary } from 'src/app/shared/platform.model';
 
 @Component({
     selector: 'app-release-card',
@@ -83,23 +83,24 @@ export class ReleaseCardComponent implements OnInit {
             }
         } as DonutChartConfig;
 
-        this.qualificationConfig = this.geratateConfig('qualification', this.item.qualification.deployed);
-        if (this.item.qualification.deployed) {
+        this.qualificationConfig = this.geratateConfig('qualification', this.item.qualification.deployed,
+            this.item.qualification.undeployed);
+        if (this.item.qualification.deployed && !this.item.qualification.undeployed) {
             this.qualificationData = this.generateData(this.item.qualification);
         }
 
-        this.keyUserConfig = this.geratateConfig('keyUser', this.item.keyUser.deployed);
-        if (this.item.keyUser.deployed) {
+        this.keyUserConfig = this.geratateConfig('keyUser', this.item.keyUser.deployed, this.item.keyUser.undeployed);
+        if (this.item.keyUser.deployed && !this.item.keyUser.undeployed) {
             this.keyUserData = this.generateData(this.item.keyUser);
         }
 
-        this.pilotConfig = this.geratateConfig('pilot', this.item.pilot.deployed);
-        if (this.item.pilot.deployed) {
+        this.pilotConfig = this.geratateConfig('pilot', this.item.pilot.deployed, this.item.pilot.undeployed);
+        if (this.item.pilot.deployed && !this.item.pilot.undeployed) {
             this.pilotData = this.generateData(this.item.pilot);
         }
 
-        this.productionConfig = this.geratateConfig('production', this.item.production.deployed);
-        if (this.item.production.deployed) {
+        this.productionConfig = this.geratateConfig('production', this.item.production.deployed, this.item.production.undeployed);
+        if (this.item.production.deployed && !this.item.production.undeployed) {
             this.productionData = this.generateData(this.item.production);
         }
 
@@ -120,15 +121,11 @@ export class ReleaseCardComponent implements OnInit {
     }
 
     generateEmptyData(): any[] {
-        return [
-            ['missing', 0],
-            ['validated', 0],
-            ['deployed', 0]
-        ];
+        return [];
 
     }
 
-    geratateConfig(platform: string, isDeployed: boolean): DonutChartConfig {
+    geratateConfig(platform: string, isDeployed: boolean, isUndeployed: boolean): DonutChartConfig {
         return {
             chartId: platform + 'Donut' + this.item.id,
             colors: {
@@ -148,7 +145,7 @@ export class ReleaseCardComponent implements OnInit {
                 },
                 empty: {
                     label: {
-                        text: isDeployed ? 'No Patch' : 'Not deployed'
+                        text: !isDeployed ? 'Not deployed' : isUndeployed ? 'Undeployed' : 'No Patch'
                     }
                 }
             },

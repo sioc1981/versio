@@ -1,5 +1,4 @@
 import {
-    ChangeDetectorRef,
     Component,
     OnInit,
     ViewEncapsulation,
@@ -10,11 +9,11 @@ import { Router, ActivatedRoute, RouterEvent } from '@angular/router';
 
 import { VerticalNavigationItem } from 'patternfly-ng/navigation/vertical-navigation/vertical-navigation-item';
 import { VerticalNavigationComponent } from 'patternfly-ng';
-import { RELEASE_CONSTANT } from '../release/shared/release.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { Subscription} from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { filter } from 'rxjs/operators';
+import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 
 
 @Component({
@@ -65,7 +64,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.subscriptions.push(this.router.events.pipe(
             filter(e => e instanceof RouterEvent)
         ).subscribe((e: RouterEvent) => {
-            //console.log('url: ', e.url);
             // to keep parameter when click on compare menu
             if (e.url.startsWith('/compare')) {
                 this.navigationItems[this.COMPARE_INDEX].url = e.url;

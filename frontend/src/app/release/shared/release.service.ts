@@ -1,27 +1,11 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Release } from './Release';
-
 import { SseService } from '../../server-event/sse.service';
-import { APP_CONSTANT } from '../../app.constants';
-import { ReleaseFull } from './ReleaseFull';
-import { Summary } from 'src/app/shared/Summary';
-import { ReleaseSummary } from './ReleaseSummary';
-import { ReleaseComparison } from './ReleaseComparison';
-
-export const RELEASE_CONSTANT = {
-    backendUrl: APP_CONSTANT.backendUrlBase + '/release',
-    httpOptions: APP_CONSTANT.httpOptions,
-    iconStyleClass: 'pficon pficon-bundle',
-    summary: new Summary(),
-    releaseSummaries: [] as ReleaseSummary[],
-    releaseSummariesNotifier$: new EventEmitter<boolean>(false),
-    title: 'Releases',
-    url: '/releases'
-};
+import { Release, ReleaseSummary, ReleaseFull, ReleaseComparison } from './release.model';
+import { RELEASE_CONSTANT } from './release.constant';
 
 @Injectable({
     providedIn: 'root'
@@ -29,7 +13,7 @@ export const RELEASE_CONSTANT = {
 export class ReleaseService {
 
 
-    constructor(private http: HttpClient, private sseService: SseService) {
+    constructor(private http: HttpClient, sseService: SseService) {
         RELEASE_CONSTANT.summary.sseCallback = this.sseCallback;
         sseService.registerSummary(RELEASE_CONSTANT.summary, 'release');
      }

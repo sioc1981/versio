@@ -12,14 +12,14 @@ import {
     WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep,
     WizardStepComponent, ListConfig, ListEvent
 } from 'patternfly-ng';
-import { Patch } from './shared/Patch';
 import { PatchService } from './shared/patch.service';
 import { ReleaseService } from '../release/shared/release.service';
-import { Release } from '../release/shared/Release';
-import { Issue } from '../issue/shared/Issue';
 import { IssueService } from '../issue/shared/issue.service';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 import { Subscription } from 'rxjs';
+import { Release } from '../release/shared/release.model';
+import { Issue } from '../issue/shared/issue.model';
+import { Patch } from './shared/patch.model';
 
 @Component({
     encapsulation: ViewEncapsulation.None,

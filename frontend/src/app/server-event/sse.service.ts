@@ -1,10 +1,10 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { APP_CONSTANT } from '../app.constants';
-import { Summary } from '../shared/Summary';
-import { IssueResultItem } from '../release-compare/issue-result-item';
-import { ReleaseComparison } from '../release/shared/ReleaseComparison';
+import { ReleaseComparison } from '../release/shared/release.model';
+import { Summary } from '../shared/summary.model';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { IssueResultItem } from '../release-compare/issue-result-item.model';
 
 @Injectable({
     providedIn: 'root'

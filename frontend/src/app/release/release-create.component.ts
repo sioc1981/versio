@@ -11,9 +11,9 @@ import {
 import { ReleaseComponent } from './release.component';
 import { WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
 import { ReleaseService } from './shared/release.service';
-import { ReleaseFull } from './shared/ReleaseFull';
 import { Subscription } from 'rxjs';
 import { now } from 'd3';
+import { ReleaseFull } from './shared/release.model';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -90,7 +90,7 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
         console.log('Saving ' + JSON.stringify(this.data));
         this.subscriptions.push(this.releaseService.addRelease(this.data as ReleaseFull)
             .subscribe(_ => {
-                this.wizardExample.getReleases();
+                this.wizardExample.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {

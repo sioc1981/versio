@@ -12,17 +12,17 @@ import {
     WizardStepComponent, WizardStep, WizardComponent, WizardEvent, WizardStepConfig, WizardConfig,
     ListConfig, ListEvent
 } from 'patternfly-ng';
-import { Release } from './shared/Release';
 import { ReleaseService } from './shared/release.service';
 import { IssueService } from '../issue/shared/issue.service';
-import { Issue } from '../issue/shared/Issue';
 import { cloneDeep } from 'lodash';
-import { ReleaseFull } from './shared/ReleaseFull';
-import { PlatformHistory } from '../shared/PlatformHistory';
 import { Subscription } from 'rxjs';
 import { ReleaseModalContainer } from './release-modal-container';
 import { ReleaseComponent } from './release.component';
 import { ReleaseDetailComponent } from './release-detail.component';
+import { Release, ReleaseFull } from './shared/release.model';
+import { Issue } from '../issue/shared/issue.model';
+import { PlatformHistory } from '../shared/platform.model';
+import { platform } from 'os';
 
 
 @Component({
@@ -211,6 +211,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         if (platformHistory) {
             platformHistory.deployDate = this.initDate(platformHistory.deployDate);
             platformHistory.validationDate = this.initDate(platformHistory.validationDate);
+            platformHistory.undeployDate = this.initDate(platformHistory.undeployDate);
         } else {
             platformHistory = new PlatformHistory();
         }
@@ -249,6 +250,17 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     startDeploy(): void {
         this.deployComplete = false;
         this.wizardConfig.done = true;
+        const platformList = ['qualification', 'keyUser', 'pilot', 'production'];
+        if (this.data.patches) {
+            this.data.patches.forEach(patch => {
+                platformList.forEach(currentPlatform => {
+                    if (patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
+                        this.release.release[currentPlatform].undeployDate === patch[currentPlatform].undeployDate) {
+                        patch[currentPlatform].undeployDate = this.data.release[currentPlatform].undeployDate;
+                    }
+                });
+            });
+        }
         this.subscriptions.push(this.releaseService.updateRelease(this.data as ReleaseFull)
             .subscribe(_ => {
                 this.releaseComponent.reloadData();
@@ -259,6 +271,8 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
                 this.deploySuccess = false;
             }));
     }
+
+
 
     stepChanged($event: WizardEvent) {
         const flatSteps = flattenWizardSteps(this.wizard);

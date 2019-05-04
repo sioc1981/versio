@@ -9,9 +9,9 @@ import {
 
 import { IssueComponent } from './issue.component';
 import { WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
-import { Issue } from './shared/Issue';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
+import { Issue } from './shared/issue.model';
 
 @Component({
     encapsulation: ViewEncapsulation.None,

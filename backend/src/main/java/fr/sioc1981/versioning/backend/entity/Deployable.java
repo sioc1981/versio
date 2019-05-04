@@ -21,7 +21,7 @@ public abstract class Deployable implements Serializable {
 	@Temporal(TemporalType.DATE)
 	protected Date packageDate;
 	
-	protected Boolean undeployed;
+	protected boolean undeployed;
 
 	@Embedded
 	// rename the basic mappings
@@ -71,11 +71,11 @@ public abstract class Deployable implements Serializable {
 		this.packageDate = packageDate;
 	}
 
-	public Boolean getUndeployed() {
+	public boolean getUndeployed() {
 		return undeployed;
 	}
 
-	public void setUndeployed(Boolean undeployed) {
+	public void setUndeployed(boolean undeployed) {
 		this.undeployed = undeployed;
 	}
 

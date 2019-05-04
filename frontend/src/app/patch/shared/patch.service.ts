@@ -3,11 +3,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { Patch } from './Patch';
-
 import { SseService } from '../../server-event/sse.service';
 import { APP_CONSTANT } from '../../app.constants';
-import { Summary } from 'src/app/shared/Summary';
+import { Summary } from 'src/app/shared/summary.model';
+import { Patch } from './patch.model';
 
 export const PATCH_CONSTANT = {
     backendUrl: APP_CONSTANT.backendUrlBase + '/patch',

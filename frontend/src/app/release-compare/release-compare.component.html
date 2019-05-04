@@ -53,19 +53,21 @@
                         <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
                             *ngSwitchCase="'MANTIS'" />
                         <img src="/src/assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'" />
-                        <span>{{row.issue.reference}} - {{row.issue.description}}</span>
+                        <a [attr.href]="buildIssueUrl(row.issue)" target="_blank">{{row.issue.reference}} - {{row.issue.description}}</a>
                     </div>
                 </ng-template>
                 <ng-template #sourcesTemplate let-row="row">
                     <span *ngFor="let src of row.sourcePatches.patches" class="col-sm-12"> {{row.sourcePatches.release}}
                         - {{src}} </span>
-                    <span *ngFor="let src of row.sourceReleases" class="col-sm-12"> {{src.version.versionNumber}}
+                    <span *ngFor="let src of row.sourceReleases" class="col-sm-12">
+                        <a routerLink="/release/{{src.version.versionNumber}}">{{src.version.versionNumber}}</a>
                     </span>
                 </ng-template>
                 <ng-template #destTemplate let-row="row">
                     <span *ngFor="let src of row.destPatches.patches" class="col-sm-12"> {{row.destPatches.release}} -
                         {{src}} </span>
-                    <span *ngFor="let dest of row.destReleases" class="col-sm-12"> {{dest.version.versionNumber}}
+                    <span *ngFor="let dest of row.destReleases" class="col-sm-12">
+                        <a routerLink="/release/{{dest.version.versionNumber}}">{{dest.version.versionNumber}}</a>
                     </span>
                 </ng-template>
             </div>

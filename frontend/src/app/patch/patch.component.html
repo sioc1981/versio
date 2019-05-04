@@ -23,8 +23,7 @@
             <ng-template #patchTemplate let-item="item" let-index="index">
                 <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">
-                        <div class="list-pf-title">{{item.sequenceNumber}}</div>
-                        <div class="list-pf-description">{{item.release.version.versionNumber}}</div>
+                        <div class="list-pf-title">{{item.release.version.versionNumber}} - {{item.sequenceNumber}}</div>
                         <div class="list-pf-description">{{item.issues[0].reference}} - {{item.issues[0].description}}</div>
                     </div>
                     <div class="list-pf-additional-content">

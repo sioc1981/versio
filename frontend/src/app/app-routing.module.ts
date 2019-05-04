@@ -12,8 +12,11 @@ const routes: Routes = [
     { path: 'dashboard', component: DashboardComponent },
     { path: 'patchs', component: PatchComponent },
     { path: 'releases', component: ReleaseComponent },
-    { path: 'release/:version', component: ReleaseDetailComponent },
+    { path: 'release/:version/:view', component: ReleaseDetailComponent },
+     { path: 'release/:version', component: ReleaseDetailComponent },
     { path: 'issues', component: IssueComponent },
+    { path: 'compare/:fromVersion/:toVersion', component: ReleaseCompareComponent },
+    { path: 'compare/:fromVersion', component: ReleaseCompareComponent },
     { path: 'compare', component: ReleaseCompareComponent }
 ];
 

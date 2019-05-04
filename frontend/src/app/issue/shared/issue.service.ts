@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Issue } from './Issue';
 import { SseService } from '../../server-event/sse.service';
 import { ISSUE_CONSTANT } from './issue.constant';
+import { Issue } from './issue.model';
 
 
 @Injectable({

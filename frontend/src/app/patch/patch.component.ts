@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { Patch } from './shared/Patch';
+import { Patch } from './shared/patch.model';
 import { PatchService } from './shared/patch.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,

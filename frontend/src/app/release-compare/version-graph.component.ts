@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter, DoCheck, Host } from '@angular/core';
-import { ReleaseComparison } from '../release/shared/ReleaseComparison';
 
 import { cloneDeep, defaultsDeep, isEqual, merge, uniqueId } from 'lodash';
 
 import { ChartBase, ChartDefaults } from 'patternfly-ng';
-import { VersionGraphConfig } from './version-graph-config';
+import { VersionGraphConfig } from './version-graph-config.model';
 import { ReleaseCompareComponent } from './release-compare.component';
+import { ReleaseComparison } from '../release/shared/release.model';
 
 @Component({
     selector: 'app-version-graph',

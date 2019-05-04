@@ -1,5 +1,5 @@
 import { Directive, Input, ElementRef, OnInit, Renderer2 } from '@angular/core';
-import { PlatformSummary } from './PlatformSummary';
+import { PlatformSummary } from './platform.model';
 
 @Directive({
     selector: '[appSummaryColor]'
@@ -43,18 +43,27 @@ export class SummaryColorDirective implements OnInit {
 
     applyPatchColor(): void {
         if (!this.appSummaryColor || !this.appSummaryColor.deployed) {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+        } else if (this.appSummaryColor.undeployed) {
+            this.renderer.addClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
         } else if (this.appSummaryColor.deployedPatchCount !== this.appSummaryPatch) {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-red');
         } else if (this.appSummaryColor.validedPatchCount === this.appSummaryPatch) {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
         } else {
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');

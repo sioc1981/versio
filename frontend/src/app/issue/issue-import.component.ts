@@ -6,9 +6,9 @@ import {
 import { IssueComponent } from './issue.component';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
-import { Issue } from './shared/Issue';
 import { cloneDeep } from 'lodash';
 import { FileItem, HttpClientUploadService, DropTargetOptions, InputFileOptions, MineTypeEnum } from '@wkoza/ngx-upload';
+import { Issue } from './shared/issue.model';
 
 @Component({
     selector: 'app-issue-import',

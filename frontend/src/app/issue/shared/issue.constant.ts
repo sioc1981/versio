@@ -1,5 +1,5 @@
 import { APP_CONSTANT } from 'src/app/app.constants';
-import { Summary } from 'src/app/shared/Summary';
+import { Summary } from 'src/app/shared/summary.model';
 
 export const ISSUE_CONSTANT = {
     backendUrl: APP_CONSTANT.backendUrlBase + '/issue',
@@ -7,5 +7,9 @@ export const ISSUE_CONSTANT = {
     iconStyleClass: 'pficon pficon-security',
     summary: new Summary(),
     title: 'Issues',
-    url: '/issues'
+    url: '/issues',
+    constainer_urls: {
+        JIRA: 'https://jira.somewhere/issues/',
+        MANTIS: 'https://mantis.somewhereelse/'
+    }
 };

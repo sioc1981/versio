@@ -2,16 +2,17 @@ import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/c
 import { ReleaseService } from './shared/release.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ReleaseFull } from './shared/ReleaseFull';
 import { ReleaseModalContainer } from './release-modal-container';
-import { WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
-    PaginationEvent, Filter, FilterEvent } from 'patternfly-ng';
+import {
+    WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
+    PaginationEvent, Filter, FilterEvent
+} from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { Release } from './shared/Release';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
-import { Issue } from '../issue/shared/Issue';
-import { Patch } from '../patch/shared/Patch';
+import { Issue } from '../issue/shared/issue.model';
+import { Patch } from '../patch/shared/patch.model';
+import { ReleaseFull, Release } from './shared/release.model';
 
 @Component({
     selector: 'app-release-detail',
@@ -23,6 +24,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     modalRef: BsModalRef;
 
     versionNumber: string;
+    currentTab = '';
 
     loading = true;
     loadingFailed = false;
@@ -56,12 +58,6 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService) { }
 
     ngOnInit() {
-        this.route.paramMap.subscribe(params => {
-            this.versionNumber = params.get('version');
-            if (params.has('version')) {
-                this.reloadData();
-            }
-        });
         this.errorConfig = {
             iconStyleClass: 'pficon-error-circle-o',
             title: 'Error'
@@ -149,6 +145,13 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
         } as PaginationConfig;
 
 
+        this.route.paramMap.subscribe(params => {
+            this.versionNumber = params.get('version');
+            this.currentTab = params.get('view');
+            if (params.has('version')) {
+                this.reloadData();
+            }
+        });
     }
 
     /**
@@ -165,11 +168,14 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     reloadData(): void {
         this.loading = true;
         this.subscriptions.push(this.releaseService.searchReleaseFull(this.versionNumber)
-            .subscribe(newRelease => { this.releaseFull = newRelease; this.release = this.releaseFull.release;
-                        this.applyIssueFilters(); this.applyPatchFilters(); },
+            .subscribe(newRelease => {
+            this.releaseFull = newRelease; this.release = this.releaseFull.release;
+                this.applyIssueFilters(); this.applyPatchFilters();
+            },
                 _ => this.loadingFailed = true,
                 () => { this.loading = false; }));
     }
+
 
     closeModal($event: WizardEvent): void {
         this.modalRef.hide();
@@ -190,7 +196,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
             this.applyIssueFilters();
         }
     }
-    
+
     applyIssueFilters(): void {
         this.filteredIssues = [];
         if (this.issueFilterConfig.appliedFilters && this.issueFilterConfig.appliedFilters.length > 0) {
@@ -262,7 +268,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     }
 
 
-        applyPatchFilters(): void {
+    applyPatchFilters(): void {
         this.filteredPatches = [];
         if (this.patchFilterConfig.appliedFilters && this.patchFilterConfig.appliedFilters.length > 0) {
             this.releaseFull.patches.forEach((item) => {

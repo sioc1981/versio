@@ -24,10 +24,10 @@
 
     <ng-template #loaded>
         <div *ngIf="release; else error">
-            <tabset>
-                <tab>
+            <tabset #staticTabs>
+                <tab #tab_overview>
                     <ng-template tabHeading>
-                        <span>Dates</span>
+                        <span>Overview</span>
                     </ng-template>
                     <div class="col-lg-12">
                         <div class="margin-left-20">
@@ -117,9 +117,9 @@
                         </div>
                     </div>
                 </tab>
-                <tab>
+                <tab #tab_releasenote [active]="currentTab === 'releasenote'">
                     <ng-template tabHeading>
-                        <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Issues
+                        <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Release note
                             ({{releaseFull.issues.length}})</span>
                     </ng-template>
                     <div class="row">
@@ -160,7 +160,7 @@
 
                     </div>
                 </tab>
-                <tab>
+                <tab #tab_patches [active]="currentTab === 'patches'">
                     <ng-template tabHeading>
                         <span class="fas {{patchIconStyleClass}}"></span> <span class="padding-left-5">Patches
                             ({{releaseFull.patches.length}})</span>

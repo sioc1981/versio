@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
-import { WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardConfig, WizardEvent, PaginationEvent, ListEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
-import { Patch } from './shared/Patch';
+import { WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardConfig, WizardEvent,
+    PaginationEvent, ListEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { FileItem, MineTypeEnum, InputFileOptions, DropTargetOptions, HttpClientUploadService } from '@wkoza/ngx-upload';
 import { PatchComponent } from './patch.component';
@@ -8,9 +8,10 @@ import { Subscription, Observable, forkJoin } from 'rxjs';
 import { PatchService } from './shared/patch.service';
 import { IssueService } from '../issue/shared/issue.service';
 import { ReleaseService } from '../release/shared/release.service';
-import { PlatformHistory } from '../shared/PlatformHistory';
-import { Issue } from '../issue/shared/Issue';
-import { Release } from '../release/shared/Release';
+import { Patch } from './shared/patch.model';
+import { Release } from '../release/shared/release.model';
+import { Issue } from '../issue/shared/issue.model';
+import { PlatformHistory } from '../shared/platform.model';
 
 @Component({
   selector: 'app-patch-import',

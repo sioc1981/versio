@@ -1,16 +1,17 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ViewChild, AfterViewInit } from '@angular/core';
-import { Release } from '../release/shared/Release';
 import { ReleaseService } from '../release/shared/release.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReleaseComparison } from '../release/shared/ReleaseComparison';
 import { Subscription } from 'rxjs';
-import { VersionGraphConfig } from './version-graph-config';
+import { VersionGraphConfig } from './version-graph-config.model';
 import { SseService } from '../server-event/sse.service';
 import {
     ToolbarConfig, TableConfig, SortConfig, PaginationConfig, FilterConfig, EmptyStateConfig,
     SortField, SortEvent, Filter, FilterEvent,
     FilterField, FilterType, PaginationEvent
 } from 'patternfly-ng';
+import { Release, ReleaseComparison } from '../release/shared/release.model';
+import { Issue } from '../issue/shared/issue.model';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 
 @Component({
     selector: 'app-release-compare',
@@ -230,7 +231,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     submit() {
-        this.router.navigate(['/compare', { fromVersion: this.fromVersion, toVersion: this.toVersion }]);
+        this.router.navigate(['/compare', this.fromVersion, this.toVersion]);
     }
 
     startCompare(): void {
@@ -456,8 +457,9 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
-    // 'issue-missing': row.destReleases.length === 0,
-    //             'issue-new': row.sourceReleases.length === 0,
-    //             'issue-exist': row.sourceReleases.length !== 0 && row.destReleases.length !== 0
+    buildIssueUrl(issue: Issue): string {
+        return ISSUE_CONSTANT.constainer_urls[issue.container] + issue.reference;
+    }
+
 
 }

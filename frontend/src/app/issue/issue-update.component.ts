@@ -3,8 +3,8 @@ import { WizardComponent, WizardStepConfig, WizardConfig, WizardStepComponent, W
 import { IssueComponent } from './issue.component';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
-import { Issue } from './shared/Issue';
 import { cloneDeep } from 'lodash';
+import { Issue } from './shared/issue.model';
 
 @Component({
     selector: 'app-issue-update',

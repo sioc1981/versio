@@ -3,17 +3,16 @@ import {
     WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardEvent, PaginationEvent, ListEvent,
     WizardStep, WizardStepComponent, WizardConfig
 } from 'patternfly-ng';
-import { ReleaseFull } from './shared/ReleaseFull';
 import { FileItem, MineTypeEnum, InputFileOptions, DropTargetOptions, HttpClientUploadService } from '@wkoza/ngx-upload';
 import { Subscription, Observable, forkJoin } from 'rxjs';
 import { ReleaseService } from './shared/release.service';
 import { ReleaseComponent } from './release.component';
 import { IssueService } from '../issue/shared/issue.service';
-import { Release } from './shared/Release';
-import { Version } from '../version/shared/Version';
-import { PlatformHistory } from '../shared/PlatformHistory';
-import { Issue } from '../issue/shared/Issue';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { ReleaseFull, Release } from './shared/release.model';
+import { Version } from '../version/shared/version.model';
+import { PlatformHistory } from '../shared/platform.model';
+import { Issue } from '../issue/shared/issue.model';
 
 @Component({
     selector: 'app-release-import',

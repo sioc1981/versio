@@ -1,5 +1,5 @@
 import { WizardEvent } from 'patternfly-ng';
-import { ReleaseFull } from './shared/ReleaseFull';
+import { ReleaseFull } from './shared/release.model';
 
 export interface ReleaseModalContainer {
 

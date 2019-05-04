@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { InfoStatusCardConfig, UtilizationDonutChartConfig } from 'patternfly-ng';
-import { RELEASE_CONSTANT } from '../release/shared/release.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
-import { of, Subscription } from 'rxjs';
-import { ReleaseSummary } from '../release/shared/ReleaseSummary';
+import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { ReleaseSummary } from '../release/shared/release.model';
+import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     patchConfig: InfoStatusCardConfig = this.getPatchCardConfig();
     releaseConfig: InfoStatusCardConfig = this.getReleaseCardConfig();
 
-    releaseSummaries: ReleaseSummary[] = []; //RELEASE_CONSTANT.releaseSummaries;
+    releaseSummaries: ReleaseSummary[] = RELEASE_CONSTANT.releaseSummaries;
 
     packageConfig: UtilizationDonutChartConfig = {
         chartId: 'exampleUtilizationDonut',

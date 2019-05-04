@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { Issue } from './shared/Issue';
 import { IssueService } from './shared/issue.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
@@ -9,6 +8,8 @@ import {
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Subscription } from 'rxjs';
+import { Issue } from './shared/issue.model';
+import { ISSUE_CONSTANT } from './shared/issue.constant';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -88,6 +89,10 @@ export class IssueComponent implements OnInit, OnDestroy {
 
         this.issueActionConfig = {
             primaryActions: [{
+                id: 'openIssue',
+                title: 'Open issue',
+                tooltip: 'Open issue in an new tab'
+            } , {
                 id: 'editIssue',
                 title: 'Edit issue',
                 tooltip: 'Edit issue'
@@ -188,6 +193,9 @@ export class IssueComponent implements OnInit, OnDestroy {
             this.openModal(this.updateIssueTemplate);
         } else if (action.id === 'importIssues') {
             this.openModal(this.importIssueTemplate);
+        } else if (action.id === 'openIssue') {
+            const url = ISSUE_CONSTANT.constainer_urls[item.container] + item.reference;
+            window.open(url, '_blank');
         } else {
             console.log('handleAction: unknown action: ' + action.id);
         }
