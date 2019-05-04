@@ -22,8 +22,6 @@ import { ReleaseDetailComponent } from './release-detail.component';
 import { Release, ReleaseFull } from './shared/release.model';
 import { Issue } from '../issue/shared/issue.model';
 import { PlatformHistory } from '../shared/platform.model';
-import { platform } from 'os';
-
 
 @Component({
     encapsulation: ViewEncapsulation.None,
