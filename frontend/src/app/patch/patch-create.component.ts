@@ -135,7 +135,7 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
         this.data.buildDate = new Date();
         this.subscriptions.push(this.patchService.addPatch(this.data as Patch)
             .subscribe(_ => {
-                this.patchComponent.getPatchs();
+                this.patchComponent.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {

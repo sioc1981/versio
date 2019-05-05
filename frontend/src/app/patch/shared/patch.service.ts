@@ -13,8 +13,8 @@ export const PATCH_CONSTANT = {
     httpOptions: APP_CONSTANT.httpOptions,
     iconStyleClass: 'fa fa-plus-square',
     summary: new Summary(),
-    title: 'Patchs',
-    url: '/patchs'
+    title: 'Patches',
+    url: '/patches'
 };
 
 @Injectable({
@@ -32,7 +32,6 @@ export class PatchService {
         if (data['count'] !== undefined) {
             const count = +data['count'];
             PATCH_CONSTANT.summary.count$.emit(count);
-
         }
     }
 
@@ -67,6 +66,13 @@ export class PatchService {
     updatePatch(patch: Patch): Observable<any> {
         return this.http.put(PATCH_CONSTANT.backendUrl, patch, PATCH_CONSTANT.httpOptions).pipe(
             catchError(this.logAndError('updatePatch'))
+        );
+    }
+
+   searchPatch(versionNumber: string, sequenceNumber: string): Observable<Patch> {
+        const url = `${PATCH_CONSTANT.backendUrl}/search/${versionNumber}/${sequenceNumber}`;
+        return this.http.get<Patch>(url).pipe(
+            catchError(this.logAndError(`searchPatch versionNulber=${versionNumber} sequenceNumber=${sequenceNumber}`))
         );
     }
 

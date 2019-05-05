@@ -92,12 +92,28 @@ public class PatchService {
 		globalSSE.broadcast("patch_count", count);
 		return count;
 	}
+	
+	
+	@GET
+	@Path("search/{versionNumber}/{sequenceNumber}")
+	@Produces("application/json")
+	public Response searchPatch(@PathParam("versionNumber") String versionNumber, @PathParam("sequenceNumber") String sequenceNumber) {
+		List<Patch> result = this.entityManager.createQuery("from Patch p where p.sequenceNumber = :sequenceNumber AND p.release.version.versionNumber = :versionNumber", Patch.class)
+				.setParameter("versionNumber", versionNumber).setParameter("sequenceNumber", sequenceNumber).getResultList();
+		
+		if (result.isEmpty()) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		
+		return Response.ok(result.get(0)).build();
+	}
+
 	@GET
 	@Path("{id}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") String id) {
-		List<Patch> result = this.entityManager.createQuery("from Patch where reference = :reference", Patch.class)
-				.setParameter("reference", id).getResultList();
+		List<Patch> result = this.entityManager.createQuery("from Patch where id = :id", Patch.class)
+				.setParameter("id", id).getResultList();
 
 		if (result.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();

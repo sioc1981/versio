@@ -67,6 +67,24 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
                     id: 'onlyDeployed',
                     value: 'True'
                 }]
+            }, {
+                id: 'deployedOn',
+                title: 'Deployed on',
+                placeholder: 'Deployed on...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'qualification',
+                    value: 'Qualification platform'
+                }, {
+                    id: 'keyUser',
+                    value: 'KeyUser platform'
+                }, {
+                    id: 'pilot',
+                    value: 'Pilot platform'
+                }, {
+                    id: 'production',
+                    value: 'Production platform'
+                }]
             }],
             resultsCount: this.filteredReleases.length,
             appliedFilters: []
@@ -193,6 +211,9 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
             match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
         } else if (filter.field.id === 'onlyDeployed') {
             match = !item.release.undeployed;
+        } else if (filter.field.id === 'deployedOn') {
+            match = item.release[filter.query.id] && item.release[filter.query.id].deployDate
+                && !item.release[filter.query.id].undeployDate;
         }
         return match;
     }

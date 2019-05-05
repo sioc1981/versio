@@ -14,6 +14,14 @@ import { Issue } from '../issue/shared/issue.model';
 import { Patch } from '../patch/shared/patch.model';
 import { ReleaseFull, Release } from './shared/release.model';
 
+
+enum ReleaseDetailTab {
+    OVERVIEW,
+    RELEASE_NOTE,
+    PATCHES,
+    ALL_ISSUES
+}
+
 @Component({
     selector: 'app-release-detail',
     templateUrl: './release-detail.component.html',
@@ -22,6 +30,8 @@ import { ReleaseFull, Release } from './shared/release.model';
 export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalContainer {
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
+
+    ReleaseDetailTabEnum = ReleaseDetailTab;
 
     versionNumber: string;
     currentTab = '';
@@ -41,6 +51,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     issues: Issue[];
     filteredIssues: Issue[] = [];
     isAscendingSortForIssues = true;
+    issueActionConfig: ActionConfig;
     issueFilterConfig: FilterConfig;
     issueSortConfig: SortConfig;
     issueToolbarConfig: ToolbarConfig;
@@ -53,6 +64,15 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     patchSortConfig: SortConfig;
     patchToolbarConfig: ToolbarConfig;
     patchPaginationConfig: PaginationConfig;
+
+    allIssues: Issue[];
+    allOriginalIssues: Issue[];
+    filteredAllIssues: Issue[] = [];
+    isAscendingSortForAllIssues = true;
+    allIssueFilterConfig: FilterConfig;
+    allIssueSortConfig: SortConfig;
+    allIssueToolbarConfig: ToolbarConfig;
+    allIssuePaginationConfig: PaginationConfig;
 
     private subscriptions: Subscription[] = [];
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService) { }
@@ -67,6 +87,14 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
                 id: 'editRelease',
                 title: 'Edit release',
                 tooltip: 'Edit release'
+            }]
+        } as ActionConfig;
+
+        this.issueActionConfig = {
+            primaryActions: [{
+                id: 'openIssue',
+                title: 'Open issue',
+                tooltip: 'Open issue in an new tab'
             }]
         } as ActionConfig;
 
@@ -99,8 +127,6 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
             appliedFilters: []
         } as FilterConfig;
 
-
-
         this.issueToolbarConfig = {
             filterConfig: this.issueFilterConfig
         } as ToolbarConfig;
@@ -114,11 +140,6 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
 
         this.patchFilterConfig = {
             fields: [{
-                id: 'version',
-                title: 'Version',
-                placeholder: 'Filter by Version...',
-                type: FilterType.TEXT
-            }, {
                 id: 'sequence',
                 title: 'Sequence',
                 placeholder: 'Filter by Sequence Number...',
@@ -144,6 +165,45 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
             totalItems: this.filteredPatches.length
         } as PaginationConfig;
 
+        this.allIssueFilterConfig = {
+            fields: [{
+                id: 'reference',
+                title: 'Reference',
+                placeholder: 'Filter by Reference...',
+                type: FilterType.TEXT
+            }, {
+                id: 'description',
+                title: 'Description',
+                placeholder: 'Filter by Description...',
+                type: FilterType.TEXT
+            }, {
+                id: 'container',
+                title: 'Container',
+                placeholder: 'Filter by Container...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'JIRA',
+                    value: 'Jira'
+                }, {
+                    id: 'MANTIS',
+                    value: 'Mantis'
+                }
+                ]
+            }],
+            resultsCount: this.filteredAllIssues.length,
+            appliedFilters: []
+        } as FilterConfig;
+
+        this.allIssueToolbarConfig = {
+            filterConfig: this.allIssueFilterConfig
+        } as ToolbarConfig;
+
+        this.allIssuePaginationConfig = {
+            pageNumber: 1,
+            pageSize: 5,
+            pageSizeIncrements: [3, 5, 10],
+            totalItems: this.filteredAllIssues.length
+        } as PaginationConfig;
 
         this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
@@ -169,8 +229,14 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
         this.loading = true;
         this.subscriptions.push(this.releaseService.searchReleaseFull(this.versionNumber)
             .subscribe(newRelease => {
-            this.releaseFull = newRelease; this.release = this.releaseFull.release;
-                this.applyIssueFilters(); this.applyPatchFilters();
+                this.releaseFull = newRelease; this.release = this.releaseFull.release;
+                this.allOriginalIssues = Array.from(this.releaseFull.issues);
+                const issueReferences = this.allOriginalIssues.map(issue => issue.reference);
+                this.releaseFull.patches.forEach(patch => {
+                    patch.issues.filter(issue => issueReferences.every(ref => ref !== issue.reference))
+                        .forEach(issue => { this.allOriginalIssues.push(issue); issueReferences.push(issue.reference); });
+                });
+                this.applyIssueFilters(); this.applyPatchFilters(); this.applyAllIssueFilters();
             },
                 _ => this.loadingFailed = true,
                 () => { this.loading = false; }));
@@ -185,16 +251,28 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
         this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
     }
 
-    handleAction(action: Action): void {
+    handleAction(action: Action, item?: any): void {
         if (action.id === 'editRelease') {
             this.openModal(this.updateReleaseTemplate);
+        } else if (action.id === 'openIssue') {
+            const url = ISSUE_CONSTANT.constainer_urls[item.container] + item.reference;
+            window.open(url, '_blank');
         }
     }
 
-    filterChanged($event: FilterEvent, isForIssue: boolean): void {
-        if (isForIssue) {
-            this.applyIssueFilters();
+    filterChanged($event: FilterEvent, releaseDetailTabType: ReleaseDetailTab): void {
+        switch (releaseDetailTabType) {
+            case ReleaseDetailTab.RELEASE_NOTE:
+                this.applyIssueFilters();
+                break;
+            case ReleaseDetailTab.PATCHES:
+                this.applyPatchFilters();
+                break;
+            case ReleaseDetailTab.ALL_ISSUES:
+                this.applyAllIssueFilters();
+                break;
         }
+
     }
 
     applyIssueFilters(): void {
@@ -212,6 +290,23 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
         this.issuePaginationConfig.pageNumber = 1;
         this.issuePaginationConfig.totalItems = this.filteredIssues.length;
         this.updateIssueItems();
+    }
+
+    applyAllIssueFilters(): void {
+        this.filteredAllIssues = [];
+        if (this.allIssueFilterConfig.appliedFilters && this.allIssueFilterConfig.appliedFilters.length > 0) {
+            this.allOriginalIssues.forEach((item) => {
+                if (this.matchesIssueFilters(item, this.allIssueFilterConfig.appliedFilters)) {
+                    this.filteredAllIssues.push(item);
+                }
+            });
+        } else {
+            this.filteredAllIssues = this.allOriginalIssues;
+        }
+        this.allIssueToolbarConfig.filterConfig.resultsCount = this.filteredAllIssues.length;
+        this.allIssuePaginationConfig.pageNumber = 1;
+        this.allIssuePaginationConfig.totalItems = this.filteredAllIssues.length;
+        this.updateAllIssueItems();
     }
 
     matchesIssueFilter(item: any, filter: Filter): boolean {
@@ -246,25 +341,43 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     }
 
 
-    handlePageSize($event: PaginationEvent, isForIssue: boolean) {
-        if (isForIssue) {
-            this.updateIssueItems();
-        } else {
-            this.updatePatches();
+    handlePageSize($event: PaginationEvent, releaseDetailTabType: ReleaseDetailTab) {
+        switch (releaseDetailTabType) {
+            case ReleaseDetailTab.RELEASE_NOTE:
+                this.updateIssueItems();
+                break;
+            case ReleaseDetailTab.PATCHES:
+                this.updatePatches();
+                break;
+            case ReleaseDetailTab.ALL_ISSUES:
+                this.updateAllIssueItems();
+                break;
         }
     }
 
-    handlePageNumber($event: PaginationEvent, isForIssue: boolean) {
-        if (isForIssue) {
-            this.updateIssueItems();
-        } else {
-            this.updatePatches();
+    handlePageNumber($event: PaginationEvent, releaseDetailTabType: ReleaseDetailTab) {
+        switch (releaseDetailTabType) {
+            case ReleaseDetailTab.RELEASE_NOTE:
+                this.updateIssueItems();
+                break;
+            case ReleaseDetailTab.PATCHES:
+                this.updatePatches();
+                break;
+            case ReleaseDetailTab.ALL_ISSUES:
+                this.updateAllIssueItems();
+                break;
         }
     }
 
     updateIssueItems() {
         this.issues = this.filteredIssues.slice((this.issuePaginationConfig.pageNumber - 1) * this.issuePaginationConfig.pageSize,
             this.issuePaginationConfig.totalItems).slice(0, this.issuePaginationConfig.pageSize);
+    }
+
+    updateAllIssueItems() {
+        this.allIssues = this.filteredAllIssues.slice(
+            (this.allIssuePaginationConfig.pageNumber - 1) * this.allIssuePaginationConfig.pageSize,
+            this.allIssuePaginationConfig.totalItems).slice(0, this.allIssuePaginationConfig.pageSize);
     }
 
 
@@ -289,9 +402,6 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
         let match = true;
         if (filter.field.id === 'sequence') {
             match = item.sequenceNumber.indexOf(filter.value) !== -1;
-        }
-        if (filter.field.id === 'version') {
-            match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
         }
         if (filter.field.id === 'issue') {
             let issueMatch = false;

@@ -3,17 +3,21 @@ import {
     OnInit,
     ViewEncapsulation,
     ViewChild,
-    OnDestroy
+    OnDestroy,
+    TemplateRef
 } from '@angular/core';
 import { Router, ActivatedRoute, RouterEvent } from '@angular/router';
 
 import { VerticalNavigationItem } from 'patternfly-ng/navigation/vertical-navigation/vertical-navigation-item';
-import { VerticalNavigationComponent } from 'patternfly-ng';
+import { VerticalNavigationComponent, AboutModalEvent, AboutModalConfig } from 'patternfly-ng';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
-import { Subscription} from 'rxjs';
+import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { filter } from 'rxjs/operators';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { environment } from 'src/environments/environment';
+import { APP_CONSTANT } from '../app.constants';
 
 
 @Component({
@@ -51,15 +55,30 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private COMPARE_INDEX = 4;
 
     @ViewChild('myNav') nav: VerticalNavigationComponent;
+    aboutConfig: AboutModalConfig;
+    modalRef: BsModalRef;
 
     navigationItems: VerticalNavigationItem[];
 
+    applicationName = APP_CONSTANT.applicationName;
+
     private subscriptions: Subscription[] = [];
 
-    constructor(private router: Router, private route: ActivatedRoute) {
+    constructor(private router: Router, private route: ActivatedRoute, private modalService: BsModalService) {
     }
 
     ngOnInit(): void {
+
+        this.aboutConfig = {
+            additionalInfo: 'Application to track changes on versions of an Application',
+            copyright: 'Trademark and Copyright Information',
+            title: this.applicationName,
+            productInfo: [
+                { name: 'Version', value: environment.version },
+                { name: 'Server Name', value: 'Localhost' },
+                { name: 'User Name', value: 'admin' },
+                { name: 'User Role', value: 'Administrator' }]
+        } as AboutModalConfig;
 
         this.subscriptions.push(this.router.events.pipe(
             filter(e => e instanceof RouterEvent)
@@ -103,43 +122,51 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
         res[this.RELEASES_INDEX] = {
             title: RELEASE_CONSTANT.title,
-                iconStyleClass: RELEASE_CONSTANT.iconStyleClass,
-                    url: RELEASE_CONSTANT.url,
-                        badges: [
-                            {
-                                count: RELEASE_CONSTANT.summary.count,
-                                tooltip: 'Total number of releases'
-                            }
-                        ]
+            iconStyleClass: RELEASE_CONSTANT.iconStyleClass,
+            url: RELEASE_CONSTANT.url,
+            badges: [
+                {
+                    count: RELEASE_CONSTANT.summary.count,
+                    tooltip: 'Total number of releases'
+                }
+            ]
         };
         res[this.PATCHES_INDEX] = {
             title: PATCH_CONSTANT.title,
-                iconStyleClass: PATCH_CONSTANT.iconStyleClass,
-                    url: PATCH_CONSTANT.url,
-                        badges: [
-                            {
-                                count: PATCH_CONSTANT.summary.count,
-                                tooltip: 'Total number of patchs'
-                            }
-                        ]
+            iconStyleClass: PATCH_CONSTANT.iconStyleClass,
+            url: PATCH_CONSTANT.url,
+            badges: [
+                {
+                    count: PATCH_CONSTANT.summary.count,
+                    tooltip: 'Total number of patches'
+                }
+            ]
         };
         res[this.ISSUES_INDEX] = {
             title: ISSUE_CONSTANT.title,
-                iconStyleClass: ISSUE_CONSTANT.iconStyleClass,
-                    url: ISSUE_CONSTANT.url,
-                        badges: [
-                            {
-                                count: ISSUE_CONSTANT.summary.count,
-                                tooltip: 'Total number of issues'
-                            }
-                        ]
+            iconStyleClass: ISSUE_CONSTANT.iconStyleClass,
+            url: ISSUE_CONSTANT.url,
+            badges: [
+                {
+                    count: ISSUE_CONSTANT.summary.count,
+                    tooltip: 'Total number of issues'
+                }
+            ]
         };
         res[this.COMPARE_INDEX] = {
             title: 'Compare',
-                iconStyleClass: 'fa fa-columns',
-                    url: '/compare'
+            iconStyleClass: 'fa fa-columns',
+            url: '/compare'
         };
         return res;
+    }
+
+    openModal(template: TemplateRef<any>): void {
+        this.modalRef = this.modalService.show(template);
+    }
+
+    closeModal($event: AboutModalEvent): void {
+        this.modalRef.hide();
     }
 
 }

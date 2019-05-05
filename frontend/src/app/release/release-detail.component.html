@@ -126,14 +126,15 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <pfng-toolbar [config]="issueToolbarConfig"
-                                    (onFilterChange)="filterChanged($event, true)">
+                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.RELEASE_NOTE)">
                                 </pfng-toolbar>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-sm-12">
-                        <pfng-list id="myList" [items]="issues" [itemTemplate]="issueTemplate">
+                        <pfng-list id="myList" [items]="issues" [itemTemplate]="issueTemplate"
+                            [actionTemplate]="issueActionTemplate">
                             <ng-template #issueTemplate let-item="item" let-index="index">
                                 <div class="list-pf-left" [ngSwitch]="item.container">
                                     <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
@@ -153,10 +154,16 @@
                                     </div>
                                 </div>
                             </ng-template>
+                            <ng-template #issueActionTemplate let-item="item" let-index="index">
+                                <pfng-action class="list-pf-actions" [config]="issueActionConfig"
+                                    (onActionSelect)="handleAction($event, item)">
+                                </pfng-action>
+                            </ng-template>
                         </pfng-list>
                         <pfng-pagination [config]="issuePaginationConfig"
-                            (onPageNumberChange)="handlePageNumber($event, true)"
-                            (onPageSizeChange)="handlePageSize($event, true)"></pfng-pagination>
+                            (onPageNumberChange)="handlePageNumber($event, ReleaseDetailTabEnum.RELEASE_NOTE)"
+                            (onPageSizeChange)="handlePageSize($event, ReleaseDetailTabEnum.RELEASE_NOTE)">
+                        </pfng-pagination>
 
                     </div>
                 </tab>
@@ -169,7 +176,7 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <pfng-toolbar [config]="patchToolbarConfig"
-                                    (onFilterChange)="filterChanged($event, false)">
+                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.PATCHES)">
                                 </pfng-toolbar>
                             </div>
                         </div>
@@ -177,30 +184,62 @@
 
 
                     <div class="col-sm-12">
-                                            <pfng-list id="myList" [items]="patches | skipUndeploy" [itemTemplate]="patchTemplate">
-                        <ng-template #patchTemplate let-item="item" let-index="index">
-                            <div class="list-pf-content-wrapper">
-                                <div class="list-pf-main-content">
+                        <pfng-list id="myList" [items]="patches | skipUndeploy" [itemTemplate]="patchTemplate">
+                            <ng-template #patchTemplate let-item="item" let-index="index">
+                                <div class="list-pf-content-wrapper">
                                     <div class="list-pf-main-content">
-                                        <div class="list-pf-title">{{item.sequenceNumber}}</div>
+                                        <div class="list-pf-main-content">
+                                            <div class="list-pf-title">
+                                                <a routerLink="/patch/{{versionNumber}}/{{item.sequenceNumber}}">{{item.sequenceNumber}}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="list-pf-additional-content">
+                                        <span class="fas fa myApp myApp-laptop-code"
+                                            [class.myApp-green]="item.packageDate"
+                                            [class.myApp-orange]="!item.packageDate"></span>
+                                        <span class="fas fa myApp myApp-user-shield"
+                                            [appHistoryColor]="item.qualification"></span>
+                                        <span class="fas fa myApp myApp-cart-check"
+                                            [appHistoryColor]="item.keyUser"></span>
+                                        <span class="fas fa myApp myApp-cash-register"
+                                            [appHistoryColor]="item.pilot"></span>
+                                        <span class="fas fa myApp myApp-store"
+                                            [appHistoryColor]="item.production"></span>
                                     </div>
                                 </div>
-                                <div class="list-pf-additional-content">
-                                    <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate"
-                                        [class.myApp-orange]="!item.packageDate"></span>
-                                    <span class="fas fa myApp myApp-user-shield"
-                                        [appHistoryColor]="item.qualification"></span>
-                                    <span class="fas fa myApp myApp-cart-check" [appHistoryColor]="item.keyUser"></span>
-                                    <span class="fas fa myApp myApp-cash-register"
-                                        [appHistoryColor]="item.pilot"></span>
-                                    <span class="fas fa myApp myApp-store" [appHistoryColor]="item.production"></span>
-                                </div>
+                            </ng-template>
+                        </pfng-list>
+                        <pfng-pagination [config]="patchPaginationConfig"
+                            (onPageNumberChange)="handlePageNumber($event, ReleaseDetailTabEnum.PATCHES)"
+                            (onPageSizeChange)="handlePageSize($event, ReleaseDetailTabEnum.PATCHES)"></pfng-pagination>
+
+                    </div>
+                </tab>
+                <tab #tab_all_issues [active]="currentTab === 'patches'">
+                    <ng-template tabHeading>
+                        <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">All Issues
+                            ({{allOriginalIssues.length}})</span>
+                    </ng-template>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <pfng-toolbar [config]="allIssueToolbarConfig"
+                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.ALL_ISSUES)">
+                                </pfng-toolbar>
                             </div>
-                        </ng-template>
-                    </pfng-list>
-                                            <pfng-pagination [config]="patchPaginationConfig"
-                            (onPageNumberChange)="handlePageNumber($event, false)"
-                            (onPageSizeChange)="handlePageSize($event, false)"></pfng-pagination>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <pfng-list id="myList" [items]="allIssues" [itemTemplate]="issueTemplate"
+                            [actionTemplate]="issueActionTemplate">
+                        </pfng-list>
+                        <pfng-pagination [config]="allIssuePaginationConfig"
+                            (onPageNumberChange)="handlePageNumber($event, ReleaseDetailTabEnum.ALL_ISSUES)"
+                            (onPageSizeChange)="handlePageSize($event, ReleaseDetailTabEnum.ALL_ISSUES)">
+                        </pfng-pagination>
 
                     </div>
                 </tab>

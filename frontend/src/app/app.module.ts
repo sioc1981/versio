@@ -50,10 +50,12 @@ import { registerLocaleData } from '@angular/common';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import localeFr from '@angular/common/locales/fr';
 import { frLocale } from 'ngx-bootstrap/locale';
+import { PatchDetailComponent } from './patch/patch-detail.component';
+import { PageNotFoundComponent } from './misc/page-not-found.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
-defineLocale('fr', frLocale); 
+defineLocale('fr', frLocale);
 
 @NgModule({
     declarations: [
@@ -62,6 +64,7 @@ defineLocale('fr', frLocale);
         IssueCreateComponent,
         PatchComponent,
         PatchCreateComponent,
+        PatchDetailComponent,
         PatchUpdateComponent,
         ReleaseComponent,
         ReleaseCreateComponent,
@@ -80,6 +83,7 @@ defineLocale('fr', frLocale);
         ReleaseImportComponent,
         PatchImportComponent,
         SkipUndeployPipe,
+        PageNotFoundComponent,
     ],
     imports: [
         AboutModalModule,

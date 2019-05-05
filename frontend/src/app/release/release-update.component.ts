@@ -118,35 +118,35 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.step2aConfig = {
             id: 'step2a',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 0,
             title: 'Build'
         } as WizardStepConfig;
         this.step2bConfig = {
             id: 'step2b',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Qualification'
         } as WizardStepConfig;
         this.step2cConfig = {
             id: 'step2c',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Key User'
         } as WizardStepConfig;
         this.step2dConfig = {
             id: 'step2d',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Pilot'
         } as WizardStepConfig;
         this.step2eConfig = {
             id: 'step2e',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Production'
         } as WizardStepConfig;

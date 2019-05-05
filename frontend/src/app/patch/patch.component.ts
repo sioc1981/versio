@@ -10,6 +10,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { PatchModalContainer } from './patch-modal-container';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -17,7 +18,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
     templateUrl: './patch.component.html',
     styleUrls: ['./patch.component.less']
 })
-export class PatchComponent implements OnInit, OnDestroy {
+export class PatchComponent implements OnInit, OnDestroy, PatchModalContainer {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createPatch') createPatchTemplate: TemplateRef<any>;
     @ViewChild('importPatch') importPatchTemplate: TemplateRef<any>;
@@ -46,7 +47,7 @@ export class PatchComponent implements OnInit, OnDestroy {
     constructor(private patchService: PatchService, private modalService: BsModalService) { }
 
     ngOnInit() {
-        this.getPatchs();
+        this.reloadData();
         this.filterConfig = {
             fields: [{
                 id: 'version',
@@ -63,6 +64,33 @@ export class PatchComponent implements OnInit, OnDestroy {
                 title: 'issue',
                 placeholder: 'Filter by issue...',
                 type: FilterType.TEXT
+            }, {
+                id: 'onlyDeployed',
+                title: 'Only deployed',
+                placeholder: 'Only deployed on any platform',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'onlyDeployed',
+                    value: 'True'
+                }]
+            }, {
+                id: 'deployedOn',
+                title: 'Deployed on',
+                placeholder: 'Deployed on...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'qualification',
+                    value: 'Qualification platform'
+                }, {
+                    id: 'keyUser',
+                    value: 'KeyUser platform'
+                }, {
+                    id: 'pilot',
+                    value: 'Pilot platform'
+                }, {
+                    id: 'production',
+                    value: 'Production platform'
+                }]
             }],
             resultsCount: this.filteredPatches.length,
             appliedFilters: []
@@ -101,16 +129,20 @@ export class PatchComponent implements OnInit, OnDestroy {
         } as PaginationConfig;
 
     }
-   /**
-      * Clean up subscriptions
-      */
+    /**
+       * Clean up subscriptions
+       */
     ngOnDestroy(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe);
     }
 
-    getPatchs(): void {
+    reloadData(): void {
         this.subscriptions.push(this.patchService.getPatchs()
             .subscribe(newPatchs => { this.patches = newPatchs; this.applyFilters(); }));
+    }
+
+    getPatch(): Patch {
+        return this.selectedPatch;
     }
 
     closeModal($event: WizardEvent): void {
@@ -143,19 +175,29 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     matchesFilter(item: any, filter: Filter): boolean {
         let match = true;
-        if (filter.field.id === 'sequence') {
-            match = item.sequenceNumber.indexOf(filter.value) !== -1;
-        }
-        if (filter.field.id === 'version') {
-            match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
-        }
-        if (filter.field.id === 'issue') {
-            let issueMatch = false;
-            item.issues.forEach(issue => {
-                issueMatch = issue.reference.indexOf(filter.value) !== -1
-                    || issue.description.indexOf(filter.value) !== -1;
-            });
-            match = issueMatch;
+        switch (filter.field.id) {
+
+            case 'sequence':
+                match = item.sequenceNumber.indexOf(filter.value) !== -1;
+                break;
+            case 'version':
+                match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
+                break;
+            case 'issue':
+                let issueMatch = false;
+                item.issues.forEach(issue => {
+                    issueMatch = issue.reference.indexOf(filter.value) !== -1
+                        || issue.description.indexOf(filter.value) !== -1;
+                });
+                match = issueMatch;
+                break;
+            case 'onlyDeployed':
+                match = !item.release.undeployed;
+                break;
+            case 'deployedOn':
+                match = item.release[filter.query.id] && item.release[filter.query.id].deployDate
+                    && !item.release[filter.query.id].undeployDate;
+                break;
         }
         return match;
     }

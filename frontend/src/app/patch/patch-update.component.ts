@@ -5,6 +5,7 @@ import {
     ViewChild,
     ViewEncapsulation,
     OnDestroy,
+    Optional,
 } from '@angular/core';
 
 import { PatchComponent } from './patch.component';
@@ -22,6 +23,8 @@ import { Release } from '../release/shared/release.model';
 import { Issue } from '../issue/shared/issue.model';
 import { Patch } from './shared/patch.model';
 import { PlatformHistory } from '../shared/platform.model';
+import { PatchDetailComponent } from './patch-detail.component';
+import { PatchModalContainer } from './patch-modal-container';
 
 
 @Component({
@@ -57,7 +60,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    patchComponent: PatchComponent;
+    patchComponent: PatchModalContainer;
 
     releases: Release[];
     releaseListConfig: ListConfig;
@@ -72,12 +75,12 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
-        @Host() patchComponent: PatchComponent) {
-        this.patchComponent = patchComponent;
+        @Optional() @Host() patchComponent: PatchComponent, @Optional() @Host() patchDetailComponent: PatchDetailComponent) {
+        this.patchComponent = patchComponent ? patchComponent : patchDetailComponent;
     }
 
     ngOnInit(): void {
-        this.patch = this.patchComponent.selectedPatch;
+        this.patch = this.patchComponent.getPatch();
         this.data = cloneDeep(this.patch);
         this.data.buildDate = new Date(this.patch.buildDate);
         this.data.packageDate = this.initDate(this.patch.packageDate);
@@ -119,35 +122,35 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.step2aConfig = {
             id: 'step2a',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 0,
             title: 'Build'
         } as WizardStepConfig;
         this.step2bConfig = {
             id: 'step2b',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Qualification'
         } as WizardStepConfig;
         this.step2cConfig = {
             id: 'step2c',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Key User'
         } as WizardStepConfig;
         this.step2dConfig = {
             id: 'step2d',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Pilot'
         } as WizardStepConfig;
         this.step2eConfig = {
             id: 'step2e',
             expandReviewDetails: true,
-            nextEnabled: false,
+            nextEnabled: true,
             priority: 1,
             title: 'Production'
         } as WizardStepConfig;
@@ -173,7 +176,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
         // Wizard
         this.wizardConfig = {
-            title: 'Edit patch : ' + this.patch.sequenceNumber + ' / ' + this.patch.release.version.versionNumber,
+            title: 'Edit patch : ' + this.patch.release.version.versionNumber + ' / ' + this.patch.sequenceNumber,
             sidebarStyleClass: 'example-wizard-sidebar',
             stepStyleClass: 'example-wizard-step'
         } as WizardConfig;
@@ -251,7 +254,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.wizardConfig.done = true;
         this.subscriptions.push(this.patchService.updatePatch(this.data as Patch)
             .subscribe(_ => {
-                this.patchComponent.getPatchs();
+                this.patchComponent.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {

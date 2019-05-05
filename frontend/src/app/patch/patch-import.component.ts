@@ -198,7 +198,7 @@ export class PatchImportComponent implements OnInit, OnDestroy {
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'stepFinale') {
             if (this.deploySuccess) {
-                this.patchComponent.getPatchs();
+                this.patchComponent.reloadData();
             }
             this.patchComponent.closeModal($event);
         }
