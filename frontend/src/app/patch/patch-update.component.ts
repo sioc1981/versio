@@ -1,14 +1,15 @@
 import {
     Component,
-    Host,
     OnInit,
     ViewChild,
     ViewEncapsulation,
     OnDestroy,
-    Optional,
+    Input,
+    Output,
+    EventEmitter,
+    TemplateRef,
 } from '@angular/core';
 
-import { PatchComponent } from './patch.component';
 import {
     WizardStepComponent, WizardStep, WizardComponent, WizardEvent, WizardStepConfig, WizardConfig,
     ListConfig, ListEvent
@@ -23,9 +24,7 @@ import { Release } from '../release/shared/release.model';
 import { Issue } from '../issue/shared/issue.model';
 import { Patch } from './shared/patch.model';
 import { PlatformHistory } from '../shared/platform.model';
-import { PatchDetailComponent } from './patch-detail.component';
-import { PatchModalContainer } from './patch-modal-container';
-
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -35,6 +34,10 @@ import { PatchModalContainer } from './patch-modal-container';
 })
 export class PatchUpdateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @ViewChild('createIssue') createIssueTemplate: TemplateRef<any>;
+    modalRef: BsModalRef;
+    @Input() patch: Patch;
+    @Output() close = new EventEmitter<Patch>();
 
     data: any = {};
     deployComplete = true;
@@ -60,27 +63,21 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    patchComponent: PatchModalContainer;
 
     releases: Release[];
     releaseListConfig: ListConfig;
     releaseVersion: String;
 
     issues: Issue[];
-
     issuesListConfig: ListConfig;
-
-    patch: Patch;
+    selectIssue: Issue;
 
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
-        @Optional() @Host() patchComponent: PatchComponent, @Optional() @Host() patchDetailComponent: PatchDetailComponent) {
-        this.patchComponent = patchComponent ? patchComponent : patchDetailComponent;
-    }
+        private modalService: BsModalService) { }
 
     ngOnInit(): void {
-        this.patch = this.patchComponent.getPatch();
         this.data = cloneDeep(this.patch);
         this.data.buildDate = new Date(this.patch.buildDate);
         this.data.packageDate = this.initDate(this.patch.packageDate);
@@ -88,6 +85,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.data.keyUser = this.initPlatformHistory(this.data.keyUser);
         this.data.pilot = this.initPlatformHistory(this.data.pilot);
         this.data.production = this.initPlatformHistory(this.data.production);
+        this.data.issues.forEach(i => i.selected = true);
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
         this.getIssues();
@@ -227,26 +225,19 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
     getIssues(): void {
         this.subscriptions.push(this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = this.preSelect(newIssues)));
-    }
-
-
-    preSelect(issues: Issue[]): Issue[] {
-        const dataIssueIds: string[] = this.data.issues.map(i => i.reference);
-        issues.forEach(issue => {
-            if (dataIssueIds.indexOf(issue.reference) !== -1) {
-                issue.selected = true;
-            }
-        });
-        return issues;
+            .subscribe(newIssues => this.issues = newIssues.sort((i1, i2) => i2.reference.localeCompare(i1.reference))));
     }
 
     // Methods
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3b') {
-            this.patchComponent.closeModal($event);
+            this.closeWizard(this.data as Patch);
         }
+    }
+
+    closeWizard(patch?: Patch) {
+        this.close.emit(patch);
     }
 
     startDeploy(): void {
@@ -254,7 +245,6 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.wizardConfig.done = true;
         this.subscriptions.push(this.patchService.updatePatch(this.data as Patch)
             .subscribe(_ => {
-                this.patchComponent.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
@@ -321,6 +311,29 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.data.release = event.item;
         this.updateVersion();
     }
+
+    onSelectIssue(event: TypeaheadMatch): void {
+        this.addIssue(event.item);
+        this.selectIssue = null;
+    }
+
+    onCreateIssueClose(issue: Issue) {
+        this.addIssue(issue);
+        this.modalRef.hide();
+    }
+
+    private addIssue(issue: Issue) {
+        if (issue && this.data.issues.filter(i => i.reference === issue.reference).length === 0) {
+            issue.selected = true;
+            this.data.issues.push(issue);
+            this.updateIssues();
+        }
+    }
+
+    openCreateIssue() {
+        this.modalRef = this.modalService.show(this.createIssueTemplate, { class: 'modal-lg' });
+    }
+
 }
 
 function flattenWizardSteps(wizard: WizardComponent): WizardStep[] {

@@ -1,4 +1,4 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="patchComponent.closeModal($event)"
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()"
     (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <form class="form-horizontal">

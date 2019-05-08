@@ -12,7 +12,6 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
-import { ReleaseModalContainer } from './release-modal-container';
 import { ReleaseFull } from './shared/release.model';
 
 @Component({
@@ -21,7 +20,7 @@ import { ReleaseFull } from './shared/release.model';
     templateUrl: './release.component.html',
     styleUrls: ['./release.component.less']
 })
-export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContainer {
+export class ReleaseComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createRelease') createReleaseTemplate: TemplateRef<any>;
     @ViewChild('importRelease') importReleaseTemplate: TemplateRef<any>;
@@ -164,10 +163,6 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
         this.subscriptions.forEach(sub => sub.unsubscribe);
     }
 
-    getRelease(): ReleaseFull {
-        return this.selectedRelease;
-    }
-
     reloadData(): void {
         this.subscriptions.push(this.releaseService.getFullReleases()
             .subscribe(newReleases => {
@@ -175,10 +170,6 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
                 this.releases = this.releases.sort((item1: any, item2: any) => this.compare(item1, item2));
                 this.applyFilters();
             }));
-    }
-
-    closeModal($event: WizardEvent): void {
-        this.modalRef.hide();
     }
 
     openModal(template: TemplateRef<any>): void {
@@ -320,4 +311,19 @@ export class ReleaseComponent implements OnInit, OnDestroy, ReleaseModalContaine
         this.items = this.filteredReleases.slice((this.paginationConfig.pageNumber - 1) * this.paginationConfig.pageSize,
             this.paginationConfig.totalItems).slice(0, this.paginationConfig.pageSize);
     }
+
+    onWizardClose(releaseFullChanged: ReleaseFull) {
+        if (releaseFullChanged) {
+            this.reloadData();
+        }
+        this.modalRef.hide();
+    }
+
+    onImportWizardClose(importSuccessfull: boolean) {
+        if (importSuccessfull) {
+            this.reloadData();
+        }
+        this.modalRef.hide();
+    }
+
 }

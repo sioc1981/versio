@@ -1,6 +1,6 @@
 <pfng-wizard #wizard
              [config]="wizardConfig"
-             (onCancel)="wizardExample.closeModal($event)"
+             (onCancel)="closeWizard()"
              (onNext)="nextClicked($event)"
              (onStepChange)="stepChanged($event)">
   <pfng-wizard-step [config]="step1Config">
@@ -15,6 +15,55 @@
         </div>
       </form>
   </pfng-wizard-step>
+    <pfng-wizard-step [config]="step2Config">
+        <form class="form-horizontal">
+            <div class="form-group required">
+                <label class="col-sm-4 control-label  required-pf" for="name">Issues</label>
+            </div>
+            <div class="col-sm-12">
+                <div class="col-sm-6" style="overflow-y: auto;">
+                    <pfng-list id="myList" [config]="issuesListConfig" [items]="data.issues"
+                        [itemTemplate]="issuesTemplate" (onSelectionChange)="handleIssuesSelectionChange($event)">
+                        <ng-template #issuesTemplate let-item="item" let-index="index">
+                            <div class="list-pf-content-wrapper">
+                                <div class="list-pf-left" [ngSwitch]="item.container">
+                                    <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
+                                        *ngSwitchCase="'MANTIS'" />
+                                    <img src="/src/assets/images/jira.svg" class="list-pf-icon-small"
+                                        *ngSwitchCase="'JIRA'" />
+                                </div>
+                                <div class="list-pf-main-content">
+                                    <div class="list-pf-title">{{item.reference}}</div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </pfng-list>
+                </div>
+                <div class="col-sm-6">
+                    <form class="form-horizontal">
+                        <div class="form-group required">
+                            <label class="col-sm-6 control-label required-pf" for="issueReference">Add existing
+                                issue</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" id="issueReference" name="issueReference"
+                                    [(ngModel)]="selectIssue" [ngModelOptions]="{standalone: true}"
+                                    typeaheadOptionField="reference" [typeahead]="issues" [typeaheadScrollable]="true"
+                                    [typeaheadMinLength]="0" (typeaheadOnSelect)="onSelectIssue($event)"
+                                    autocomplete="off">
+                            </div>
+                        </div>
+                    </form>
+                    <hr />
+                    <div class="col-sm-12">
+                        <button (click)="openCreateIssue()">Create New Issue</button>
+                    </div>
+                    <ng-template #createIssue>
+                        <app-issue-create (close)="onCreateIssueClose($event)"></app-issue-create>
+                    </ng-template>
+                </div>
+            </div>
+        </form>
+    </pfng-wizard-step>
   <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
       <div class="wizard-pf-contents">
         <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">

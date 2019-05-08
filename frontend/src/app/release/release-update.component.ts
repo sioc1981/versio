@@ -6,6 +6,10 @@ import {
     ViewEncapsulation,
     OnDestroy,
     Optional,
+    TemplateRef,
+    Input,
+    Output,
+    EventEmitter,
 } from '@angular/core';
 
 import {
@@ -16,12 +20,11 @@ import { ReleaseService } from './shared/release.service';
 import { IssueService } from '../issue/shared/issue.service';
 import { cloneDeep } from 'lodash';
 import { Subscription } from 'rxjs';
-import { ReleaseModalContainer } from './release-modal-container';
-import { ReleaseComponent } from './release.component';
-import { ReleaseDetailComponent } from './release-detail.component';
 import { Release, ReleaseFull } from './shared/release.model';
 import { Issue } from '../issue/shared/issue.model';
 import { PlatformHistory } from '../shared/platform.model';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -31,6 +34,10 @@ import { PlatformHistory } from '../shared/platform.model';
 })
 export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @ViewChild('createIssue') createIssueTemplate: TemplateRef<any>;
+    modalRef: BsModalRef;
+    @Input() release: ReleaseFull;
+    @Output() close = new EventEmitter<ReleaseFull>();
 
     data: any = {};
     deployComplete = false;
@@ -56,27 +63,22 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    releaseComponent: ReleaseModalContainer;
 
     releases: Release[];
     releaseListConfig: ListConfig;
     releaseVersion: String;
 
     issues: Issue[];
-
     issuesListConfig: ListConfig;
-
-    release: ReleaseFull;
+    selectIssue: Issue;
 
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private releaseService: ReleaseService,
-        @Optional() @Host() releaseComponent: ReleaseComponent, @Optional() @Host() releaseDetailComponent: ReleaseDetailComponent) {
-        this.releaseComponent = releaseComponent ? releaseComponent : releaseDetailComponent;
+        private modalService: BsModalService) {
     }
 
     ngOnInit(): void {
-        this.release = this.releaseComponent.getRelease();
         this.data = cloneDeep(this.release);
         this.data.release.buildDate = new Date(this.release.release.buildDate);
         this.data.release.packageDate = this.initDate(this.release.release.packageDate);
@@ -84,6 +86,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.data.release.keyUser = this.initPlatformHistory(this.data.release.keyUser);
         this.data.release.pilot = this.initPlatformHistory(this.data.release.pilot);
         this.data.release.production = this.initPlatformHistory(this.data.release.production);
+        this.data.issues.forEach(i => i.selected = true);
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
         this.getIssues();
@@ -223,28 +226,20 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
     getIssues(): void {
         this.subscriptions.push(this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = this.preSelect(newIssues)));
-    }
-
-
-    preSelect(issues: Issue[]): Issue[] {
-        const dataIssueIds: string[] = this.data.issues.map(i => i.reference);
-        issues.forEach(issue => {
-            if (dataIssueIds.indexOf(issue.reference) !== -1) {
-                issue.selected = true;
-            }
-        });
-        return issues;
+            .subscribe(newIssues => this.issues = newIssues.sort((i1, i2) => i2.reference.localeCompare(i1.reference))));
     }
 
     // Methods
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3b') {
-            this.releaseComponent.closeModal($event);
+            this.closeWizard(this.data as ReleaseFull);
         }
     }
 
+    closeWizard(releaseFull?: ReleaseFull) {
+        this.close.emit(releaseFull);
+    }
     startDeploy(): void {
         this.deployComplete = false;
         this.wizardConfig.done = true;
@@ -261,7 +256,6 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         }
         this.subscriptions.push(this.releaseService.updateRelease(this.data as ReleaseFull)
             .subscribe(_ => {
-                this.releaseComponent.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
@@ -322,6 +316,28 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     handleIssuesSelectionChange($event: ListEvent): void {
         this.data.issues = $event.selectedItems;
         this.updateIssues();
+    }
+
+    onSelectIssue(event: TypeaheadMatch): void {
+        this.addIssue(event.item);
+        this.selectIssue = null;
+    }
+
+    onCreateIssueClose(issue: Issue) {
+        this.addIssue(issue);
+        this.modalRef.hide();
+    }
+
+    private addIssue(issue: Issue) {
+        if (issue && this.data.issues.filter(i => i.reference === issue.reference).length === 0) {
+            issue.selected = true;
+            this.data.issues.push(issue);
+            this.updateIssues();
+        }
+    }
+
+    openCreateIssue() {
+        this.modalRef = this.modalService.show(this.createIssueTemplate, { class: 'modal-lg' });
     }
 
 }

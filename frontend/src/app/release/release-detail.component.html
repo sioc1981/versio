@@ -251,6 +251,6 @@
         <pfng-empty-state [config]="errorConfig"></pfng-empty-state>
     </ng-template>
     <ng-template #updateRelease>
-        <app-release-update></app-release-update>
+        <app-release-update [release]="releaseFull" (close)="onWizardClose($event)"></app-release-update>
     </ng-template>
 </div>

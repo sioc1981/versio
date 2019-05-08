@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Host, Output, EventEmitter } from '@angular/core';
 import {
     WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardEvent, PaginationEvent, ListEvent,
     WizardStep, WizardStepComponent, WizardConfig
@@ -21,6 +21,7 @@ import { Issue } from '../issue/shared/issue.model';
 })
 export class ReleaseImportComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @Output() close = new EventEmitter<boolean>();
 
     data: any = {};
 
@@ -191,11 +192,12 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'stepFinale') {
-            if (this.deploySuccess) {
-                this.releaseComponent.reloadData();
-            }
-            this.releaseComponent.closeModal($event);
+            this.closeWizard();
         }
+    }
+
+    closeWizard() {
+        this.close.emit(this.deploySuccess);
     }
 
     startDeploy(): void {

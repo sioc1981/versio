@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/c
 import { ReleaseService } from './shared/release.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ReleaseModalContainer } from './release-modal-container';
 import {
     WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
     PaginationEvent, Filter, FilterEvent
@@ -27,7 +26,7 @@ enum ReleaseDetailTab {
     templateUrl: './release-detail.component.html',
     styleUrls: ['./release-detail.component.less']
 })
-export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalContainer {
+export class ReleaseDetailComponent implements OnInit, OnDestroy {
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
@@ -242,11 +241,6 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
                 () => { this.loading = false; }));
     }
 
-
-    closeModal($event: WizardEvent): void {
-        this.modalRef.hide();
-    }
-
     openModal(template: TemplateRef<any>): void {
         this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
     }
@@ -436,5 +430,12 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy, ReleaseModalCo
     updatePatches() {
         this.patches = this.filteredPatches.slice((this.patchPaginationConfig.pageNumber - 1) * this.patchPaginationConfig.pageSize,
             this.patchPaginationConfig.totalItems).slice(0, this.patchPaginationConfig.pageSize);
+    }
+
+    onWizardClose(releaseFullChanged: ReleaseFull) {
+        if (releaseFullChanged) {
+            this.reloadData();
+        }
+        this.modalRef.hide();
     }
 }

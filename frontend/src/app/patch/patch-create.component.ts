@@ -4,10 +4,12 @@ import {
     OnInit,
     ViewChild,
     ViewEncapsulation,
-    OnDestroy
+    OnDestroy,
+    TemplateRef,
+    EventEmitter,
+    Output
 } from '@angular/core';
 
-import { PatchComponent } from './patch.component';
 import {
     WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep,
     WizardStepComponent, ListConfig, ListEvent
@@ -20,6 +22,7 @@ import { Subscription } from 'rxjs';
 import { Release } from '../release/shared/release.model';
 import { Issue } from '../issue/shared/issue.model';
 import { Patch } from './shared/patch.model';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -29,8 +32,14 @@ import { Patch } from './shared/patch.model';
 })
 export class PatchCreateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @ViewChild('createIssue') createIssueTemplate: TemplateRef<any>;
+    modalRef: BsModalRef;
 
-    data: any = {};
+    @Output() close = new EventEmitter<Patch>();
+
+    data: any = {
+        issues: []
+    };
     deployComplete = true;
     deploySuccess = false;
 
@@ -42,6 +51,7 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
     // Wizard Step 2
     step2Config: WizardStepConfig;
     issues: Issue[];
+    selectIssue: Issue;
 
     issuesListConfig: ListConfig;
 
@@ -50,13 +60,11 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    patchComponent: PatchComponent;
 
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
-        @Host() patchComponent: PatchComponent) {
-        this.patchComponent = patchComponent;
+        private modalService: BsModalService) {
     }
 
     ngOnInit(): void {
@@ -117,16 +125,19 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
 
     getIssues(): void {
         this.subscriptions.push(this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = newIssues));
+            .subscribe(newIssues => this.issues = newIssues.sort((i1, i2) => i2.reference.localeCompare(i1.reference))));
     }
 
 
     // Methods
-
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3') {
-            this.patchComponent.closeModal($event);
+            this.closeWizard(this.data as Patch);
         }
+    }
+
+    closeWizard(patch?: Patch) {
+        this.close.emit(patch);
     }
 
     startDeploy(): void {
@@ -135,7 +146,6 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
         this.data.buildDate = new Date();
         this.subscriptions.push(this.patchService.addPatch(this.data as Patch)
             .subscribe(_ => {
-                this.patchComponent.reloadData();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
@@ -178,7 +188,6 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
     }
 
     handleIssuesSelectionChange($event: ListEvent): void {
-        console.log(JSON.stringify($event.selectedItems));
         this.data.issues = $event.selectedItems;
         this.updateIssues();
     }
@@ -188,6 +197,27 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
         this.updateVersion();
     }
 
+    onSelectIssue(event: TypeaheadMatch): void {
+        this.addIssue(event.item);
+        this.selectIssue = null;
+    }
+
+    onCreateIssueClose(issue: Issue) {
+        this.addIssue(issue);
+        this.modalRef.hide();
+    }
+
+    private addIssue(issue: Issue) {
+        if (issue && this.data.issues.filter(i => i.reference === issue.reference).length === 0) {
+            issue.selected = true;
+            this.data.issues.push(issue);
+            this.updateIssues();
+        }
+    }
+
+    openCreateIssue() {
+        this.modalRef = this.modalService.show(this.createIssueTemplate, { class: 'modal-lg' });
+    }
 }
 
 function flattenWizardSteps(wizard: WizardComponent): WizardStep[] {

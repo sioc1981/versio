@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Host, Output, EventEmitter } from '@angular/core';
 import { WizardComponent, WizardStepConfig, ListConfig, PaginationConfig, WizardConfig, WizardEvent,
     PaginationEvent, ListEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { FileItem, MineTypeEnum, InputFileOptions, DropTargetOptions, HttpClientUploadService } from '@wkoza/ngx-upload';
-import { PatchComponent } from './patch.component';
 import { Subscription, Observable, forkJoin } from 'rxjs';
 import { PatchService } from './shared/patch.service';
 import { IssueService } from '../issue/shared/issue.service';
@@ -20,6 +19,7 @@ import { PlatformHistory } from '../shared/platform.model';
 })
 export class PatchImportComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @Output() close = new EventEmitter<boolean>();
 
     data: any = {};
 
@@ -57,7 +57,6 @@ export class PatchImportComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    patchComponent: PatchComponent;
 
     fileReader = new FileReader();
 
@@ -79,9 +78,7 @@ export class PatchImportComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private patchService: PatchService, private issueService: IssueService, private releaseService: ReleaseService,
-        @Host() patchComponent: PatchComponent, public uploader: HttpClientUploadService) {
-        this.patchComponent = patchComponent;
-    }
+        public uploader: HttpClientUploadService) { }
 
     ngOnInit(): void {
         this.getVersions();
@@ -197,11 +194,12 @@ export class PatchImportComponent implements OnInit, OnDestroy {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'stepFinale') {
-            if (this.deploySuccess) {
-                this.patchComponent.reloadData();
-            }
-            this.patchComponent.closeModal($event);
+            this.closeWizard();
         }
+    }
+
+    closeWizard() {
+        this.close.emit(this.deploySuccess);
     }
 
     startDeploy(): void {

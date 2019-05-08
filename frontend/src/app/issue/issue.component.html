@@ -7,10 +7,10 @@
                 (onFilterChange)="filterChanged($event)">
             </pfng-toolbar>
             <ng-template #createIssue>
-                <app-issue-create></app-issue-create>
+                <app-issue-create (close)="onWizardClose($event)"></app-issue-create>
             </ng-template>
             <ng-template #importIssue>
-                <app-issue-import></app-issue-import>
+                <app-issue-import (close)="onImportWizardClose($event)"></app-issue-import>
             </ng-template>
         </div>
     </div>
@@ -44,10 +44,9 @@
             </ng-template>
         </pfng-list>
             <ng-template #updateIssue>
-                <app-issue-update></app-issue-update>
+                <app-issue-update (close)="onWizardClose($event)" [issue]="selectedIssue"></app-issue-update>
             </ng-template>
             <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
                 (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
-        
     </div>
 </div>

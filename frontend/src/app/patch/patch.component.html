@@ -7,10 +7,10 @@
                 (onFilterChange)="filterChanged($event)">
             </pfng-toolbar>
             <ng-template #createPatch>
-                <app-patch-create></app-patch-create>
+                <app-patch-create (close)="onWizardClose($event)"></app-patch-create>
             </ng-template>
             <ng-template #importPatch>
-                <app-patch-import></app-patch-import>
+                <app-patch-import (close)="onImportWizardClose($event)"></app-patch-import>
             </ng-template>
         </div>
     </div>
@@ -62,7 +62,7 @@
             </ng-template>
         </pfng-list>
         <ng-template #updatePatch>
-            <app-patch-update></app-patch-update>
+            <app-patch-update [patch]="selectedPatch" (close)="onWizardClose($event)"></app-patch-update>
         </ng-template>
 
         <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"

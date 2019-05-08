@@ -10,7 +10,6 @@ import { PATCH_CONSTANT, PatchService } from '../patch/shared/patch.service';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { Issue } from '../issue/shared/issue.model';
 import { Patch } from '../patch/shared/patch.model';
-import { PatchModalContainer } from './patch-modal-container';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 
 
@@ -24,7 +23,7 @@ enum PatchDetailTab {
     templateUrl: './patch-detail.component.html',
     styleUrls: ['./patch-detail.component.less']
 })
-export class PatchDetailComponent implements OnInit, OnDestroy, PatchModalContainer {
+export class PatchDetailComponent implements OnInit, OnDestroy {
     @ViewChild('updatePatch') updatePatchTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
@@ -152,11 +151,6 @@ export class PatchDetailComponent implements OnInit, OnDestroy, PatchModalContai
                 () => { this.loading = false; }));
     }
 
-
-    closeModal($event: WizardEvent): void {
-        this.modalRef.hide();
-    }
-
     openModal(template: TemplateRef<any>): void {
         this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
     }
@@ -248,6 +242,13 @@ export class PatchDetailComponent implements OnInit, OnDestroy, PatchModalContai
     updateIssueItems() {
         this.issues = this.filteredIssues.slice((this.issuePaginationConfig.pageNumber - 1) * this.issuePaginationConfig.pageSize,
             this.issuePaginationConfig.totalItems).slice(0, this.issuePaginationConfig.pageSize);
+    }
+
+    onWizardClose(patchChanged: Patch) {
+        if (patchChanged) {
+            this.reloadData();
+        }
+        this.modalRef.hide();
     }
 
 }

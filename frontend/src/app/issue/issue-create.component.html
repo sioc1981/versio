@@ -1,4 +1,4 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="issueComponent.closeModal($event)"
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()"
     (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <form class="form-horizontal">
@@ -27,12 +27,12 @@
                 <label class="col-sm-4 control-label required-pf" for="container">Issue container</label>
                 <div class="col-sm-8">
                     <div class="col-sm-6">
-                        <input class="col-sm-2" type="radio" id="container" name="container" value="MANTIS" [(ngModel)]="data.container">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="MANTIS" [(ngModel)]="data.container" (ngModelChange)="updateName()">
                         <label class="col-sm-10" for="MANTIS">Mantis</label>
                         <img src="/src/assets/images/mantis_logo.png" class="col-sm-6" />
                     </div>
                     <div class="col-sm-6">
-                        <input class="col-sm-2" type="radio" id="container" name="container" value="JIRA" [(ngModel)]="data.container">
+                        <input class="col-sm-2" type="radio" id="container" name="container" value="JIRA" [(ngModel)]="data.container" (ngModelChange)="updateName()">
                         <label class="col-sm-10" for="JIRA">Jira</label>
                         <img src="/src/assets/images/jira.svg" class="col-sm-6" />
                     </div>

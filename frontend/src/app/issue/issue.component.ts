@@ -213,4 +213,18 @@ export class IssueComponent implements OnInit, OnDestroy {
         this.items = this.filteredIssues.slice((this.paginationConfig.pageNumber - 1) * this.paginationConfig.pageSize,
             this.paginationConfig.totalItems).slice(0, this.paginationConfig.pageSize);
     }
+
+    onWizardClose(issuesChanged: Issue) {
+        if (issuesChanged) {
+            this.getIssues();
+        }
+        this.modalRef.hide();
+    }
+
+    onImportWizardClose(importSuccessfull: boolean) {
+        if (importSuccessfull) {
+            this.getIssues();
+        }
+        this.modalRef.hide();
+    }
 }

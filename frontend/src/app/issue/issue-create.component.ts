@@ -1,13 +1,13 @@
 import {
     Component,
-    Host,
     OnInit,
     ViewChild,
     ViewEncapsulation,
-    OnDestroy
+    OnDestroy,
+    EventEmitter,
+    Output
 } from '@angular/core';
 
-import { IssueComponent } from './issue.component';
 import { WizardComponent, WizardStepConfig, WizardConfig, WizardEvent, WizardStep, WizardStepComponent } from 'patternfly-ng';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
@@ -21,6 +21,7 @@ import { Issue } from './shared/issue.model';
 })
 export class IssueCreateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @Output() close = new EventEmitter<Issue>();
 
     data: any = {};
     deployComplete = true;
@@ -34,12 +35,10 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    issueComponent: IssueComponent;
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private issueService: IssueService, @Host() issueComponent: IssueComponent) {
-        this.issueComponent = issueComponent;
+    constructor(private issueService: IssueService) {
     }
 
     ngOnInit(): void {
@@ -78,8 +77,12 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3') {
-            this.issueComponent.closeModal($event);
+            this.closeWizard(this.data as Issue);
         }
+    }
+
+    closeWizard(issue?: Issue) {
+        this.close.emit(issue);
     }
 
     startDeploy(): void {
@@ -93,7 +96,6 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
         console.log('Saving ' + JSON.stringify(this.data));
         this.subscriptions.push(this.issueService.addIssue(this.data as Issue)
             .subscribe(_ => {
-                this.issueComponent.getIssues();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
@@ -117,7 +119,8 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
 
     updateName(): void {
         this.step1Config.nextEnabled = (this.data.reference !== undefined && this.data.reference.length > 0)
-            && (this.data.description !== undefined && this.data.description.length > 0);
+            && (this.data.description !== undefined && this.data.description.length > 0)
+            && (this.data.container !== undefined && this.data.container.length > 0);
         this.setNavAway(this.step1Config.nextEnabled);
     }
 

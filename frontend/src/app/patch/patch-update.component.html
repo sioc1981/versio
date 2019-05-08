@@ -1,4 +1,4 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="patchComponent.closeModal($event)" (onNext)="nextClicked($event)"
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()" (onNext)="nextClicked($event)"
     (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <!-- Step 1A: Details -->
@@ -15,14 +15,14 @@
                 <div class="form-group required">
                     <label class="col-sm-4 control-label required-pf" for="sequence">Sequence</label>
                     <div class="col-sm-8">
-                        <input class="form-control" id="sequence" name="sequence" type="text" required [(ngModel)]="data.sequenceNumber"
-                            (ngModelChange)="updateVersion()">
+                        <input class="form-control" id="sequence" name="sequence" type="text" required
+                            [(ngModel)]="data.sequenceNumber" (ngModelChange)="updateVersion()">
                     </div>
                 </div>
                 <div class="form-group required">
                     <label class="col-sm-4 control-label" for="Undeploy">Undeploy</label>
                     <div class="col-sm-8">
-                            <ui-switch [(ngModel)]="data.undeployed" [ngModelOptions]="{standalone: true}"></ui-switch>
+                        <ui-switch [(ngModel)]="data.undeployed" [ngModelOptions]="{standalone: true}"></ui-switch>
                     </div>
                 </div>
             </form>
@@ -31,18 +31,40 @@
         <pfng-wizard-substep [config]="step1bConfig" [reviewTemplate]="step1bReviewTemplate">
             <form class="form-horizontal">
                 <div class="col-sm-12">
-                    <pfng-list id="myList" [config]="issuesListConfig" [items]="issues" [itemTemplate]="issuesTemplate"
-                        (onSelectionChange)="handleIssuesSelectionChange($event)">
+                    <form class="form-horizontal">
+                        <div class="form-group required">
+                            <label class="col-sm-4 control-label required-pf" for="issueReference">Add existing
+                                issue</label>
+                            <div class="col-sm-4" style="border-right: 1px solid;">
+                                <input class="form-control" id="issueReference" name="issueReference"
+                                    [(ngModel)]="selectIssue" [ngModelOptions]="{standalone: true}"
+                                    typeaheadOptionField="reference" [typeahead]="issues" [typeaheadScrollable]="true"
+                                    [typeaheadMinLength]="0" (typeaheadOnSelect)="onSelectIssue($event)"
+                                    autocomplete="off">
+                            </div>
+                            <div class="col-sm-4" style="border-left: 1px">
+                                <button (click)="openCreateIssue()">Create New Issue</button>
+                            </div>
+                        </div>
+                    </form>
+                    <ng-template #createIssue>
+                        <app-issue-create (close)="onCreateIssueClose($event)"></app-issue-create>
+                    </ng-template>
+                </div>
+                <hr />
+                <div class="col-sm-12" style="overflow-y: auto;">
+                    <pfng-list id="myList" [config]="issuesListConfig" [items]="data.issues"
+                        [itemTemplate]="issuesTemplate" (onSelectionChange)="handleIssuesSelectionChange($event)">
                         <ng-template #issuesTemplate let-item="item" let-index="index">
                             <div class="list-pf-content-wrapper">
+                                <div class="list-pf-left" [ngSwitch]="item.container">
+                                    <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
+                                        *ngSwitchCase="'MANTIS'" />
+                                    <img src="/src/assets/images/jira.svg" class="list-pf-icon-small"
+                                        *ngSwitchCase="'JIRA'" />
+                                </div>
                                 <div class="list-pf-main-content">
                                     <div class="list-pf-title">{{item.reference}}</div>
-                                    <div class="list-pf-description">{{item.globalReference}}</div>
-                                </div>
-                                <div class="list-pf-additional-content">
-                                    <div>
-                                        <div class="list-pf-description">{{item.description}}</div>
-                                    </div>
                                 </div>
                             </div>
                         </ng-template>
@@ -58,13 +80,15 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Build Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.buildDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.buildDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Package Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.packageDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.packageDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
             </form>
@@ -75,19 +99,22 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.qualification.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.qualification.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.qualification.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.qualification.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Undeploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.qualification.undeployDate" [ngModelOptions]="{standalone: true}"
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.qualification.undeployDate" [ngModelOptions]="{standalone: true}"
                             [attr.disabled]="patch.release.qualification?.undeployDate ? '' : null">
                     </div>
                 </div>
@@ -99,19 +126,22 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.keyUser.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.keyUser.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.keyUser.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.keyUser.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Undeploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.keyUser.undeployDate" [ngModelOptions]="{standalone: true}"
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.keyUser.undeployDate" [ngModelOptions]="{standalone: true}"
                             [attr.disabled]="patch.release.keyUser?.undeployDate ? '' : null">
                     </div>
                 </div>
@@ -123,19 +153,22 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.pilot.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.pilot.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.pilot.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.pilot.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Undeploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.pilot.undeployDate" [ngModelOptions]="{standalone: true}"
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.pilot.undeployDate" [ngModelOptions]="{standalone: true}"
                             [attr.disabled]="patch.release.pilot?.undeployDate ? '' : null">
                     </div>
                 </div>
@@ -147,19 +180,22 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.production.deployDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.production.deployDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.production.validationDate" [ngModelOptions]="{standalone: true}">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.production.validationDate" [ngModelOptions]="{standalone: true}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="fermentum">Undeploy Date</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker [(ngModel)]="data.production.undeployDate" [ngModelOptions]="{standalone: true}"
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.production.undeployDate" [ngModelOptions]="{standalone: true}"
                             [attr.disabled]="patch.release.production?.undeployDate ? '' : null">
                     </div>
                 </div>
@@ -173,20 +209,20 @@
         </pfng-wizard-substep>
         <!-- Step 3B: Deploy -->
         <pfng-wizard-substep [config]="step3bConfig" (onShow)="startDeploy()">
-       <div class="wizard-pf-contents">
-            <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
-                <div class="spinner spinner-lg blank-slate-pf-icon"></div>
-                <h3 class="blank-slate-pf-main-action">Update in progress</h3>
+            <div class="wizard-pf-contents">
+                <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+                    <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+                    <h3 class="blank-slate-pf-main-action">Update in progress</h3>
+                </div>
+                <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
+                    <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
+                    <h3 class="blank-slate-pf-main-action">Update was successful</h3>
+                </div>
+                <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+                    <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+                    <h3 class="blank-slate-pf-main-action">Update failed</h3>
+                </div>
             </div>
-            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
-                <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
-                <h3 class="blank-slate-pf-main-action">Update was successful</h3>
-            </div>
-            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
-                <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
-                <h3 class="blank-slate-pf-main-action">Update failed</h3>
-            </div>
-        </div>
 
         </pfng-wizard-substep>
     </pfng-wizard-step>

@@ -7,10 +7,10 @@
                 (onFilterChange)="filterChanged($event)" (onSortChange)="handleSortChanged($event)">
             </pfng-toolbar>
             <ng-template #createRelease>
-                <app-release-create></app-release-create>
+                <app-release-create (close)="onWizardClose($event)"></app-release-create>
             </ng-template>
             <ng-template #importRelease>
-                <app-release-import></app-release-import>
+                <app-release-import (close)="onImportWizardClose($event)"></app-release-import>
             </ng-template>
         </div>
     </div>
@@ -64,7 +64,7 @@
                 </ng-template>
             </pfng-list>
             <ng-template #updateRelease>
-                <app-release-update></app-release-update>
+                <app-release-update [release]="selectedRelease" (close)="onWizardClose($event)"></app-release-update>
             </ng-template>
             <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
                 (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>

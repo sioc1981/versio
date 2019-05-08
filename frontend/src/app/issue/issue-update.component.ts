@@ -1,6 +1,5 @@
-import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Output, Input, EventEmitter } from '@angular/core';
 import { WizardComponent, WizardStepConfig, WizardConfig, WizardStepComponent, WizardStep, WizardEvent } from 'patternfly-ng';
-import { IssueComponent } from './issue.component';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
 import { cloneDeep } from 'lodash';
@@ -13,6 +12,8 @@ import { Issue } from './shared/issue.model';
 })
 export class IssueUpdateComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @Input() issue: Issue;
+    @Output() close = new EventEmitter<Issue>();
 
     data: any = {};
     deployComplete = true;
@@ -26,17 +27,13 @@ export class IssueUpdateComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    issueComponent: IssueComponent;
-
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private issueService: IssueService, @Host() issueComponent: IssueComponent) {
-        this.issueComponent = issueComponent;
-    }
+    constructor(private issueService: IssueService) { }
 
     ngOnInit(): void {
-        this.data = cloneDeep(this.issueComponent.selectedIssue);
+        this.data = cloneDeep(this.issue);
         // Step 1
         this.step1Config = {
             id: 'step1',
@@ -53,7 +50,7 @@ export class IssueUpdateComponent implements OnInit, OnDestroy {
 
         // Wizard
         this.wizardConfig = {
-            title: 'Edit issue ' + this.issueComponent.selectedIssue.reference,
+            title: 'Edit issue ' + this.issue.reference,
             //   sidebarStyleClass: 'example-wizard-sidebar',
             //   stepStyleClass: 'example-wizard-step'
         } as WizardConfig;
@@ -72,8 +69,12 @@ export class IssueUpdateComponent implements OnInit, OnDestroy {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3') {
-            this.issueComponent.closeModal($event);
+            this.closeWizard(this.data as Issue);
         }
+    }
+
+    closeWizard(issue?: Issue) {
+        this.close.emit(issue);
     }
 
     startDeploy(): void {
@@ -82,7 +83,6 @@ export class IssueUpdateComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(this.issueService.updateIssue(this.data as Issue)
             .subscribe(_ => {
-                this.issueComponent.getIssues();
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
@@ -106,7 +106,9 @@ export class IssueUpdateComponent implements OnInit, OnDestroy {
 
     updateName(): void {
         this.step1Config.nextEnabled = (this.data.reference !== undefined && this.data.reference.length > 0)
-            && (this.data.description !== undefined && this.data.description.length > 0);
+            && (this.data.description !== undefined && this.data.description.length > 0)
+            && (this.data.container !== undefined && this.data.container.length > 0)
+            ;
         this.setNavAway(this.step1Config.nextEnabled);
     }
 

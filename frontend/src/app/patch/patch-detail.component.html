@@ -183,6 +183,6 @@
         <pfng-empty-state [config]="errorConfig"></pfng-empty-state>
     </ng-template>
     <ng-template #updatePatch>
-        <app-patch-update></app-patch-update>
+        <app-patch-update [patch]="patch" (close)="onWizardClose($event)"></app-patch-update>
     </ng-template>
 </div>

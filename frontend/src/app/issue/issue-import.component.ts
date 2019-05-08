@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild, Host } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Host, EventEmitter, Output } from '@angular/core';
 import {
     WizardComponent, WizardStepConfig, WizardConfig, WizardStepComponent, WizardStep, WizardEvent, ListConfig,
     PaginationConfig, PaginationEvent, ListEvent
 } from 'patternfly-ng';
-import { IssueComponent } from './issue.component';
 import { IssueService } from './shared/issue.service';
 import { Subscription } from 'rxjs';
 import { cloneDeep } from 'lodash';
@@ -17,6 +16,7 @@ import { Issue } from './shared/issue.model';
 })
 export class IssueImportComponent implements OnInit, OnDestroy {
     @ViewChild('wizard') wizard: WizardComponent;
+    @Output() close = new EventEmitter<boolean>();
 
     data: any = {};
 
@@ -48,7 +48,6 @@ export class IssueImportComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    issueComponent: IssueComponent;
 
     fileReader = new FileReader();
 
@@ -69,10 +68,7 @@ export class IssueImportComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private issueService: IssueService, @Host() issueComponent: IssueComponent,
-        public uploader: HttpClientUploadService) {
-        this.issueComponent = issueComponent;
-    }
+    constructor(private issueService: IssueService, public uploader: HttpClientUploadService) { }
 
     ngOnInit(): void {
 
@@ -183,11 +179,12 @@ export class IssueImportComponent implements OnInit, OnDestroy {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'stepFinale') {
-            if (this.deploySuccess) {
-                this.issueComponent.getIssues();
-            }
-            this.issueComponent.closeModal($event);
+            this.closeWizard();
         }
+    }
+
+    closeWizard() {
+        this.close.emit(this.deploySuccess);
     }
 
     startDeploy(): void {

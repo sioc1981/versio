@@ -79,7 +79,7 @@ public class ReleaseService {
 	@Path("{id}")
 	@DELETE
 	public Response delete(@PathParam("id") String id) {
-		Release release = this.entityManager.find(Release.class, id);
+		ReleaseFull release = this.entityManager.find(ReleaseFull.class, id);
 
 		try {
 			this.entityManager.remove(release);
@@ -95,7 +95,7 @@ public class ReleaseService {
 	@GET
 	@Produces("application/json")
 	public Response findAll() {
-		return Response.ok(this.entityManager.createQuery("from Release r").getResultList()).build();
+		return Response.ok(this.entityManager.createQuery("from Release r order by r.version.versionNumber DESC").getResultList()).build();
 	}
 
 	@GET

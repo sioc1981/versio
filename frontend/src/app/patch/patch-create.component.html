@@ -1,20 +1,20 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="patchComponent.closeModal($event)" (onNext)="nextClicked($event)"
-    (onStepChange)="stepChanged($event)">
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()"
+    (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <form class="form-horizontal">
             <div class="form-group required">
                 <label class="col-sm-4 control-label  required-pf" for="myList">Version</label>
                 <div class="col-sm-8">
-                    <input id="myList" [(ngModel)]="releaseVersion" [ngModelOptions]="{standalone: true}" class="form-control"
-                        typeaheadOptionField="version.versionNumber" [typeahead]="releases"
+                    <input id="myList" [(ngModel)]="releaseVersion" [ngModelOptions]="{standalone: true}"
+                        class="form-control" typeaheadOptionField="version.versionNumber" [typeahead]="releases"
                         (typeaheadOnSelect)="onSelect($event)" [typeaheadMinLength]="0" autocomplete="off">
                 </div>
             </div>
             <div class="form-group required">
                 <label class="col-sm-4 control-label required-pf" for="sequence">Sequence</label>
                 <div class="col-sm-8">
-                    <input class="form-control" id="sequence" name="sequence" type="text" required [(ngModel)]="data.sequenceNumber"
-                        (ngModelChange)="updateVersion()">
+                    <input class="form-control" id="sequence" name="sequence" type="text" required
+                        [(ngModel)]="data.sequenceNumber" (ngModelChange)="updateVersion()">
                 </div>
             </div>
         </form>
@@ -25,22 +25,46 @@
                 <label class="col-sm-4 control-label  required-pf" for="name">Issues</label>
             </div>
             <div class="col-sm-12">
-                <pfng-list id="myList" [config]="issuesListConfig" [items]="issues" [itemTemplate]="issuesTemplate"
-                    (onSelectionChange)="handleIssuesSelectionChange($event)">
-                    <ng-template #issuesTemplate let-item="item" let-index="index">
-                        <div class="list-pf-content-wrapper">
-                            <div class="list-pf-main-content">
-                                <div class="list-pf-title">{{item.reference}}</div>
-                                <div class="list-pf-description">{{item.globalReference}}</div>
-                            </div>
-                            <div class="list-pf-additional-content">
-                                <div>
-                                    <div class="list-pf-description">{{item.description}}</div>
+                <div class="col-sm-6" style="overflow-y: auto;">
+                    <pfng-list id="myList" [config]="issuesListConfig" [items]="data.issues"
+                        [itemTemplate]="issuesTemplate" (onSelectionChange)="handleIssuesSelectionChange($event)">
+                        <ng-template #issuesTemplate let-item="item" let-index="index">
+                            <div class="list-pf-content-wrapper">
+                                <div class="list-pf-left" [ngSwitch]="item.container">
+                                    <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
+                                        *ngSwitchCase="'MANTIS'" />
+                                    <img src="/src/assets/images/jira.svg" class="list-pf-icon-small"
+                                        *ngSwitchCase="'JIRA'" />
+                                </div>
+                                <div class="list-pf-main-content">
+                                    <div class="list-pf-title">{{item.reference}}</div>
                                 </div>
                             </div>
+                        </ng-template>
+                    </pfng-list>
+                </div>
+                <div class="col-sm-6">
+                    <form class="form-horizontal">
+                        <div class="form-group required">
+                            <label class="col-sm-6 control-label required-pf" for="issueReference">Add existing
+                                issue</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" id="issueReference" name="issueReference"
+                                    [(ngModel)]="selectIssue" [ngModelOptions]="{standalone: true}"
+                                    typeaheadOptionField="reference" [typeahead]="issues" [typeaheadScrollable]="true"
+                                    [typeaheadMinLength]="0" (typeaheadOnSelect)="onSelectIssue($event)"
+                                    autocomplete="off">
+                            </div>
                         </div>
+                    </form>
+                    <hr />
+                    <div class="col-sm-12">
+                        <button (click)="openCreateIssue()">Create New Issue</button>
+                    </div>
+                    <ng-template #createIssue>
+                        <app-issue-create (close)="onCreateIssueClose($event)"></app-issue-create>
                     </ng-template>
-                </pfng-list>
+                </div>
             </div>
         </form>
     </pfng-wizard-step>

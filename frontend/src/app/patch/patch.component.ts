@@ -10,7 +10,6 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
-import { PatchModalContainer } from './patch-modal-container';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -18,7 +17,7 @@ import { PatchModalContainer } from './patch-modal-container';
     templateUrl: './patch.component.html',
     styleUrls: ['./patch.component.less']
 })
-export class PatchComponent implements OnInit, OnDestroy, PatchModalContainer {
+export class PatchComponent implements OnInit, OnDestroy {
     @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createPatch') createPatchTemplate: TemplateRef<any>;
     @ViewChild('importPatch') importPatchTemplate: TemplateRef<any>;
@@ -145,10 +144,6 @@ export class PatchComponent implements OnInit, OnDestroy, PatchModalContainer {
         return this.selectedPatch;
     }
 
-    closeModal($event: WizardEvent): void {
-        this.modalRef.hide();
-    }
-
     openModal(template: TemplateRef<any>): void {
         this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
     }
@@ -245,5 +240,19 @@ export class PatchComponent implements OnInit, OnDestroy, PatchModalContainer {
     updateItems() {
         this.items = this.filteredPatches.slice((this.paginationConfig.pageNumber - 1) * this.paginationConfig.pageSize,
             this.paginationConfig.totalItems).slice(0, this.paginationConfig.pageSize);
+    }
+
+    onWizardClose(patchChanged: Patch) {
+        if (patchChanged) {
+            this.reloadData();
+        }
+        this.modalRef.hide();
+    }
+
+    onImportWizardClose(importSuccessfull: boolean) {
+        if (importSuccessfull) {
+            this.reloadData();
+        }
+        this.modalRef.hide();
     }
 }
