@@ -58,6 +58,11 @@ export class ReleaseComponent implements OnInit, OnDestroy {
                 placeholder: 'Filter by Version...',
                 type: FilterType.TEXT
             }, {
+                id: 'issue',
+                title: 'Issue',
+                placeholder: 'Filter by issue...',
+                type: FilterType.TEXT
+            }, {
                 id: 'onlyDeployed',
                 title: 'Only deployed',
                 placeholder: 'Only deployed on any platform',
@@ -198,13 +203,24 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
     matchesFilter(item: any, filter: Filter): boolean {
         let match = true;
-        if (filter.field.id === 'version') {
-            match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
-        } else if (filter.field.id === 'onlyDeployed') {
-            match = !item.release.undeployed;
-        } else if (filter.field.id === 'deployedOn') {
-            match = item.release[filter.query.id] && item.release[filter.query.id].deployDate
-                && !item.release[filter.query.id].undeployDate;
+        switch (filter.field.id) {
+            case 'version':
+                match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
+                break;
+            case 'issue':
+                let issueMatch = false;
+                item.issues.forEach(issue => {
+                    issueMatch = issue.reference.indexOf(filter.value) !== -1
+                        || issue.description.indexOf(filter.value) !== -1;
+                });
+                match = issueMatch;
+                break;
+            case 'onlyDeployed':
+                match = !item.release.undeployed;
+                break;
+            case 'deployedOn':
+                match = item.release[filter.query.id] && item.release[filter.query.id].deployDate
+                    && !item.release[filter.query.id].undeployDate;
         }
         return match;
     }

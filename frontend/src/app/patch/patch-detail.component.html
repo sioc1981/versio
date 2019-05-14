@@ -34,7 +34,7 @@
                             <h4>
                                 <span class="fas {{RELEASE_CONSTANT.iconStyleClass}}"></span>
                                 <span>{{RELEASE_CONSTANT.title}}
-                                <a routerLink="/release/{{versionNumber}}">{{versionNumber}}</a>
+                                    <a routerLink="/release/{{versionNumber}}">{{versionNumber}}</a>
                                 </span>
                             </h4>
                         </div>
@@ -143,7 +143,8 @@
                     </div>
 
                     <div class="col-sm-12">
-                        <pfng-list id="myList" [items]="issues" [itemTemplate]="issueTemplate" [actionTemplate]="issueActionTemplate">
+                        <pfng-list id="myList" [items]="issues" [itemTemplate]="issueTemplate"
+                            [actionTemplate]="issueActionTemplate">
                             <ng-template #issueTemplate let-item="item" let-index="index">
                                 <div class="list-pf-left" [ngSwitch]="item.container">
                                     <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
@@ -153,12 +154,10 @@
                                 </div>
                                 <div class="list-pf-content-wrapper">
                                     <div class="list-pf-main-content">
-                                        <div class="list-pf-title">{{item.reference}}</div>
-                                        <div class="list-pf-description">{{item.globalReference}}</div>
-                                    </div>
-                                    <div class="list-pf-additional-content">
-                                        <div>
-                                            <div class="list-pf-description">{{item.description}}</div>
+                                        <div class="list-pf-title">
+                                            {{item.reference}}
+                                            <div class="list-pf-description" style="font-weight: initial;">
+                                                {{item.description}}</div>
                                         </div>
                                     </div>
                                 </div>

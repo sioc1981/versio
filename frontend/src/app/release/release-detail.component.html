@@ -144,12 +144,10 @@
                                 </div>
                                 <div class="list-pf-content-wrapper">
                                     <div class="list-pf-main-content">
-                                        <div class="list-pf-title">{{item.reference}}</div>
-                                        <div class="list-pf-description">{{item.globalReference}}</div>
-                                    </div>
-                                    <div class="list-pf-additional-content">
-                                        <div>
-                                            <div class="list-pf-description">{{item.description}}</div>
+                                        <div class="list-pf-title">
+                                            {{item.reference}}
+                                            <div class="list-pf-description" style="font-weight: initial;">
+                                                {{item.description}}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -190,7 +188,8 @@
                                     <div class="list-pf-main-content">
                                         <div class="list-pf-main-content">
                                             <div class="list-pf-title">
-                                                <a routerLink="/patch/{{versionNumber}}/{{item.sequenceNumber}}">{{item.sequenceNumber}}</a>
+                                                <a
+                                                    routerLink="/patch/{{versionNumber}}/{{item.sequenceNumber}}">{{item.sequenceNumber}}</a>
                                             </div>
                                         </div>
                                     </div>

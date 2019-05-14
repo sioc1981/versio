@@ -1,5 +1,5 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()"
-    (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()" (onNext)="nextClicked($event)"
+    (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <!-- Step 1A: Details -->
         <pfng-wizard-substep [config]="step1aConfig" [reviewTemplate]="step1aReviewTemplate">
@@ -14,7 +14,8 @@
                 <div class="form-group required">
                     <label class="col-sm-4 control-label" for="Undeploy">Undeploy</label>
                     <div class="col-sm-8">
-                            <ui-switch [(ngModel)]="data.release.undeployed" [ngModelOptions]="{standalone: true}"></ui-switch>
+                        <ui-switch [(ngModel)]="data.release.undeployed" [ngModelOptions]="{standalone: true}">
+                        </ui-switch>
                     </div>
                 </div>
             </form>
@@ -56,7 +57,11 @@
                                         *ngSwitchCase="'JIRA'" />
                                 </div>
                                 <div class="list-pf-main-content">
-                                    <div class="list-pf-title">{{item.reference}}</div>
+                                    <div class="list-pf-title">
+                                        {{item.reference}}
+                                        <div class="list-pf-description" style="font-weight: initial;">
+                                            {{item.description}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </ng-template>

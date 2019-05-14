@@ -1,20 +1,16 @@
-<pfng-wizard #wizard
-             [config]="wizardConfig"
-             (onCancel)="closeWizard()"
-             (onNext)="nextClicked($event)"
-             (onStepChange)="stepChanged($event)">
-  <pfng-wizard-step [config]="step1Config">
-      <form class="form-horizontal">
-        <div class="form-group required">
-          <label class="col-sm-4 control-label required-pf" for="releaseNumber">Release Number</label>
-          <div class="col-sm-8">
-            <input class="form-control" id="versionNumber" name="Release Number" type="text" required
-                   [(ngModel)]="data.release.version.versionNumber"
-                   (ngModelChange)="updateName()">
-          </div>
-        </div>
-      </form>
-  </pfng-wizard-step>
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()" (onNext)="nextClicked($event)"
+    (onStepChange)="stepChanged($event)">
+    <pfng-wizard-step [config]="step1Config">
+        <form class="form-horizontal">
+            <div class="form-group required">
+                <label class="col-sm-4 control-label required-pf" for="releaseNumber">Release Number</label>
+                <div class="col-sm-8">
+                    <input class="form-control" id="versionNumber" name="Release Number" type="text" required
+                        [(ngModel)]="data.release.version.versionNumber" (ngModelChange)="updateName()">
+                </div>
+            </div>
+        </form>
+    </pfng-wizard-step>
     <pfng-wizard-step [config]="step2Config">
         <form class="form-horizontal">
             <div class="form-group required">
@@ -33,7 +29,11 @@
                                         *ngSwitchCase="'JIRA'" />
                                 </div>
                                 <div class="list-pf-main-content">
-                                    <div class="list-pf-title">{{item.reference}}</div>
+                                    <div class="list-pf-title">
+                                        {{item.reference}}
+                                        <div class="list-pf-description" style="font-weight: initial;">
+                                            {{item.description}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </ng-template>
@@ -64,20 +64,20 @@
             </div>
         </form>
     </pfng-wizard-step>
-  <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
-      <div class="wizard-pf-contents">
-        <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
-          <div class="spinner spinner-lg blank-slate-pf-icon"></div>
-          <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
+    <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
+        <div class="wizard-pf-contents">
+            <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+                <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+                <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
+            </div>
+            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
+                <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
+                <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
+            </div>
+            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+                <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+                <h3 class="blank-slate-pf-main-action">Creation failed</h3>
+            </div>
         </div>
-        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
-          <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
-          <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
-        </div>
-        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
-          <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
-          <h3 class="blank-slate-pf-main-action">Creation failed</h3>
-        </div>
-      </div>
-  </pfng-wizard-step>
+    </pfng-wizard-step>
 </pfng-wizard>

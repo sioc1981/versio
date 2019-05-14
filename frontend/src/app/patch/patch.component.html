@@ -4,7 +4,7 @@
     <div class="col-sm-12">
         <div class="form-group">
             <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)"
-                (onFilterChange)="filterChanged($event)">
+                (onFilterChange)="filterChanged($event)" (onSortChange)="handleSortChanged($event)">
             </pfng-toolbar>
             <ng-template #createPatch>
                 <app-patch-create (close)="onWizardClose($event)"></app-patch-create>

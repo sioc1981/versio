@@ -3,7 +3,9 @@ import { IssueService } from './shared/issue.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
     PaginationConfig,
-    PaginationEvent
+    PaginationEvent,
+    SortField,
+    SortEvent
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -26,10 +28,11 @@ export class IssueComponent implements OnInit, OnDestroy {
 
     actionConfig: ActionConfig;
     issueActionConfig: ActionConfig;
-    isAscendingSort = true;
+    isAscendingSort = false;
     filterConfig: FilterConfig;
     sortConfig: SortConfig;
     toolbarConfig: ToolbarConfig;
+    currentSortField: SortField;
 
     issues: Issue[];
     filteredIssues: Issue[] = [];
@@ -87,7 +90,24 @@ export class IssueComponent implements OnInit, OnDestroy {
             }]
         } as ActionConfig;
 
-        this.issueActionConfig = {
+        this.sortConfig = {
+            fields: [{
+                id: 'reference',
+                title: 'Reference',
+                sortType: 'alpha'
+            }, {
+                id: 'globalReference',
+                title: 'Global Reference',
+                sortType: 'alpha'
+            }, {
+                id: 'container',
+                title: 'Container',
+                sortType: 'alpha'
+            }],
+            isAscending: this.isAscendingSort
+        } as SortConfig;
+
+        this.currentSortField = this.sortConfig.fields[0];        this.issueActionConfig = {
             primaryActions: [{
                 id: 'openIssue',
                 title: 'Open issue',
@@ -101,7 +121,8 @@ export class IssueComponent implements OnInit, OnDestroy {
 
         this.toolbarConfig = {
             filterConfig: this.filterConfig,
-            actionConfig: this.actionConfig
+            actionConfig: this.actionConfig,
+            sortConfig: this.sortConfig
         } as ToolbarConfig;
 
         this.paginationConfig = {
@@ -207,6 +228,57 @@ export class IssueComponent implements OnInit, OnDestroy {
 
     handlePageNumber($event: PaginationEvent) {
         this.updateItems();
+    }
+
+    compare(item1: any, item2: any): number {
+        let compValue = 0;
+        if (this.currentSortField.id === 'reference') {
+            compValue = this.compareReference(item1, item2);
+        } else if (this.currentSortField.id === 'globalReference') {
+            compValue = this.compareGlobalReference(item1, item2);
+        } else if (this.currentSortField.id === 'container') {
+            compValue = this.compareContainer(item1, item2);
+        }
+
+        if (compValue === 0) {
+            compValue = this.compareReference(item1, item2);
+        }
+        if (!this.isAscendingSort) {
+            compValue = compValue * -1;
+        }
+        return compValue;
+    }
+
+    compareGlobalReference(item1: any, item2: any): number {
+        let compValue = 0;
+        const globalReference1 = item1.globalReference || '';
+        const globalReference2 = item2.globalReference || '';
+        compValue = globalReference1.localeCompare(globalReference2);
+        return compValue;
+    }
+
+    compareReference(item1: any, item2: any): number {
+        let compValue = 0;
+        const reference1 = item1.reference;
+        const reference2 = item2.reference;
+        compValue = reference1.localeCompare(reference2);
+        return compValue;
+    }
+
+    compareContainer(item1: any, item2: any): number {
+        let compValue = 0;
+        const container1 = item1.container;
+        const container2 = item2.container;
+        compValue = container1.localeCompare(container2);
+        return compValue;
+    }
+
+    // Handle sort changes
+    handleSortChanged($event: SortEvent): void {
+        this.currentSortField = $event.field;
+        this.isAscendingSort = $event.isAscending;
+        this.issues.sort((item1: any, item2: any) => this.compare(item1, item2));
+        this.applyFilters();
     }
 
     updateItems() {

@@ -1,5 +1,5 @@
-<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()"
-    (onNext)="nextClicked($event)" (onStepChange)="stepChanged($event)">
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()" (onNext)="nextClicked($event)"
+    (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
         <form class="form-horizontal">
             <div class="form-group required">
@@ -86,9 +86,11 @@
                                     </ng-template>
                                 </pfng-list-expand-toggle>
                                 <div style="justify-content:flex-end; display: inline-flex;">
-                                    <pfng-list-expand-toggle [expandId]="'build'" [item]="item" [template]="buildTemplate">
+                                    <pfng-list-expand-toggle [expandId]="'build'" [item]="item"
+                                        [template]="buildTemplate">
                                         <ng-template #buildTemplate let-patch="item">
-                                            <span class="fas myApp myApp-laptop-code" [class.myApp-green]="patch.packageDate"
+                                            <span class="fas myApp myApp-laptop-code"
+                                                [class.myApp-green]="patch.packageDate"
                                                 [class.myApp-orange]="!patch.packageDate"></span>
                                         </ng-template>
                                     </pfng-list-expand-toggle>
@@ -99,12 +101,15 @@
                                                 [appHistoryColor]="patch.qualification"></span>
                                         </ng-template>
                                     </pfng-list-expand-toggle>
-                                    <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item" [template]="keyuserTemplate">
+                                    <pfng-list-expand-toggle [expandId]="'keyuser'" [item]="item"
+                                        [template]="keyuserTemplate">
                                         <ng-template #keyuserTemplate let-patch="item">
-                                            <span class="fas myApp myApp-cart-check" [appHistoryColor]="patch.keyUser"></span>
+                                            <span class="fas myApp myApp-cart-check"
+                                                [appHistoryColor]="patch.keyUser"></span>
                                         </ng-template>
                                     </pfng-list-expand-toggle>
-                                    <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item" [template]="pilotTemplate">
+                                    <pfng-list-expand-toggle [expandId]="'pilot'" [item]="item"
+                                        [template]="pilotTemplate">
                                         <ng-template #pilotTemplate let-patch="item">
                                             <span class="fas myApp myApp-cash-register"
                                                 [appHistoryColor]="patch.pilot"></span>
@@ -113,7 +118,8 @@
                                     <pfng-list-expand-toggle [expandId]="'production'" [item]="item"
                                         [template]="productionTemplate">
                                         <ng-template #productionTemplate let-patch="item">
-                                            <span class="fas myApp myApp-store" [appHistoryColor]="patch.production"></span>
+                                            <span class="fas myApp myApp-store"
+                                                [appHistoryColor]="patch.production"></span>
                                         </ng-template>
                                     </pfng-list-expand-toggle>
                                 </div>
@@ -129,12 +135,10 @@
                                 <ng-template #issueTemplate let-item="item" let-index="index">
                                     <div class="list-pf-content-wrapper">
                                         <div class="list-pf-main-content">
-                                            <div class="list-pf-title">{{item.reference}}</div>
-                                            <div class="list-pf-description">{{item.globalReference}}</div>
-                                        </div>
-                                        <div class="list-pf-additional-content">
-                                            <div>
-                                                <div class="list-pf-description">{{item.description}}</div>
+                                            <div class="list-pf-title">
+                                                {{item.reference}}
+                                                <div class="list-pf-description" style="font-weight: initial;">
+                                                    {{item.description}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -221,7 +225,8 @@
             <ng-template #itemDeployTemplate let-item="item" let-index="index">
                 <div class="list-pf-content-wrapper" [ngSwitch]="item.container">
                     <div class="list-pf-main-content">
-                        <div class="list-pf-title">{{item.release.version.versionNumber}} - {{item.sequenceNumber}}  </div>
+                        <div class="list-pf-title">{{item.release.version.versionNumber}} - {{item.sequenceNumber}}
+                        </div>
                     </div>
                     <div class="list-pf-additional-content" style="justify-content: flex-end" [ngSwitch]="item.deploy">
                         <div *ngSwitchDefault>

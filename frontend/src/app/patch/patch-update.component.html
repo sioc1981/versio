@@ -64,7 +64,11 @@
                                         *ngSwitchCase="'JIRA'" />
                                 </div>
                                 <div class="list-pf-main-content">
-                                    <div class="list-pf-title">{{item.reference}}</div>
+                                    <div class="list-pf-title">
+                                        {{item.reference}}
+                                        <div class="list-pf-description" style="font-weight: initial;">
+                                            {{item.description}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </ng-template>
