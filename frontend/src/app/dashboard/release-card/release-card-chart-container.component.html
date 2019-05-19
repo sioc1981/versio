@@ -1,0 +1,11 @@
+<div *ngIf="platformSummary && platformSummary.deployed && !platformSummary.undeployed; else noPatch">
+    <ng-content></ng-content>
+</div>
+<ng-template #noPatch>
+    <div [ngStyle]="{'height': height+'px','color': 'grey','font-size': '2em','padding': '20% 0px'}">
+        <span *ngIf="platformSummary?.undeployed; else undeployed">Undeployed</span>
+        <ng-template #undeployed>
+            <span>Not deployed</span>
+        </ng-template>
+    </div>
+</ng-template>

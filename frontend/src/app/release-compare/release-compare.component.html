@@ -53,19 +53,24 @@
                         <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
                             *ngSwitchCase="'MANTIS'" />
                         <img src="/src/assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'" />
-                        <a [attr.href]="buildIssueUrl(row.issue)" target="_blank">{{row.issue.reference}} - {{row.issue.description}}</a>
+                        <a [attr.href]="buildIssueUrl(row.issue)" target="_blank">{{row.issue.reference}} -
+                            {{row.issue.description}}</a>
                     </div>
                 </ng-template>
                 <ng-template #sourcesTemplate let-row="row">
-                    <span *ngFor="let src of row.sourcePatches.patches" class="col-sm-12"> {{row.sourcePatches.release}}
-                        - {{src}} </span>
+                    <span *ngFor="let src of row.sourcePatches.patches" class="col-sm-12">
+                        <a routerLink="/patch/{{row.sourcePatches.release}}/{{src}}"> {{row.sourcePatches.release}}
+                            - {{src}} </a>
+                    </span>
                     <span *ngFor="let src of row.sourceReleases" class="col-sm-12">
                         <a routerLink="/release/{{src.version.versionNumber}}">{{src.version.versionNumber}}</a>
                     </span>
                 </ng-template>
                 <ng-template #destTemplate let-row="row">
-                    <span *ngFor="let src of row.destPatches.patches" class="col-sm-12"> {{row.destPatches.release}} -
-                        {{src}} </span>
+                    <span *ngFor="let src of row.destPatches.patches" class="col-sm-12">
+                        <a routerLink="/patch/{{row.destPatches.release}}/{{src}}"> {{row.destPatches.release}}
+                            - {{src}} </a>
+                    </span>
                     <span *ngFor="let dest of row.destReleases" class="col-sm-12">
                         <a routerLink="/release/{{dest.version.versionNumber}}">{{dest.version.versionNumber}}</a>
                     </span>

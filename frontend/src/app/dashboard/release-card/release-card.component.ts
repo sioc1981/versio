@@ -35,10 +35,14 @@ export class ReleaseCardComponent implements OnInit {
 
     maxPatch: number;
 
+    chartHeight = 100;
+
     constructor() { }
 
     ngOnInit() {
         this.config = {
+            // noPadding: true,
+            // topBorder: false
         } as CardConfig;
 
         // this.packageConfig.total = this.item.patchCount;
@@ -135,7 +139,7 @@ export class ReleaseCardComponent implements OnInit {
                 missing: '#cc0000'      // red
             },
             centerLabel: ' ',
-            chartHeight: 100,
+            chartHeight: this.chartHeight,
             data: {
                 names: {
                     available: 'Available',

@@ -58,9 +58,6 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
 
         // Wizard
         this.wizardConfig = {
-            //   title: 'Wizard Title',
-            //   sidebarStyleClass: 'example-wizard-sidebar',
-            //   stepStyleClass: 'example-wizard-step'
         } as WizardConfig;
 
         this.setNavAway(false);
@@ -77,7 +74,7 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
 
     nextClicked($event: WizardEvent): void {
         if ($event.step.config.id === 'step3') {
-            this.closeWizard(this.data as Issue);
+            this.closeWizard(this.deploySuccess ? this.data as Issue : undefined);
         }
     }
 
@@ -89,11 +86,6 @@ export class IssueCreateComponent implements OnInit, OnDestroy {
         this.deployComplete = false;
         this.wizardConfig.done = true;
 
-        // // Simulate a delay
-        // setTimeout(() => {
-        //   this.deployComplete = true;
-        // }, 2500);
-        console.log('Saving ' + JSON.stringify(this.data));
         this.subscriptions.push(this.issueService.addIssue(this.data as Issue)
             .subscribe(_ => {
                 this.deployComplete = true;

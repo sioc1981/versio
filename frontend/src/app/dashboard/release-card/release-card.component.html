@@ -1,19 +1,21 @@
-<div class="col-lg-4" >
-    <pfng-card [config]="config">
-        <div class="card-pf-heading-details">
-            <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
-                appSummaryType="release"></span>
-            <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
-                appSummaryType="release"></span>
-            <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
-                appSummaryType="release"></span>
-            <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production" appSummaryType="release"></span>
-        </div>
-        <h2 class="card-pf-title">
-            <a routerLink="/release/{{item.versionNumber}}">{{item.versionNumber}}</a>
-        </h2>
-        <hr>
-        <div class="row" style="height:330px; vertical-align: middle;">
+<div class="col-sm-4">
+    <pfng-card class="custom-card" [config]="config" [headerTemplate]="spacesHeaderTemplate">
+        <ng-template #spacesHeaderTemplate>
+            <div class="card-pf-heading-details">
+                <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
+                    appSummaryType="release"></span>
+                <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
+                    appSummaryType="release"></span>
+                <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
+                    appSummaryType="release"></span>
+                <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
+                    appSummaryType="release"></span>
+            </div>
+            <h2 class="card-pf-title">
+                <a routerLink="/release/{{item.versionNumber}}">{{item.versionNumber}}</a>
+            </h2>
+        </ng-template>
+        <div class="col-sm-12 custom-blank-slate-card">
             <div *ngIf="item.patchCount > 0">
                 <div class="row">
                     <div class="col-sm-6">
@@ -21,30 +23,55 @@
                         </pfng-utilization-donut-chart>
                     </div>
                     <div class="col-sm-6 text-center">
-                        <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
-                            appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
-                        <pfng-donut-chart [chartData]="productionData" [config]="productionConfig">
-                        </pfng-donut-chart>
+                        <div class="row">
+                            <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
+                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                        </div>
+                        <div class="row">
+                            <app-release-card-chart-container [platformSummary]="item.production"
+                                [height]="chartHeight">
+                                <pfng-donut-chart [chartData]="productionData" [config]="productionConfig">
+                                </pfng-donut-chart>
+                            </app-release-card-chart-container>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-4 text-center">
-                        <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
-                            appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
-                        <pfng-donut-chart [chartData]="qualificationData" [config]="qualificationConfig">
-                        </pfng-donut-chart>
+                        <div class="row">
+                            <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
+                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                        </div>
+                        <div class="row">
+                            <app-release-card-chart-container [platformSummary]="item.qualification"
+                                [height]="chartHeight">
+                                <pfng-donut-chart [chartData]="qualificationData" [config]="qualificationConfig">
+                                </pfng-donut-chart>
+                            </app-release-card-chart-container>
+                        </div>
                     </div>
                     <div class="col-sm-4 text-center">
-                        <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
-                            appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
-                        <pfng-donut-chart [chartData]="keyUserData" [config]="keyUserConfig"></pfng-donut-chart>
+                        <div class="row">
+                            <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
+                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                        </div>
+                        <div class="row">
+                            <app-release-card-chart-container [platformSummary]="item.keyUser" [height]="chartHeight">
+                                <pfng-donut-chart [chartData]="keyUserData" [config]="keyUserConfig"></pfng-donut-chart>
+                            </app-release-card-chart-container>
+                        </div>
                     </div>
                     <div class="col-sm-4 text-center">
-                        <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
-                            appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
-
-                        <pfng-donut-chart [chartData]="pilotData" [config]="pilotConfig">
-                        </pfng-donut-chart>
+                        <div class="row">
+                            <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
+                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                        </div>
+                        <div class="row">
+                            <app-release-card-chart-container [platformSummary]="item.keyUser" [height]="chartHeight">
+                                <pfng-donut-chart [chartData]="pilotData" [config]="pilotConfig">
+                                </pfng-donut-chart>
+                            </app-release-card-chart-container>
+                        </div>
                     </div>
                 </div>
             </div>
