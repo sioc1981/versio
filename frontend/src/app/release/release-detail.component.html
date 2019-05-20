@@ -174,7 +174,8 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <pfng-toolbar [config]="patchToolbarConfig"
-                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.PATCHES)">
+                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.PATCHES)"
+                                    (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.PATCHES)">
                                 </pfng-toolbar>
                             </div>
                         </div>
@@ -182,7 +183,7 @@
 
 
                     <div class="col-sm-12">
-                        <pfng-list id="myList" [items]="patches | skipUndeploy" [itemTemplate]="patchTemplate">
+                        <pfng-list id="myList" [items]="patches" [itemTemplate]="patchTemplate">
                             <ng-template #patchTemplate let-item="item" let-index="index">
                                 <div class="list-pf-content-wrapper">
                                     <div class="list-pf-main-content">

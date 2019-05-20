@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
     WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
-    PaginationEvent, Filter, FilterEvent
+    PaginationEvent, Filter, FilterEvent, SortField, SortEvent
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
@@ -63,6 +63,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     patchSortConfig: SortConfig;
     patchToolbarConfig: ToolbarConfig;
     patchPaginationConfig: PaginationConfig;
+    currentPatchSortField: SortField;
 
     allIssues: Issue[];
     allOriginalIssues: Issue[];
@@ -148,14 +149,86 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                 title: 'issue',
                 placeholder: 'Filter by issue...',
                 type: FilterType.TEXT
+            }, {
+                id: 'onlyDeployed',
+                title: 'Only deployed',
+                placeholder: 'Only deployed on any platform',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'onlyDeployed',
+                    value: 'True'
+                }]
+            }, {
+                id: 'deployedOn',
+                title: 'Deployed on',
+                placeholder: 'Deployed on...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'qualification',
+                    value: 'Qualification platform'
+                }, {
+                    id: 'keyUser',
+                    value: 'KeyUser platform'
+                }, {
+                    id: 'pilot',
+                    value: 'Pilot platform'
+                }, {
+                    id: 'production',
+                    value: 'Production platform'
+                }]
+            }, {
+                id: 'missingOn',
+                title: 'Missing on',
+                placeholder: 'Missing on...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'qualification',
+                    value: 'Qualification platform'
+                }, {
+                    id: 'keyUser',
+                    value: 'KeyUser platform'
+                }, {
+                    id: 'pilot',
+                    value: 'Pilot platform'
+                }, {
+                    id: 'production',
+                    value: 'Production platform'
+                }]
             }],
             resultsCount: this.filteredPatches.length,
             appliedFilters: []
         } as FilterConfig;
 
-        this.patchToolbarConfig = {
-            filterConfig: this.patchFilterConfig
-        } as ToolbarConfig;
+        this.patchSortConfig = {
+            fields: [{
+                id: 'sequenceNumber',
+                title: 'Sequence Number',
+                sortType: 'alpha'
+            }, {
+                id: 'buildDate',
+                title: 'Build Date',
+                sortType: 'alpha'
+            }, {
+                id: 'qualificationDate',
+                title: 'Qualification Deploy Date',
+                sortType: 'alpha'
+            }, {
+                id: 'keyUserDate',
+                title: 'KeyUser Deploy Date',
+                sortType: 'alpha'
+            }, {
+                id: 'pilotDate',
+                title: 'Pilot Deploy Date',
+                sortType: 'alpha'
+            }, {
+                id: 'productionDate',
+                title: 'Production Deploy Date',
+                sortType: 'alpha'
+            }],
+            isAscending: this.isAscendingSortForPatches
+        } as SortConfig;
+
+        this.currentPatchSortField = this.patchSortConfig.fields[0];
 
         this.patchPaginationConfig = {
             pageNumber: 1,
@@ -163,6 +236,11 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             pageSizeIncrements: [3, 5, 10],
             totalItems: this.filteredPatches.length
         } as PaginationConfig;
+
+        this.patchToolbarConfig = {
+            filterConfig: this.patchFilterConfig,
+            sortConfig: this.patchSortConfig
+        } as ToolbarConfig;
 
         this.allIssueFilterConfig = {
             fields: [{
@@ -193,16 +271,16 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        this.allIssueToolbarConfig = {
-            filterConfig: this.allIssueFilterConfig
-        } as ToolbarConfig;
-
         this.allIssuePaginationConfig = {
             pageNumber: 1,
             pageSize: 5,
             pageSizeIncrements: [3, 5, 10],
             totalItems: this.filteredAllIssues.length
         } as PaginationConfig;
+
+        this.allIssueToolbarConfig = {
+            filterConfig: this.allIssueFilterConfig
+        } as ToolbarConfig;
 
         this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
@@ -229,6 +307,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         this.subscriptions.push(this.releaseService.searchReleaseFull(this.versionNumber)
             .subscribe(newRelease => {
                 this.releaseFull = newRelease; this.release = this.releaseFull.release;
+                this.releaseFull.patches.sort((item1: any, item2: any) => this.comparePatch(item1, item2));
                 this.allOriginalIssues = Array.from(this.releaseFull.issues);
                 const issueReferences = this.allOriginalIssues.map(issue => issue.reference);
                 this.releaseFull.patches.forEach(patch => {
@@ -334,6 +413,72 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         return matches;
     }
 
+    comparePatch(item1: any, item2: any): number {
+        let compValue = 0;
+        if (this.currentPatchSortField.id === 'sequenceNumber') {
+            compValue = this.compareSequenceNumber(item1, item2);
+        } else if (this.currentPatchSortField.id === 'buildDate') {
+            compValue = this.compareBuildDate(item1, item2);
+        } else if (this.currentPatchSortField.id === 'qualificationDate') {
+            compValue = this.compareDeployDate(item1, item2, 'qualification');
+        } else if (this.currentPatchSortField.id === 'keyUserDate') {
+            compValue = this.compareDeployDate(item1, item2, 'keyUser');
+        } else if (this.currentPatchSortField.id === 'pilotDate') {
+            compValue = this.compareDeployDate(item1, item2, 'pilot');
+        } else if (this.currentPatchSortField.id === 'productionDate') {
+            compValue = this.compareDeployDate(item1, item2, 'production');
+        }
+
+        if (compValue === 0) {
+            compValue = this.compareSequenceNumber(item1, item2);
+        }
+        if (!this.isAscendingSortForPatches) {
+            compValue = compValue * -1;
+        }
+        return compValue;
+    }
+
+
+    compareSequenceNumber(item1: any, item2: any): number {
+        let compValue = 0;
+        const seqNum1 = item1.sequenceNumber;
+        const seqNum2 = item2.sequenceNumber;
+        compValue = seqNum1.localeCompare(seqNum2);
+        return compValue;
+    }
+
+    compareBuildDate(item1: any, item2: any): number {
+        let compValue = 0;
+        const sourceRelease1 = item1.release.buildDate;
+        const sourceRelease2 = item2.release.buildDate;
+        compValue = sourceRelease1 - sourceRelease2;
+        return compValue;
+    }
+
+    compareDeployDate(item1: any, item2: any, platform: string): number {
+        let compValue = 0;
+        const sourceRelease1 = item1.release[platform] ? item1.release[platform].deployDate : 0;
+        const sourceRelease2 = item2.release[platform] ? item2.release[platform].deployDate : 0;
+        compValue = sourceRelease1 - sourceRelease2;
+        return compValue;
+    }
+
+    // Handle sort changes
+    handleSortChanged($event: SortEvent, releaseDetailTabType: ReleaseDetailTab): void {
+
+        switch (releaseDetailTabType) {
+            case ReleaseDetailTab.RELEASE_NOTE:
+                break;
+            case ReleaseDetailTab.PATCHES:
+                this.currentPatchSortField = $event.field;
+                this.isAscendingSortForPatches = $event.isAscending;
+                this.releaseFull.patches.sort((item1: any, item2: any) => this.comparePatch(item1, item2));
+                this.applyPatchFilters();
+                break;
+            case ReleaseDetailTab.ALL_ISSUES:
+                break;
+        }
+    }
 
     handlePageSize($event: PaginationEvent, releaseDetailTabType: ReleaseDetailTab) {
         switch (releaseDetailTabType) {
@@ -394,16 +539,29 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
     matchesPatchFilter(item: any, filter: Filter): boolean {
         let match = true;
-        if (filter.field.id === 'sequence') {
-            match = item.sequenceNumber.indexOf(filter.value) !== -1;
-        }
-        if (filter.field.id === 'issue') {
-            let issueMatch = false;
-            item.issues.forEach(issue => {
-                issueMatch = issue.reference.indexOf(filter.value) !== -1
-                    || issue.description.indexOf(filter.value) !== -1;
-            });
-            match = issueMatch;
+        switch (filter.field.id) {
+
+            case 'sequence':
+                match = item.sequenceNumber.indexOf(filter.value) !== -1;
+                break;
+            case 'issue':
+                let issueMatch = false;
+                item.issues.forEach(issue => {
+                    issueMatch = issueMatch || issue.reference.indexOf(filter.value) !== -1
+                        || issue.description.indexOf(filter.value) !== -1;
+                });
+                match = issueMatch;
+                break;
+            case 'onlyDeployed':
+                match = !item.release.undeployed;
+                break;
+            case 'deployedOn':
+                match = item[filter.query.id] && item[filter.query.id].deployDate
+                    && !item[filter.query.id].undeployDate;
+                break;
+            case 'missingOn':
+                match = !item[filter.query.id] || !item[filter.query.id].deployDate;
+                break;
         }
         return match;
     }
