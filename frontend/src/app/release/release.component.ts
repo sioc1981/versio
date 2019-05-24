@@ -13,6 +13,7 @@ import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { ReleaseFull } from './shared/release.model';
+import { AuthenticationService } from '../auth/authentication.service';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -47,7 +48,8 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private releaseService: ReleaseService, private modalService: BsModalService) { }
+    constructor(private releaseService: ReleaseService, private modalService: BsModalService,
+        private auth: AuthenticationService) { }
 
     ngOnInit() {
         this.reloadData();
@@ -112,17 +114,29 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        this.actionConfig = {
-            primaryActions: [{
-                id: 'addRelease',
-                title: 'Add new release',
-                tooltip: 'Add a new release'
-            }, {
-                id: 'importRelease',
-                title: 'Import releases',
-                tooltip: 'Import releases'
-            }]
-        } as ActionConfig;
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'addRelease',
+                        title: 'Add new release',
+                        tooltip: 'Add a new release'
+                    }, {
+                        id: 'importRelease',
+                        title: 'Import releases',
+                        tooltip: 'Import releases'
+                    }]
+                } as ActionConfig;
+
+                this.releaseActionConfig = {
+                    primaryActions: [{
+                        id: 'editRelease',
+                        title: 'Edit release',
+                        tooltip: 'Edit release'
+                    }]
+                } as ActionConfig;
+            }
+        });
 
         this.sortConfig = {
             fields: [{
@@ -155,14 +169,6 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
 
         this.currentSortField = this.sortConfig.fields[0];
-
-        this.releaseActionConfig = {
-            primaryActions: [{
-                id: 'editRelease',
-                title: 'Edit release',
-                tooltip: 'Edit release'
-            }]
-        } as ActionConfig;
 
         this.toolbarConfig = {
             filterConfig: this.filterConfig,

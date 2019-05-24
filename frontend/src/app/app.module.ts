@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, APP_INITIALIZER } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -12,6 +12,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxUploadModule } from '@wkoza/ngx-upload';
 import { MarkdownModule } from 'ngx-markdown';
 import { UiSwitchModule } from 'ngx-toggle-switch';
+import { KeycloakAngularModule } from 'keycloak-angular';
 
 import {
     AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
@@ -45,6 +46,7 @@ import { ReleaseImportComponent } from './release/release-import.component';
 import { PatchImportComponent } from './patch/patch-import.component';
 import { SkipUndeployPipe } from './shared/skip-undeploy.pipe';
 import { ReleaseDetailComponent } from './release/release-detail.component';
+import { initializer } from './app-init';
 
 import { registerLocaleData } from '@angular/common';
 import { defineLocale } from 'ngx-bootstrap/chronos';
@@ -53,6 +55,7 @@ import { frLocale } from 'ngx-bootstrap/locale';
 import { PatchDetailComponent } from './patch/patch-detail.component';
 import { PageNotFoundComponent } from './misc/page-not-found.component';
 import { ReleaseCardChartContainerComponent } from './dashboard/release-card/release-card-chart-container.component';
+import { AuthenticationService } from './auth/authentication.service';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -100,6 +103,7 @@ defineLocale('fr', frLocale);
         FormsModule,
         HttpClientModule,
         InfoStatusCardModule,
+        KeycloakAngularModule,
         ListModule,
         MarkdownModule.forRoot({ loader: HttpClient }),
         ModalModule.forRoot(),
@@ -116,8 +120,17 @@ defineLocale('fr', frLocale);
         UtilizationDonutChartModule,
         WizardModule
     ],
-    providers: [BsDropdownConfig, NotificationService, SseService,
-        { provide: LOCALE_ID, useValue: 'fr' }],
+    providers: [{
+        provide: APP_INITIALIZER,
+        useFactory: initializer,
+        multi: true,
+        deps: [AuthenticationService]
+    },
+        BsDropdownConfig,
+        NotificationService,
+        SseService,
+    { provide: LOCALE_ID, useValue: 'fr' }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

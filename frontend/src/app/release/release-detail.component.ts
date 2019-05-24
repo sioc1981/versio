@@ -12,6 +12,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { Issue } from '../issue/shared/issue.model';
 import { Patch } from '../patch/shared/patch.model';
 import { ReleaseFull, Release } from './shared/release.model';
+import { AuthenticationService } from '../auth/authentication.service';
 
 
 enum ReleaseDetailTab {
@@ -75,20 +76,26 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     allIssuePaginationConfig: PaginationConfig;
 
     private subscriptions: Subscription[] = [];
-    constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService) { }
+    constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService,
+        private auth: AuthenticationService) { }
 
     ngOnInit() {
         this.errorConfig = {
             iconStyleClass: 'pficon-error-circle-o',
             title: 'Error'
         } as EmptyStateConfig;
-        this.actionConfig = {
-            primaryActions: [{
-                id: 'editRelease',
-                title: 'Edit release',
-                tooltip: 'Edit release'
-            }]
-        } as ActionConfig;
+
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'editRelease',
+                        title: 'Edit release',
+                        tooltip: 'Edit release'
+                    }]
+                } as ActionConfig;
+            }
+        });
 
         this.issueActionConfig = {
             primaryActions: [{

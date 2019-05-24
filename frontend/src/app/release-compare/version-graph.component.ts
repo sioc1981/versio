@@ -114,8 +114,6 @@ export class VersionGraphComponent extends ChartBase implements OnInit, DoCheck 
     }
 
     tooltip(): any {
-        console.log('releaseCompareComponent: ' + this.releaseCompareComponent);
-
         return {
             format: {
                 value: this.getTooltipValueFormat()

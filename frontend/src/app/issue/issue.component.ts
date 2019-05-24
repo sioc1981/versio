@@ -12,6 +12,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Subscription } from 'rxjs';
 import { Issue } from './shared/issue.model';
 import { ISSUE_CONSTANT } from './shared/issue.constant';
+import { AuthenticationService } from '../auth/authentication.service';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -44,7 +45,7 @@ export class IssueComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private issueService: IssueService, private modalService: BsModalService) { }
+    constructor(private issueService: IssueService, private modalService: BsModalService, private auth: AuthenticationService) { }
 
     ngOnInit() {
         this.getIssues();
@@ -78,17 +79,34 @@ export class IssueComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        this.actionConfig = {
+        this.issueActionConfig = {
             primaryActions: [{
-                id: 'addIssue',
-                title: 'Add new issue',
-                tooltip: 'Add a new issue'
-            }, {
-                id: 'importIssues',
-                title: 'Import issues',
-                tooltip: 'Import new issues'
+                id: 'openIssue',
+                title: 'Open issue',
+                tooltip: 'Open issue in an new tab'
             }]
         } as ActionConfig;
+        
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+            this.actionConfig = {
+                primaryActions: [{
+                    id: 'addIssue',
+                    title: 'Add new issue',
+                    tooltip: 'Add a new issue'
+                }, {
+                    id: 'importIssues',
+                    title: 'Import issues',
+                    tooltip: 'Import new issues'
+                }]
+            } as ActionConfig;
+
+            this.issueActionConfig.primaryActions.push({
+                id: 'editIssue',
+                title: 'Edit issue',
+                tooltip: 'Edit issue'
+            });
+        }});
 
         this.sortConfig = {
             fields: [{
@@ -107,17 +125,7 @@ export class IssueComponent implements OnInit, OnDestroy {
             isAscending: this.isAscendingSort
         } as SortConfig;
 
-        this.currentSortField = this.sortConfig.fields[0];        this.issueActionConfig = {
-            primaryActions: [{
-                id: 'openIssue',
-                title: 'Open issue',
-                tooltip: 'Open issue in an new tab'
-            } , {
-                id: 'editIssue',
-                title: 'Edit issue',
-                tooltip: 'Edit issue'
-            }]
-        } as ActionConfig;
+        this.currentSortField = this.sortConfig.fields[0];
 
         this.toolbarConfig = {
             filterConfig: this.filterConfig,
@@ -154,7 +162,7 @@ export class IssueComponent implements OnInit, OnDestroy {
         this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
     }
 
-     applyFilters(): void {
+    applyFilters(): void {
         this.filteredIssues = [];
         if (this.filterConfig.appliedFilters && this.filterConfig.appliedFilters.length > 0) {
             this.issues.forEach((item) => {

@@ -11,6 +11,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { Issue } from '../issue/shared/issue.model';
 import { Patch } from '../patch/shared/patch.model';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
+import { AuthenticationService } from '../auth/authentication.service';
 
 
 enum PatchDetailTab {
@@ -56,20 +57,27 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
 
 
     private subscriptions: Subscription[] = [];
-    constructor(private patchService: PatchService, private route: ActivatedRoute, private modalService: BsModalService) { }
+    constructor(private patchService: PatchService, private route: ActivatedRoute, private modalService: BsModalService,
+         private auth: AuthenticationService) { }
 
     ngOnInit() {
         this.errorConfig = {
             iconStyleClass: 'pficon-error-circle-o',
             title: 'Error'
         } as EmptyStateConfig;
-        this.actionConfig = {
-            primaryActions: [{
-                id: 'editPatch',
-                title: 'Edit patch',
-                tooltip: 'Edit patch'
-            }]
-        } as ActionConfig;
+
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'editPatch',
+                        title: 'Edit patch',
+                        tooltip: 'Edit patch'
+                    }]
+                } as ActionConfig;
+            }
+        });
 
         this.issueActionConfig = {
             primaryActions: [{

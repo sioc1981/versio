@@ -18,6 +18,7 @@ import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { environment } from 'src/environments/environment';
 import { APP_CONSTANT } from '../app.constants';
+import { AuthenticationService } from '../auth/authentication.service';
 
 
 @Component({
@@ -61,10 +62,16 @@ export class NavigationComponent implements OnInit, OnDestroy {
     navigationItems: VerticalNavigationItem[];
 
     applicationName = APP_CONSTANT.applicationName;
+    hasAuthentication = this.authenticationService.canAuthenticate();
+
+    username = '';
+
+    loggedIn = false;
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private router: Router, private route: ActivatedRoute, private modalService: BsModalService) {
+    constructor(private router: Router, private route: ActivatedRoute, private modalService: BsModalService,
+        private authenticationService: AuthenticationService) {
     }
 
     ngOnInit(): void {
@@ -103,6 +110,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(c =>
             this.navigationItems[this.PATCHES_INDEX].badges[0].count = c));
         this.navigationItems = this.getItems();
+        if (this.hasAuthentication) {
+            this.authenticationService.isLoggedIn().then(r => {
+                this.loggedIn = r;
+                this.username = r ? this.authenticationService.getUsername() : '';
+            });
+        }
     }
 
     /**
@@ -169,4 +182,11 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.modalRef.hide();
     }
 
+    login($event: any) {
+        this.authenticationService.login();
+    }
+
+    logout($event: any) {
+        this.authenticationService.logout();
+    }
 }

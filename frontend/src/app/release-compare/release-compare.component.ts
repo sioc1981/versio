@@ -342,7 +342,6 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
             match = item.destReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1
                 || item.destPatches.release === filter.query.id;
         } else if (filter.field.id === 'missingRelease') {
-            console.log('missingRelease: ' + filter.query.id);
             if (filter.query.id === 'sourceReleases') {
                 match = item.destReleases.length === 0 && item.destPatches.patches.length === 0;
             }

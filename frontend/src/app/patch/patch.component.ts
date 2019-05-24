@@ -12,6 +12,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { AuthenticationService } from '../auth/authentication.service';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -46,7 +47,7 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private patchService: PatchService, private modalService: BsModalService) { }
+    constructor(private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService) { }
 
     ngOnInit() {
         this.reloadData();
@@ -116,17 +117,29 @@ export class PatchComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        this.actionConfig = {
-            primaryActions: [{
-                id: 'addPatch',
-                title: 'Add new patch',
-                tooltip: 'Add a new patch'
-            }, {
-                id: 'importPatch',
-                title: 'Import patches',
-                tooltip: 'Import patches'
-            }]
-        } as ActionConfig;
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'addPatch',
+                        title: 'Add new patch',
+                        tooltip: 'Add a new patch'
+                    }, {
+                        id: 'importPatch',
+                        title: 'Import patches',
+                        tooltip: 'Import patches'
+                    }]
+                } as ActionConfig;
+
+                this.patchActionConfig = {
+                    primaryActions: [{
+                        id: 'editPatch',
+                        title: 'Edit patch',
+                        tooltip: 'Edit patch'
+                    }]
+                } as ActionConfig;
+            }
+        });
 
         this.sortConfig = {
             fields: [{
@@ -162,14 +175,6 @@ export class PatchComponent implements OnInit, OnDestroy {
         } as SortConfig;
 
         this.currentSortField = this.sortConfig.fields[0];
-
-        this.patchActionConfig = {
-            primaryActions: [{
-                id: 'editPatch',
-                title: 'Edit patch',
-                tooltip: 'Edit patch'
-            }]
-        } as ActionConfig;
 
         this.toolbarConfig = {
             filterConfig: this.filterConfig,

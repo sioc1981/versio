@@ -4,6 +4,7 @@ import { PatchService } from './patch/shared/patch.service';
 import { ReleaseService } from './release/shared/release.service';
 import { SseService } from './server-event/sse.service';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { AuthenticationService } from './auth/authentication.service';
 
 @Component({
     selector: 'app-root',
@@ -14,7 +15,7 @@ export class AppComponent implements OnInit {
     title = 'frontend';
 
     constructor(private issueService: IssueService, private patchService: PatchService, private releaseService: ReleaseService,
-        private sseService: SseService, private localeService: BsLocaleService) { }
+        private sseService: SseService, private localeService: BsLocaleService, private auth: AuthenticationService) { }
 
     @HostListener('window:beforeunload', ['$event'])
     beforeunloadHandler(event: any) {
@@ -23,5 +24,6 @@ export class AppComponent implements OnInit {
 
     ngOnInit(): void {
         this.localeService.use('fr');
+        this.auth.checkAndRelog();
     }
 }

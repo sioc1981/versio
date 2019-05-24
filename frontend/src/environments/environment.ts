@@ -6,7 +6,8 @@ declare var require: any;
 export const environment = {
   production: false,
   backendUrlBase: 'http://localhost:8080',
-  version: require('../../package.json').version
+  version: require('../../package.json').version,
+  hasAuthentication: false
 };
 
 /*
