@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { PatchDetailComponent } from './patch-detail.component';
+import { AppModule } from '../app.module';
 
 describe('PatchDetailComponent', () => {
   let component: PatchDetailComponent;
@@ -11,7 +12,9 @@ describe('PatchDetailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PatchDetailComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

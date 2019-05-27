@@ -1,25 +1,27 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ReleaseCardNoChartDataComponent } from './release-card-no-chart-data.component';
+import { ReleaseCardChartContainerComponent } from './release-card-chart-container.component';
+import { AppModule } from 'src/app/app.module';
 
-describe('ReleaseCardNoChartDataComponent', () => {
-  let component: ReleaseCardNoChartDataComponent;
-  let fixture: ComponentFixture<ReleaseCardNoChartDataComponent>;
+describe('ReleaseCardChartContainerComponent', () => {
+    let component: ReleaseCardChartContainerComponent;
+    let fixture: ComponentFixture<ReleaseCardChartContainerComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ReleaseCardNoChartDataComponent ]
-    })
-    .compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [
+                AppModule
+            ]
+        }).compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ReleaseCardNoChartDataComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(ReleaseCardChartContainerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

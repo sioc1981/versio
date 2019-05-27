@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { ReleaseDetailComponent } from './release-detail.component';
+import { AppModule } from '../app.module';
 
 describe('ReleaseDetailComponent', () => {
   let component: ReleaseDetailComponent;
@@ -11,7 +12,9 @@ describe('ReleaseDetailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ReleaseDetailComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

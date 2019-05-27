@@ -1,14 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { IssueUpdateComponent } from './issue-update.component';
+import { AppModule } from '../app.module';
 
 describe('IssueUpdateComponent', () => {
   let component: IssueUpdateComponent;
   let fixture: ComponentFixture<IssueUpdateComponent>;
 
-  beforeEach(async(() => {
+  beforeAll(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ IssueUpdateComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

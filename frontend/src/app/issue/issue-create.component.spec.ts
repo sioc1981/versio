@@ -1,14 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { IssueCreateComponent } from './issue-create.component';
+import { AppModule } from '../app.module';
 
 describe('IssueCreateComponent', () => {
   let component: IssueCreateComponent;
   let fixture: ComponentFixture<IssueCreateComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ IssueCreateComponent ]
+TestBed.configureTestingModule({
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

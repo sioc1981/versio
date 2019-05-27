@@ -23,7 +23,6 @@ import { AuthenticationService } from '../auth/authentication.service';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
-    // tslint:disable-next-line:component-selector
     selector: 'app-navigation',
     styles: [`
     .example-page-container.container-fluid {

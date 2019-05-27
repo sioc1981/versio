@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PatchUpdateComponent } from './patch-update.component';
+import { AppModule } from '../app.module';
 
 describe('PatchUpdateComponent', () => {
   let component: PatchUpdateComponent;
@@ -8,7 +9,9 @@ describe('PatchUpdateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PatchUpdateComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

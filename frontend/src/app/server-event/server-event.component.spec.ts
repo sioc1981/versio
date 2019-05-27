@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ServerEventComponent } from './server-event.component';
+import { AppModule } from '../app.module';
 
 describe('ServerEventComponent', () => {
   let component: ServerEventComponent;
@@ -8,7 +9,9 @@ describe('ServerEventComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ServerEventComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

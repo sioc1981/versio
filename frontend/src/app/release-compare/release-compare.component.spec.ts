@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ReleaseCompareComponent } from './release-compare.component';
+import { AppModule } from '../app.module';
 
 describe('ReleaseCompareComponent', () => {
   let component: ReleaseCompareComponent;
@@ -8,7 +9,9 @@ describe('ReleaseCompareComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ReleaseCompareComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));

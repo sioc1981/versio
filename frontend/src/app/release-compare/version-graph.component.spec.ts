@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VersionGraphComponent } from './version-graph.component';
+import { AppModule } from '../app.module';
 
 describe('VersionGraphComponent', () => {
   let component: VersionGraphComponent;
@@ -8,7 +9,9 @@ describe('VersionGraphComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ VersionGraphComponent ]
+        imports: [
+            AppModule
+        ]
     })
     .compileComponents();
   }));
