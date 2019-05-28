@@ -57,7 +57,6 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
     // Wizard
     wizardConfig: WizardConfig;
-    releaseComponent: ReleaseComponent;
 
     fileReader = new FileReader();
 
@@ -78,10 +77,7 @@ export class ReleaseImportComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private releaseService: ReleaseService, private issueService: IssueService, @Host() releaseComponent: ReleaseComponent,
-        public uploader: HttpClientUploadService) {
-        this.releaseComponent = releaseComponent;
-    }
+    constructor(private releaseService: ReleaseService, private issueService: IssueService, public uploader: HttpClientUploadService) { }
 
     ngOnInit(): void {
 

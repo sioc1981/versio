@@ -133,7 +133,7 @@ export class ReleaseCardComponent implements OnInit {
         return {
             chartId: platform + 'Donut' + this.item.id,
             colors: {
-                available: '#bbbbbb',     // gray
+                available: '#bbbbbb',     // grey
                 validated: '#3f9c35', // green
                 deployed: '#ec7a08',     // orange
                 missing: '#cc0000'      // red

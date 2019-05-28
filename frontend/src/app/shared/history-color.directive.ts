@@ -11,22 +11,22 @@ export class HistoryColorDirective implements OnInit {
 
     ngOnInit() {
        if (!this.appHistoryColor || !this.appHistoryColor.validationDate && !this.appHistoryColor.deployDate ) {
-            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-red');
        } else if (this.appHistoryColor.undeployDate) {
-            this.renderer.addClass(this.hostElement.nativeElement, 'myApp-gray');
+            this.renderer.addClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
        } else if (this.appHistoryColor.validationDate) {
-            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
         } else {
-            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-gray');
+            this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');

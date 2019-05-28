@@ -6,7 +6,6 @@ import { PlatformHistory, PlatformSummary } from 'src/app/shared/platform.model'
 export class Release {
     id: number;
     version: Version;
-    issues: Issue[];
     buildDate: Date;
     packageDate: Date;
     qualification: PlatformHistory;
@@ -16,7 +15,6 @@ export class Release {
 }
 
 export class ReleaseFull {
-
     release: Release;
     issues: Issue[];
     patches: Patch[];
