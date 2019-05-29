@@ -7,11 +7,13 @@ variables:
 #  MAVEN_CLI_OPTS: "-s $CI_PROJECT_DIR/.m2/settings.xml --batch-mode"
   MAVEN_CLI_OPTS: "--batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  CLI_VERSION: 6.2.1
 
 cache:
   paths:
     - $CI_PROJECT_DIR/.m2/repository/
     - backend/target/
+    - frontend/node_modules/
 
 build-backend:
   stage: build
@@ -20,12 +22,30 @@ build-backend:
     - cd backend
     - mvn $MAVEN_CLI_OPTS compile
 
+build-frontend:
+  stage: build
+  image: trion/ng-cli
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - ng build
+
 test-backend:
   stage: test
   image: maven:latest
   script:
     - cd backend
     - mvn $MAVEN_CLI_OPTS test
+
+test-frontend:karma:
+  stage: test
+  image: trion/ng-cli-karma:${CLI_VERSION}
+  allow_failure: false
+  before_script:
+    - cd frontend
+  script:
+    - ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
 
 package-backend:
   stage: package
