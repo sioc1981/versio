@@ -1,0 +1,34 @@
+stages:
+  - build
+  - test
+  - package
+
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+    - backend/target/
+
+build-backend:
+  stage: build
+  image: maven:latest
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS compile
+
+test-backend:
+  stage: test
+  image: maven:latest
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS test
+
+package-backend:
+  stage: package
+  image: maven:latest
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS package
