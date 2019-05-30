@@ -45,22 +45,21 @@ export class AuthenticationService {
         return res;
     }
 
-    checkAndRelog(): void {
+    async checkAndRelog() {
         if (environment.hasAuthentication) {
             const wasLoggedIn: boolean = localStorage.getItem(IS_LOGGED_IN_KEY) === 'true';
-            this.isLoggedIn().then(loggedIn => {
-                localStorage.setItem(IS_LOGGED_IN_KEY, '' + loggedIn);
-                if (loggedIn) {
-                    this.keycloakService.getToken().then(_ => {
-                        localStorage.setItem(AUTH_TOKEN, this.keycloakService.getKeycloakInstance().token);
-                        localStorage.setItem(AUTH_REFRESH_TOKEN, this.keycloakService.getKeycloakInstance().refreshToken);
-                    }
-                    );
+            const loggedIn: boolean = await this.isLoggedIn();
+            localStorage.setItem(IS_LOGGED_IN_KEY, '' + loggedIn);
+            if (loggedIn) {
+                this.keycloakService.getToken().then(_ => {
+                    localStorage.setItem(AUTH_TOKEN, this.keycloakService.getKeycloakInstance().token);
+                    localStorage.setItem(AUTH_REFRESH_TOKEN, this.keycloakService.getKeycloakInstance().refreshToken);
                 }
-                if (wasLoggedIn && !loggedIn) {
-                    this.keycloakService.loadUserProfile(true);
-                }
-            });
+                );
+            }
+            if (wasLoggedIn && !loggedIn) {
+                this.keycloakService.loadUserProfile(true);
+            }
         }
     }
 

@@ -1,7 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
 
-console.log('protocol: ', location.protocol);
-
 export const APP_CONSTANT = {
     applicationName: 'Version Management',
     backendUrlBase: location.protocol + '//' + location.hostname + ':8080' + '/backend/api',

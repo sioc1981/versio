@@ -79,23 +79,22 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService,
         private auth: AuthenticationService) { }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.errorConfig = {
             iconStyleClass: 'pficon-error-circle-o',
             title: 'Error'
         } as EmptyStateConfig;
 
-        this.auth.isLoggedIn().then(loggedIn => {
-            if (loggedIn) {
-                this.actionConfig = {
-                    primaryActions: [{
-                        id: 'editRelease',
-                        title: 'Edit release',
-                        tooltip: 'Edit release'
-                    }]
-                } as ActionConfig;
-            }
-        });
+        const loggedIn = await this.auth.isLoggedIn();
+        if (loggedIn) {
+            this.actionConfig = {
+                primaryActions: [{
+                    id: 'editRelease',
+                    title: 'Edit release',
+                    tooltip: 'Edit release'
+                }]
+            } as ActionConfig;
+        }
 
         this.issueActionConfig = {
             primaryActions: [{

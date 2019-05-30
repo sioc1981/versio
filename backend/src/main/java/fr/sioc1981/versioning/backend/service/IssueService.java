@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -64,21 +63,6 @@ public class IssueService {
 		return Response.ok(this.entityManager.merge(newIssue)).build();
 	}
 
-	@Path("{id}")
-	@DELETE
-	public Response delete(@PathParam("id") String id) {
-		Issue issue = this.entityManager.find(Issue.class, id);
-
-		try {
-			this.entityManager.remove(issue);
-			getCount();
-		} catch (Exception e) {
-			throw new RuntimeException("Could not delete issue.", e);
-		}
-
-		return Response.ok().build();
-	}
-
 	@GET
 	@Produces("application/json")
 	public Response findAll() {
@@ -103,7 +87,7 @@ public class IssueService {
 	@Produces("application/json")
 	@Path("/test")
 	public Response summarize(@QueryParam("q") String q) {
-		LOG.warn("parameters: {}",request.getParameterMap());
+		LOG.warn("parameters: {}", request.getParameterMap());
 		LOG.warn("q: {}", q);
 		return Response.ok().build();
 	}
@@ -112,41 +96,44 @@ public class IssueService {
 	@Path("/search/releasecomparison")
 	@Produces(MediaType.SERVER_SENT_EVENTS)
 	public void search(final @Context SseEventSink eventSink) {
-		LOG.warn("parameters: {}",request.getParameterMap());
-		LOG.warn("q: {}",request.getParameter("q"));
+		LOG.warn("parameters: {}", request.getParameterMap());
+		LOG.warn("q: {}", request.getParameter("q"));
 		HashSet<String> versions = new HashSet<>();
 		HashSet<String> patchedVersions = new HashSet<>();
 		IssueReleaseComparisonParam comparison = IssueReleaseComparisonParam.valueOf(request.getParameter("q"));
-		if(comparison != null) {
-			if(comparison.getSourceReleases() != null && !comparison.getSourceReleases().isEmpty()) {
+		if (comparison != null) {
+			if (comparison.getSourceReleases() != null && !comparison.getSourceReleases().isEmpty()) {
 				versions.addAll(comparison.getSourceReleases());
 				patchedVersions.add(comparison.getSourceReleases().get(comparison.getSourceReleases().size() - 1));
 			}
-			if(comparison.getDestReleases() != null && !comparison.getDestReleases().isEmpty()) {
+			if (comparison.getDestReleases() != null && !comparison.getDestReleases().isEmpty()) {
 				versions.addAll(comparison.getDestReleases());
 				patchedVersions.add(comparison.getDestReleases().get(comparison.getDestReleases().size() - 1));
 			}
 		}
 
 		for (final String versionNumber : versions) {
-			Stream<Issue> result = this.entityManager
-					.createQuery("select i from ReleaseFull rf join rf.issues i where rf.release.version.versionNumber = :versionNumber", Issue.class)
-					.setParameter("versionNumber", versionNumber).getResultStream();
+			Stream<Issue> result = this.entityManager.createQuery(
+					"select i from ReleaseFull rf join rf.issues i where rf.release.version.versionNumber = :versionNumber",
+					Issue.class).setParameter("versionNumber", versionNumber).getResultStream();
 
-			result.map(issue -> this.createIssueReleaseComparisonResultItem(issue, versionNumber, null)).forEach(
-					ircri -> eventSink.send(sse.newEventBuilder().data(ircri).mediaType(MediaType.APPLICATION_JSON_TYPE).build()));
+			result.map(issue -> this.createIssueReleaseComparisonResultItem(issue, versionNumber, null))
+					.forEach(ircri -> eventSink.send(
+							sse.newEventBuilder().data(ircri).mediaType(MediaType.APPLICATION_JSON_TYPE).build()));
 		}
 
 		for (final String versionNumber : patchedVersions) {
 			@SuppressWarnings("unchecked")
-			Stream<Object[]> result = this.entityManager
-					.createQuery("select i, p.sequenceNumber from Patch p join p.issues i where p.release.version.versionNumber = :versionNumber")
+			Stream<Object[]> result = this.entityManager.createQuery(
+					"select i, p.sequenceNumber from Patch p join p.issues i where p.release.version.versionNumber = :versionNumber")
 					.setParameter("versionNumber", versionNumber).getResultStream();
-			
-			result.map(issue -> this.createIssueReleaseComparisonResultItem((Issue)issue[0], versionNumber, (String)issue[1])).forEach(
-					ircri -> eventSink.send(sse.newEventBuilder().data(ircri).mediaType(MediaType.APPLICATION_JSON_TYPE).build()));
+
+			result.map(issue -> this.createIssueReleaseComparisonResultItem((Issue) issue[0], versionNumber,
+					(String) issue[1]))
+					.forEach(ircri -> eventSink.send(
+							sse.newEventBuilder().data(ircri).mediaType(MediaType.APPLICATION_JSON_TYPE).build()));
 		}
-		
+
 		eventSink.close();
 	}
 
@@ -166,7 +153,8 @@ public class IssueService {
 
 	private IssueReleaseComparisonResultItem createIssueReleaseComparisonResultItem(final Issue issue,
 			final String versionNumber, String patchSequence) {
-		LOG.warn("createIssueReleaseComparisonResultItem({},{},{})", issue.getReference(), versionNumber, patchSequence);
+		LOG.warn("createIssueReleaseComparisonResultItem({},{},{})", issue.getReference(), versionNumber,
+				patchSequence);
 		IssueReleaseComparisonResultItem res = new IssueReleaseComparisonResultItem();
 		res.setIssue(issue);
 		res.setIssueReference(issue.getReference());

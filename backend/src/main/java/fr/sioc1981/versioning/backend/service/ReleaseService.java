@@ -15,7 +15,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -76,26 +75,12 @@ public class ReleaseService {
 		return Response.ok(updatedRelease).build();
 	}
 
-	@Path("{id}")
-	@DELETE
-	public Response delete(@PathParam("id") String id) {
-		ReleaseFull release = this.entityManager.find(ReleaseFull.class, id);
-
-		try {
-			this.entityManager.remove(release);
-			getCount();
-
-		} catch (Exception e) {
-			throw new RuntimeException("Could not delete release.", e);
-		}
-
-		return Response.ok().build();
-	}
-
 	@GET
 	@Produces("application/json")
 	public Response findAll() {
-		return Response.ok(this.entityManager.createQuery("from Release r order by r.version.versionNumber DESC").getResultList()).build();
+		return Response.ok(
+				this.entityManager.createQuery("from Release r order by r.version.versionNumber DESC").getResultList())
+				.build();
 	}
 
 	@GET
@@ -155,7 +140,8 @@ public class ReleaseService {
 	@Path("{id}/full")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") String id) {
-		List<ReleaseFull> result = this.entityManager.createQuery("from ReleaseFull rf where rf.release.version.versionNumber = :id", ReleaseFull.class)
+		List<ReleaseFull> result = this.entityManager
+				.createQuery("from ReleaseFull rf where rf.release.version.versionNumber = :id", ReleaseFull.class)
 				.setParameter("id", id).getResultList();
 
 		if (result.isEmpty()) {
@@ -172,11 +158,12 @@ public class ReleaseService {
 		Version v1 = new Version(source);
 		Version v2 = new Version(dest);
 
-		final Version baseVersion = new Version(findVersionBase(v1, v2));
+		final Version baseVersion = new Version(removeInvalidPart(findVersionBase(v1, v2)));
+		LOG.info("Common base version: {}", baseVersion);
 		ReleaseComparison comparison = new ReleaseComparison();
 		if (!v2.equals(v1)) {
-			comparison.setSourceReleases(findAllBetween(baseVersion, v1));
-			comparison.setDestReleases(findAllBetween(baseVersion, v2));
+			comparison.setSourceReleases(findAllBetween2(baseVersion, v1));
+			comparison.setDestReleases(findAllBetween2(baseVersion, v2));
 		}
 		return Response.ok(comparison).build();
 	}
@@ -193,7 +180,7 @@ public class ReleaseService {
 			params.put("baseFeatureNumber", baseVersion.getFeatureNumber());
 			params.put("versionFeatureNumber", v1.getFeatureNumber());
 			featureSearch = true;
-		} 
+		}
 		if (v1.getPatchNumber() != 0) {
 			params.put("featureNumber", v1.getFeatureNumber());
 			int basePatch = baseVersion.getPatchNumber();
@@ -210,8 +197,59 @@ public class ReleaseService {
 			qlString += " and v.featureNumber = :featureNumber and v.patchNumber = 0";
 			params.put("featureNumber", v1.getFeatureNumber());
 		}
+
+		qlString += " order by v.versionNumber";
+		TypedQuery<Release> query = this.entityManager.createQuery(qlString, Release.class);
+		params.forEach((name, value) -> query.setParameter(name, value));
+		return query.getResultList();
+	}
+
+	public List<Release> findAllBetween2(Version baseVersion, Version v1) {
+		String qlString = "SELECT r FROM Release r join fetch r.version v where ";
+		HashMap<String, Integer> params = new HashMap<String, Integer>();
+		params.put("baseNumber", v1.getBaseNumber());
+		params.put("interimNumber", v1.getInterimNumber());
+		params.put("featureNumber", v1.getFeatureNumber());
+		params.put("patchNumber", v1.getPatchNumber());
+		int baseInterim = baseVersion.getInterimNumber();
+		int baseFeature = baseVersion.getFeatureNumber();
+		int basePatch = baseVersion.getPatchNumber();
+		boolean areVersionDifferent = false;
+		if (areVersionDifferent || baseVersion.getBaseNumber() != v1.getBaseNumber()) {
+			qlString += "(v.baseNumber BETWEEN :baseBaseNumber AND :previousBaseNumber and v.interimNumber = 0 AND v.featureNumber = 0 AND v.patchNumber = 0) OR ";
+			params.put("baseBaseNumber", baseVersion.getBaseNumber());
+			params.put("previousBaseNumber", v1.getBaseNumber() - 1);
+			areVersionDifferent = true;
+			baseInterim = 0;
+			baseFeature = 0;
+			basePatch = 0;
+		}
+		if (areVersionDifferent || baseVersion.getInterimNumber() != v1.getInterimNumber()) {
+			qlString += "(v.baseNumber = :baseNumber and v.interimNumber BETWEEN :baseInterimNumber AND :previousInterimNumber AND v.featureNumber = 0 AND v.patchNumber = 0) OR ";
+			params.put("baseInterimNumber", baseInterim);
+			params.put("previousInterimNumber", v1.getInterimNumber() - 1);
+			areVersionDifferent = true;
+			baseFeature = 0;
+			basePatch = 0;
+		}
+		if (areVersionDifferent || baseVersion.getFeatureNumber() != v1.getFeatureNumber()) {
+			qlString += "(v.baseNumber = :baseNumber and v.interimNumber = :interimNumber AND  v.featureNumber BETWEEN :baseFeatureNumber AND :previousFeatureNumber AND v.patchNumber = 0) OR ";
+			params.put("baseFeatureNumber", baseFeature);
+			params.put("previousFeatureNumber", v1.getFeatureNumber() - 1);
+			areVersionDifferent = true;
+			basePatch = 0;
+		}
+		if (areVersionDifferent || v1.getPatchNumber() != baseVersion.getPatchNumber()) {
+			qlString += "(v.baseNumber = :baseNumber and v.interimNumber = :interimNumber AND v.featureNumber = :featureNumber and v.patchNumber BETWEEN :basePatchNumber AND :previousPatchNumber) OR ";
+			params.put("basePatchNumber", basePatch);
+			params.put("previousPatchNumber", v1.getPatchNumber()-1);
+			areVersionDifferent = true;
+		}
+
+		qlString += "(v.baseNumber = :baseNumber and v.interimNumber = :interimNumber AND v.featureNumber = :featureNumber and v.patchNumber = :patchNumber)";
 		
 		qlString += " order by v.versionNumber";
+		LOG.info("query: {}", qlString);
 		TypedQuery<Release> query = this.entityManager.createQuery(qlString, Release.class);
 		params.forEach((name, value) -> query.setParameter(name, value));
 		return query.getResultList();
@@ -224,21 +262,28 @@ public class ReleaseService {
 			return String.valueOf(Math.min(v1.getBaseNumber(), v2.getBaseNumber()));
 		}
 		base.append(v1.getBaseNumber());
-		base.append(".");
 		compare = v1.getInterimNumber() - v2.getInterimNumber();
 		if (compare != 0) {
 			return base.toString() + String.valueOf(Math.min(v1.getInterimNumber(), v2.getInterimNumber()));
 		}
-		base.append(v1.getInterimNumber());
 		base.append(".");
+		base.append(v1.getInterimNumber());
 		compare = v1.getFeatureNumber() - v2.getFeatureNumber();
 		if (compare != 0) {
 			return base.toString() + String.valueOf(Math.min(v1.getFeatureNumber(), v2.getFeatureNumber()));
 		}
+		base.append(".");
 		base.append(v1.getFeatureNumber());
 		base.append(".");
 		base.append(Math.min(v1.getPatchNumber(), v2.getPatchNumber()));
 		return base.toString().replaceAll("(\\.0)+$", "");
 	}
-
+	
+	private String removeInvalidPart(String version) {
+		String result = version;
+		while (result.endsWith("\\.0")) {
+			result = result.substring(0, result.length() -2);
+		}
+		return result;
+	}
 }

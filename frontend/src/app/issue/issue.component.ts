@@ -47,7 +47,7 @@ export class IssueComponent implements OnInit, OnDestroy {
 
     constructor(private issueService: IssueService, private modalService: BsModalService, private auth: AuthenticationService) { }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.getIssues();
 
         this.filterConfig = {
@@ -86,9 +86,9 @@ export class IssueComponent implements OnInit, OnDestroy {
                 tooltip: 'Open issue in an new tab'
             }]
         } as ActionConfig;
-        
-        this.auth.isLoggedIn().then(loggedIn => {
-            if (loggedIn) {
+
+        const loggedIn = await this.auth.isLoggedIn();
+        if (loggedIn) {
             this.actionConfig = {
                 primaryActions: [{
                     id: 'addIssue',
@@ -106,7 +106,7 @@ export class IssueComponent implements OnInit, OnDestroy {
                 title: 'Edit issue',
                 tooltip: 'Edit issue'
             });
-        }});
+        }
 
         this.sortConfig = {
             fields: [{

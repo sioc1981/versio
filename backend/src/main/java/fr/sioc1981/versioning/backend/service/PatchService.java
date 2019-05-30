@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -27,13 +26,13 @@ import fr.sioc1981.versioning.backend.entity.Patch;
 public class PatchService {
 
 	Logger log = Logger.getLogger(PatchService.class.getName());
-	
+
 	@Inject
 	private EntityManager entityManager;
 
 	@EJB
-	private GlobalSSE globalSSE; 
-	
+	private GlobalSSE globalSSE;
+
 	@EJB
 	private ReleaseService releaseService;
 
@@ -45,7 +44,7 @@ public class PatchService {
 	public Response create(Patch newPatch) {
 		log.warning("create " + newPatch);
 		this.entityManager.persist(newPatch);
-		
+
 		getCount();
 		releaseService.getSummary(newPatch.getRelease().getId());
 		return Response.ok(newPatch).build();
@@ -57,21 +56,6 @@ public class PatchService {
 		Patch patch = this.entityManager.merge(newPatch);
 		releaseService.getSummary(newPatch.getRelease().getId());
 		return Response.ok(patch).build();
-	}
-
-	@Path("{id}")
-	@DELETE
-	public Response delete(@PathParam("id") String id) {
-		Patch patch = this.entityManager.find(Patch.class, id);
-
-		try {
-			this.entityManager.remove(patch);
-			getCount();
-		} catch (Exception e) {
-			throw new RuntimeException("Could not delete patch.", e);
-		}
-
-		return Response.ok().build();
 	}
 
 	@GET
@@ -88,23 +72,26 @@ public class PatchService {
 	}
 
 	public Long getCount() {
-		Long count =  this.entityManager.createQuery("select count(1) as count from Patch", Long.class).getSingleResult();
+		Long count = this.entityManager.createQuery("select count(1) as count from Patch", Long.class)
+				.getSingleResult();
 		globalSSE.broadcast("patch_count", count);
 		return count;
 	}
-	
-	
+
 	@GET
 	@Path("search/{versionNumber}/{sequenceNumber}")
 	@Produces("application/json")
-	public Response searchPatch(@PathParam("versionNumber") String versionNumber, @PathParam("sequenceNumber") String sequenceNumber) {
-		List<Patch> result = this.entityManager.createQuery("from Patch p where p.sequenceNumber = :sequenceNumber AND p.release.version.versionNumber = :versionNumber", Patch.class)
-				.setParameter("versionNumber", versionNumber).setParameter("sequenceNumber", sequenceNumber).getResultList();
-		
+	public Response searchPatch(@PathParam("versionNumber") String versionNumber,
+			@PathParam("sequenceNumber") String sequenceNumber) {
+		List<Patch> result = this.entityManager.createQuery(
+				"from Patch p where p.sequenceNumber = :sequenceNumber AND p.release.version.versionNumber = :versionNumber",
+				Patch.class).setParameter("versionNumber", versionNumber).setParameter("sequenceNumber", sequenceNumber)
+				.getResultList();
+
 		if (result.isEmpty()) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
-		
+
 		return Response.ok(result.get(0)).build();
 	}
 
