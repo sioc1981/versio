@@ -21,6 +21,11 @@ import { APP_CONSTANT } from '../app.constants';
 import { AuthenticationService } from '../auth/authentication.service';
 
 
+class Property {
+    key: string;
+    value: string;
+}
+
 @Component({
     encapsulation: ViewEncapsulation.None,
     selector: 'app-navigation',
@@ -81,9 +86,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
             title: this.applicationName,
             productInfo: [
                 { name: 'Version', value: environment.version },
-                { name: 'Server Name', value: 'Localhost' },
-                { name: 'User Name', value: 'admin' },
-                { name: 'User Role', value: 'Administrator' }]
+                { name: 'Server Name', value: location.hostname },
+                { name: 'User Name', value: 'username' }]
         } as AboutModalConfig;
 
         this.subscriptions.push(this.router.events.pipe(
@@ -113,6 +117,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
             this.authenticationService.isLoggedIn().then(r => {
                 this.loggedIn = r;
                 this.username = r ? this.authenticationService.getUsername() : '';
+                (this.aboutConfig.productInfo[2] as Property).value = r ? this.username : '';
             });
         }
     }

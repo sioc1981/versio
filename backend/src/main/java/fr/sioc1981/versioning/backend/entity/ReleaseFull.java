@@ -24,7 +24,7 @@ import fr.sioc1981.versioning.backend.data.PlatformCount;
 import fr.sioc1981.versioning.backend.data.ReleaseFullSummary;
 
 /**
- * Entity implementation class for Entity: Patch
+ * Entity implementation class for Entity: ReleaseFull
  *
  */
 @Entity

@@ -12,7 +12,7 @@ import javax.persistence.OneToOne;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * Entity implementation class for Entity: Patch
+ * Entity implementation class for Entity: Release
  *
  */
 @Entity
