@@ -51,7 +51,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
     constructor(private releaseService: ReleaseService, private modalService: BsModalService,
         private auth: AuthenticationService) { }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.reloadData();
         this.filterConfig = {
             fields: [{
@@ -114,28 +114,30 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        const loggedIn = await this.auth.isLoggedIn();
-        if (loggedIn) {
-            this.actionConfig = {
-                primaryActions: [{
-                    id: 'addRelease',
-                    title: 'Add new release',
-                    tooltip: 'Add a new release'
-                }, {
-                    id: 'importRelease',
-                    title: 'Import releases',
-                    tooltip: 'Import releases'
-                }]
-            } as ActionConfig;
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'addRelease',
+                        title: 'Add new release',
+                        tooltip: 'Add a new release'
+                    }, {
+                        id: 'importRelease',
+                        title: 'Import releases',
+                        tooltip: 'Import releases'
+                    }]
+                } as ActionConfig;
+                this.toolbarConfig.actionConfig = this.actionConfig;
 
-            this.releaseActionConfig = {
-                primaryActions: [{
-                    id: 'editRelease',
-                    title: 'Edit release',
-                    tooltip: 'Edit release'
-                }]
-            } as ActionConfig;
-        }
+                this.releaseActionConfig = {
+                    primaryActions: [{
+                        id: 'editRelease',
+                        title: 'Edit release',
+                        tooltip: 'Edit release'
+                    }]
+                } as ActionConfig;
+            }
+        });
 
         this.sortConfig = {
             fields: [{

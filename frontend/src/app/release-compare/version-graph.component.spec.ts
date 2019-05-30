@@ -28,8 +28,32 @@ describe('VersionGraphComponent', () => {
         },
     };
     const releaseComparison: ReleaseComparison = {
-        sourceReleases: [],
-        destReleases: []
+        sourceReleases: [{
+            id: 1,
+            version: {
+                id: 1,
+                versionNumber: '1.0.0.0'
+            },
+            buildDate: new Date(),
+            packageDate: null,
+            qualification: null,
+            keyUser: null,
+            pilot: null,
+            production: null
+        }],
+        destReleases: [{
+            id: 1,
+            version: {
+                id: 1,
+                versionNumber: '1.0.0.0'
+            },
+            buildDate: new Date(),
+            packageDate: null,
+            qualification: null,
+            keyUser: null,
+            pilot: null,
+            production: null
+        }]
     };
 
     beforeEach(async(() => {

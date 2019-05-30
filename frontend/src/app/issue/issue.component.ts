@@ -47,7 +47,7 @@ export class IssueComponent implements OnInit, OnDestroy {
 
     constructor(private issueService: IssueService, private modalService: BsModalService, private auth: AuthenticationService) { }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.getIssues();
 
         this.filterConfig = {
@@ -87,26 +87,28 @@ export class IssueComponent implements OnInit, OnDestroy {
             }]
         } as ActionConfig;
 
-        const loggedIn = await this.auth.isLoggedIn();
-        if (loggedIn) {
-            this.actionConfig = {
-                primaryActions: [{
-                    id: 'addIssue',
-                    title: 'Add new issue',
-                    tooltip: 'Add a new issue'
-                }, {
-                    id: 'importIssues',
-                    title: 'Import issues',
-                    tooltip: 'Import new issues'
-                }]
-            } as ActionConfig;
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'addIssue',
+                        title: 'Add new issue',
+                        tooltip: 'Add a new issue'
+                    }, {
+                        id: 'importIssues',
+                        title: 'Import issues',
+                        tooltip: 'Import new issues'
+                    }]
+                } as ActionConfig;
+                this.toolbarConfig.actionConfig = this.actionConfig;
 
-            this.issueActionConfig.primaryActions.push({
-                id: 'editIssue',
-                title: 'Edit issue',
-                tooltip: 'Edit issue'
-            });
-        }
+                this.issueActionConfig.primaryActions.push({
+                    id: 'editIssue',
+                    title: 'Edit issue',
+                    tooltip: 'Edit issue'
+                });
+            }
+        });
 
         this.sortConfig = {
             fields: [{

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
 import { Patch } from './shared/patch.model';
 import { PatchService } from './shared/patch.service';
 import {
@@ -47,9 +47,10 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService) { }
+    constructor(private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService,
+        private zone: NgZone) { }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.reloadData();
         this.filterConfig = {
             fields: [{
@@ -117,28 +118,30 @@ export class PatchComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        const loggedIn = await this.auth.isLoggedIn();
-        if (loggedIn) {
-            this.actionConfig = {
-                primaryActions: [{
-                    id: 'addPatch',
-                    title: 'Add new patch',
-                    tooltip: 'Add a new patch'
-                }, {
-                    id: 'importPatch',
-                    title: 'Import patches',
-                    tooltip: 'Import patches'
-                }]
-            } as ActionConfig;
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.actionConfig = {
+                    primaryActions: [{
+                        id: 'addPatch',
+                        title: 'Add new patch',
+                        tooltip: 'Add a new patch'
+                    }, {
+                        id: 'importPatch',
+                        title: 'Import patches',
+                        tooltip: 'Import patches'
+                    }]
+                } as ActionConfig;
+                this.toolbarConfig.actionConfig = this.actionConfig;
 
-            this.patchActionConfig = {
-                primaryActions: [{
-                    id: 'editPatch',
-                    title: 'Edit patch',
-                    tooltip: 'Edit patch'
-                }]
-            } as ActionConfig;
-        }
+                this.patchActionConfig = {
+                    primaryActions: [{
+                        id: 'editPatch',
+                        title: 'Edit patch',
+                        tooltip: 'Edit patch'
+                    }]
+                } as ActionConfig;
+            }
+        });
 
         this.sortConfig = {
             fields: [{
