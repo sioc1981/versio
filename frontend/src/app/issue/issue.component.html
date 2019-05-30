@@ -28,8 +28,8 @@
         <pfng-list id="myList" [items]="items" [itemTemplate]="itemTemplate" [actionTemplate]="actionTemplate">
             <ng-template #itemTemplate let-item="item" let-index="index">
            <div class="list-pf-left" [ngSwitch]="item.container">
-              <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'MANTIS'"/>
-              <img src="/src/assets/images/jira.svg" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'JIRA'"/>
+              <img src="assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'MANTIS'"/>
+              <img src="assets/images/jira.svg" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'JIRA'"/>
             </div>
                  <div class="list-pf-content-wrapper">
                     <div class="list-pf-main-content">

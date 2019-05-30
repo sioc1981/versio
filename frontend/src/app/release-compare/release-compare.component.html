@@ -50,9 +50,9 @@
                 <!-- Column templates -->
                 <ng-template #issueTemplate let-row="row">
                     <div class="list-pf-left" [ngSwitch]="row.issue.container">
-                        <img src="/src/assets/images/mantis_logo.png" class="list-pf-icon-small"
+                        <img src="assets/images/mantis_logo.png" class="list-pf-icon-small"
                             *ngSwitchCase="'MANTIS'" />
-                        <img src="/src/assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'" />
+                        <img src="assets/images/jira.svg" class="list-pf-icon-small" *ngSwitchCase="'JIRA'" />
                         <a [attr.href]="buildIssueUrl(row.issue)" target="_blank">{{row.issue.reference}} -
                             {{row.issue.description}}</a>
                     </div>

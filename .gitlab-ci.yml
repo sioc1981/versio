@@ -29,6 +29,7 @@ build-frontend:
     - cd frontend
     - npm ci
   script:
+    - rm -f dist/frontend
     - ng build
 
 test-backend:
