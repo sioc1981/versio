@@ -24,7 +24,7 @@ const routes: Routes = [
         PatchRoutingModule,
         ReleaseRoutingModule,
         ReleaseCompareRoutingModule,
-        RouterModule.forRoot(routes, { useHash: true }) // always last
+        RouterModule.forRoot(routes, { useHash: true })
     ],
   exports: [ RouterModule ]
 })
