@@ -36,8 +36,7 @@ export class SseService {
             this.subscribers.forEach(obs => obs.next(data));
         };
         this.es.onerror = (evt) => {
-            const data: any = JSON.parse(evt.data);
-            this.subscribers.forEach(obs => obs.error(data));
+            this.subscribers.forEach(obs => obs.error(evt));
         };
     }
 
@@ -56,6 +55,12 @@ export class SseService {
                     summary.sseCallback(message[filter]);
                 }
             });
+        }, error => {
+            this.innerZone.run(() => {
+                if (summary.sseErrorCallback !== undefined) {
+                    summary.sseErrorCallback(error);
+                }
+            });
         });
         return summary;
     }
@@ -64,7 +69,7 @@ export class SseService {
     getIssueItems(releaseComparison: ReleaseComparison): Observable<IssueResultItem> {
         return Observable.create(observer => {
             const eventSource = new EventSource(ISSUE_CONSTANT.backendUrl + '/search/releasecomparison?q='
-                + encodeURI( JSON.stringify(this.convertIntoIssueParam(releaseComparison))));
+                + encodeURI(JSON.stringify(this.convertIntoIssueParam(releaseComparison))));
             eventSource.onmessage = score => this.zone.run(() => observer.next(JSON.parse(score.data)));
             eventSource.onerror = error => this.zone.run(() => observer.error(error));
             return () => eventSource.close();

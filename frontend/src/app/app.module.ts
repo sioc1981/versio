@@ -29,7 +29,6 @@ import { IssueComponent } from './issue/issue.component';
 import { PatchComponent } from './patch/patch.component';
 import { PatchCreateComponent } from './patch/patch-create.component';
 import { PatchUpdateComponent } from './patch/patch-update.component';
-import { ServerEventComponent } from './server-event/server-event.component';
 import { ReleaseComponent } from './release/release.component';
 import { ReleaseCreateComponent } from './release/release-create.component';
 import { ReleaseUpdateComponent } from './release/release-update.component';
@@ -79,7 +78,6 @@ defineLocale('fr', frLocale);
         ReleaseUpdateComponent,
         NavigationComponent,
         DashboardComponent,
-        ServerEventComponent,
         HistoryColorDirective,
         SummaryColorDirective,
         ReleaseCardComponent,
