@@ -68,7 +68,7 @@ export class AuthenticationService {
         if (environment.hasAuthentication) {
             return this.keycloakService.isLoggedIn();
         } else {
-            return new Promise<boolean>((resolve, reject) => resolve(true));
+            return Promise.resolve(true);
         }
     }
 

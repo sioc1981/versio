@@ -10,16 +10,17 @@ import { Router, ActivatedRoute, RouterEvent } from '@angular/router';
 
 import { VerticalNavigationItem } from 'patternfly-ng/navigation/vertical-navigation/vertical-navigation-item';
 import { VerticalNavigationComponent, AboutModalEvent, AboutModalConfig } from 'patternfly-ng';
-import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { Subscription } from 'rxjs';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { filter } from 'rxjs/operators';
-import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { environment } from 'src/environments/environment';
-import { APP_CONSTANT } from '../app.constants';
 import { AuthenticationService } from '../auth/authentication.service';
 
+import { APP_CONSTANT } from '../app.constants';
+import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import { PATCH_CONSTANT } from '../patch/shared/patch.service';
+import { RELEASE_CONSTANT } from '../release/shared/release.constant';
+import { ADMIN_CONSTANT } from '../admin/shared/admin.constant';
 
 class Property {
     key: string;
@@ -58,6 +59,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private PATCHES_INDEX = 2;
     private ISSUES_INDEX = 3;
     private COMPARE_INDEX = 4;
+    private ADMIN_INDEX = 5;
 
     @ViewChild('myNav') nav: VerticalNavigationComponent;
     aboutConfig: AboutModalConfig;
@@ -118,7 +120,14 @@ export class NavigationComponent implements OnInit, OnDestroy {
                 this.loggedIn = r;
                 this.username = r ? this.authenticationService.getUsername() : '';
                 (this.aboutConfig.productInfo[2] as Property).value = r ? this.username : '';
+                if (r) {
+                    this.addAdminItems();
+                } else {
+                    delete this.navigationItems[this.ADMIN_INDEX];
+                }
             });
+        } else {
+            this.addAdminItems()
         }
     }
 
@@ -177,6 +186,17 @@ export class NavigationComponent implements OnInit, OnDestroy {
         };
         return res;
     }
+
+    addAdminItems(): void {
+        const res: VerticalNavigationItem[] = this.navigationItems;
+        const adminItem: VerticalNavigationItem = {
+            title: ADMIN_CONSTANT.title,
+            iconStyleClass: ADMIN_CONSTANT.iconStyleClass,
+            url: ADMIN_CONSTANT.url,
+        };
+        res[this.ADMIN_INDEX] =  adminItem;
+    }
+
 
     openModal(template: TemplateRef<any>): void {
         this.modalRef = this.modalService.show(template);

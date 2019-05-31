@@ -35,10 +35,13 @@ export class SseService {
             const data: any = JSON.parse(evt.data);
             this.subscribers.forEach(obs => obs.next(data));
         };
+        this.es.onerror = (evt) => {
+            const data: any = JSON.parse(evt.data);
+            this.subscribers.forEach(obs => obs.error(data));
+        };
     }
 
     close(): void {
-        console.log('close sseService ');
         this.es.close();
     }
 

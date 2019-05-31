@@ -56,6 +56,9 @@ import { PatchDetailComponent } from './patch/patch-detail.component';
 import { PageNotFoundComponent } from './misc/page-not-found.component';
 import { ReleaseCardChartContainerComponent } from './dashboard/release-card/release-card-chart-container.component';
 import { AuthenticationService } from './auth/authentication.service';
+import { AdminComponent } from './admin/admin.component';
+import { ApplicationsComponent } from './admin/application/applications/applications.component';
+import { ForbiddenPageComponent } from './misc/forbidden-page.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -88,7 +91,10 @@ defineLocale('fr', frLocale);
         PatchImportComponent,
         SkipUndeployPipe,
         PageNotFoundComponent,
-        ReleaseCardChartContainerComponent
+        ReleaseCardChartContainerComponent,
+        AdminComponent,
+        ApplicationsComponent,
+        ForbiddenPageComponent
     ],
     imports: [
         AboutModalModule,
