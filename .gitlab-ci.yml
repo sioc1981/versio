@@ -54,3 +54,19 @@ package-backend:
   script:
     - cd backend
     - mvn $MAVEN_CLI_OPTS package
+  artifacts:
+    paths:
+      - backend/target/*.war
+
+package-frontend:
+  stage: build
+  image: trion/ng-cli
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - rm -f dist/frontend
+    - ng build --progress false --prod --base-href "/frontend/"
+  artifacts:
+    paths:
+     - frontend/dist/frontend.war
