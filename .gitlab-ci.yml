@@ -25,8 +25,8 @@ deploy-versioning:
     APP: versioning
     APP_HOST: $CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
   before_script:
-    - echo "OPENSHIFT_SERVER: $OPENSHIFT_SERVER"
-    - echo "OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN"
+    - "echo OPENSHIFT_SERVER: $OPENSHIFT_SERVER"
+    - "echo OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN"
     - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
     - oc project "$CI_PROJECT_NAME" 2> /dev/null
   script:
