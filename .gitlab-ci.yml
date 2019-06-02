@@ -31,7 +31,7 @@ deploy-versioning:
     - tar x -f oc.tar.gz
     - echo $PATH
     - ls -l
-    - oc version
+    - cp oc /usr/bin
 #    - oc cluster status
     - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
 #    - oc login https://api.us-east-2.online-starter.openshift.com:6443 -u=sioc1981 -p=$OPENSHIFT_PASSWORD --insecure-skip-tls-verify
