@@ -1,6 +1,6 @@
 stages:
-  - build
-  - test
+#  - build
+#  - test
   - package
   - deploy
 
@@ -17,38 +17,38 @@ cache:
     - backend/target/
     - frontend/node_modules/
 
-build-backend:
-  stage: build
-  image: maven:latest
-  script:
-    - cd backend
-    - mvn $MAVEN_CLI_OPTS compile
+#build-backend:
+#  stage: build
+#  image: maven:latest
+#  script:
+#    - cd backend
+#    - mvn $MAVEN_CLI_OPTS compile
 
-build-frontend:
-  stage: build
-  image: trion/ng-cli
-  before_script:
-    - cd frontend
-    - npm ci
-  script:
-    - rm -f dist/frontend
-    - ng build
+#build-frontend:
+#  stage: build
+#  image: trion/ng-cli
+#  before_script:
+#    - cd frontend
+#    - npm ci
+#  script:
+#    - rm -f dist/frontend
+#    - ng build
 
-test-backend:
-  stage: test
-  image: maven:latest
-  script:
-    - cd backend
-    - mvn $MAVEN_CLI_OPTS test
+#test-backend:
+#  stage: test
+#  image: maven:latest
+#  script:
+#    - cd backend
+#    - mvn $MAVEN_CLI_OPTS test
 
-test-frontend:karma:
-  stage: test
-  image: trion/ng-cli-karma:${CLI_VERSION}
-  allow_failure: false
-  before_script:
-    - cd frontend
-  script:
-    - ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
+#test-frontend:karma:
+#  stage: test
+#  image: trion/ng-cli-karma:${CLI_VERSION}
+#  allow_failure: false
+#  before_script:
+#    - cd frontend
+#  script:
+#    - ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
 
 package-backend:
   stage: package
@@ -68,7 +68,7 @@ package-frontend:
     - npm ci
   script:
     - rm -f dist/frontend
-    - ng build --progress false --prod --base-href "/frontend/"
+    - ng build --progress false --prod
   artifacts:
     paths:
      - frontend/dist/frontend.war
