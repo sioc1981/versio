@@ -74,8 +74,11 @@ package-frontend:
      - frontend/dist/frontend.war
 
 deploy-versioning:
-  stage: package
+  stage: deploy
   image: ayufan/openshift-cli
+  variables:
+    APP: versioning
+    APP_HOST: $CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
   before_script:
     - oc login "$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
     - oc project "$CI_PROJECT_NAME" 2> /dev/null
@@ -83,14 +86,6 @@ deploy-versioning:
     - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP --strategy=docker"
 #    - "oc start-build $APP --from-dir=. --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
 #    - "oc get routes $APP 2> /dev/null || oc expose service $APP --hostname=$APP_HOST"
-
-production:
-  <<: *deploy
-  stage: production
-  variables:
-    APP: versioning
-    APP_HOST: $CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
-  when: manual
   environment:
     name: production
     url: http://$CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
