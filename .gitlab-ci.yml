@@ -27,7 +27,8 @@ deploy-versioning:
   before_script:
     - "echo OPENSHIFT_SERVER: $OPENSHIFT_SERVER"
     - "echo OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN"
-    - "curl -L https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz | tar x -f -"
+    - wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz
+    - curl -I https://mirror.openshift.com/pub/openshift-v4/clients/oc/4.1/linux/oc.tar.gz
     - which oc
     - oc version
 #    - oc cluster status
