@@ -27,9 +27,10 @@ deploy-versioning:
   before_script:
     - "echo OPENSHIFT_SERVER: $OPENSHIFT_SERVER"
     - "echo OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN"
+    - oc version
 #    - oc cluster status
-#    - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
-    - oc login https://api.us-east-2.online-starter.openshift.com:6443 -u=sioc1981 -p=$OPENSHIFT_PASSWORD --insecure-skip-tls-verify
+    - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
+#    - oc login https://api.us-east-2.online-starter.openshift.com:6443 -u=sioc1981 -p=$OPENSHIFT_PASSWORD --insecure-skip-tls-verify
     - oc project "$CI_PROJECT_NAME"
   script:
 #    - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP --strategy=docker"
