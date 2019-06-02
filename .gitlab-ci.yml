@@ -27,7 +27,7 @@ deploy-versioning:
   before_script:
     - "echo OPENSHIFT_SERVER: $OPENSHIFT_SERVER"
     - "echo OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN"
-    - oc cluster status
+#    - oc cluster status
 #    - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
     - oc project "$CI_PROJECT_NAME" 2> /dev/null
   script:
