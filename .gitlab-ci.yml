@@ -20,7 +20,7 @@ cache:
 
 deploy-versioning:
   stage: deploy
-  image: alpine:3.7
+  image: ebits/openshift-client
   variables:
     APP: versioning
     APP_HOST: $CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
@@ -32,6 +32,7 @@ deploy-versioning:
     - echo $PATH
     - ls -l
     - cp oc /usr/bin
+    - which oc
 #    - oc cluster status
     - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
 #    - oc login https://api.us-east-2.online-starter.openshift.com:6443 -u=sioc1981 -p=$OPENSHIFT_PASSWORD --insecure-skip-tls-verify
