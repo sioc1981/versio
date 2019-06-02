@@ -29,11 +29,12 @@ deploy-versioning:
     - "echo OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN"
 #    - oc cluster status
 #    - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
-    - oc project "$CI_PROJECT_NAME" 2> /dev/null
+    - oc project "$CI_PROJECT_NAME"
   script:
-    - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP --strategy=docker"
+#    - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP --strategy=docker"
 #    - "oc start-build $APP --from-dir=. --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
-#    - "oc get routes $APP 2> /dev/null || oc expose service $APP --hostname=$APP_HOST"
+#    - "oc get routes $APP  || oc expose service $APP --hostname=$APP_HOST"
+    - "echo end"
   environment:
     name: production
     url: http://$CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
