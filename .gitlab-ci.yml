@@ -45,8 +45,8 @@ deploy-versioning:
 #    - "oc start-build $APP --from-dir=. --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
 #    - "oc get routes $APP  || oc expose service $APP --hostname=$APP_HOST"
     - "echo end"
-  environment:
-    name: *
-    url: http://$CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
+#  environment:
+#    name: *
+#    url: http://$CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
   only:
     - master
