@@ -25,6 +25,9 @@ Add Datasource to wildfly server:
 </datasource>
 ```
 
+Tested with a Postgresql Database.
+
+
 run with a Wildfly 16.0 running:
 ```
 mvn clean wildfly:deploy
