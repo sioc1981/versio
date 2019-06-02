@@ -1,11 +1,10 @@
 stages:
-#  - build
-#  - test
-#  - package
+  - build
+  - test
+  - package
   - deploy
 
 variables:
-#  MAVEN_CLI_OPTS: "-s $CI_PROJECT_DIR/.m2/settings.xml --batch-mode"
   MAVEN_CLI_OPTS: "--batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   CLI_VERSION: 6.2.1
@@ -17,6 +16,62 @@ cache:
     - $CI_PROJECT_DIR/.m2/repository/
     - backend/target/
     - frontend/node_modules/
+
+build-backend:
+  stage: build
+  image: maven:latest
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS compile
+
+build-frontend:
+  stage: build
+  image: trion/ng-cli
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - rm -f dist/frontend
+    - ng build
+
+test-backend:
+  stage: test
+  image: maven:latest
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS test
+
+test-frontend:karma:
+  stage: test
+  image: trion/ng-cli-karma:${CLI_VERSION}
+  allow_failure: false
+  before_script:
+    - cd frontend
+  script:
+    - ng test --no-watch --no-progress --browsers=ChromeHeadlessCI
+
+package-backend:
+  stage: package
+  image: maven:latest
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS package
+  artifacts:
+    paths:
+      - backend/target/*.war
+
+package-frontend:
+  stage: package
+  image: trion/ng-cli
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - rm -f dist/frontend
+    - ng build --progress false --prod --base-href "/frontend/"
+  artifacts:
+    paths:
+     - frontend/dist/frontend.war
 
 deploy-versioning:
   stage: deploy
@@ -45,8 +100,6 @@ deploy-versioning:
 #    - "oc start-build $APP --from-dir=. --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
 #    - "oc get routes $APP  || oc expose service $APP --hostname=$APP_HOST"
     - "echo end"
-#  environment:
-#    name: *
-#    url: http://$CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
+
   only:
     - master
