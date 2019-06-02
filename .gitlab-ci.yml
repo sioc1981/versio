@@ -1,7 +1,7 @@
 stages:
-  - build
-  - test
-  - package
+#  - build
+#  - test
+#  - package
   - deploy
 
 variables:
@@ -9,6 +9,7 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   CLI_VERSION: 6.2.1
+  OPENSHIFT_SERVER: "https://api.us-east-2.online-starter.openshift.com:6443"
   OPENSHIFT_DOMAIN: "apps.us-east-2.online-starter.openshift.com"
 
 cache:
@@ -80,7 +81,7 @@ deploy-versioning:
     APP: versioning
     APP_HOST: $CI_PROJECT_NAME.$OPENSHIFT_DOMAIN
   before_script:
-    - oc login "$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
+    - oc login --server="$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
     - oc project "$CI_PROJECT_NAME" 2> /dev/null
   script:
     - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP --strategy=docker"
