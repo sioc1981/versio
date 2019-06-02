@@ -97,6 +97,3 @@ deploy-versioning:
     - "oc start-build $APP --from-dir=build/ --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
     - "oc get routes $APP 2> /dev/null || oc expose service $APP --hostname=$APP_HOST"
     - "echo end"
-
-  only:
-    - master
