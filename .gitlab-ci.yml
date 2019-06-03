@@ -92,8 +92,8 @@ deploy-versioning:
     - mkdir -p deployments
     - cp -r frontend/dist/frontend.war deployments/
     - cp -r backend/target/*.war deployments/
-    - ls -la build
+    - ls -la deployments
     - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP --strategy=docker"
-    - "oc start-build $APP --from-dir=build/ --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
+    - "oc start-build $APP --from-dir=. --follow || sleep 3s && oc start-build $APP --from-dir=. --follow"
     - "oc get routes $APP 2> /dev/null || oc expose service $APP --hostname=$APP_HOST"
     - "echo end"
