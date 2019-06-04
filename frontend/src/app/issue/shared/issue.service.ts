@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { SseService } from '../../server-event/sse.service';
 import { ISSUE_CONSTANT } from './issue.constant';
 import { Issue } from './issue.model';
+import { IssueContainer } from 'src/app/admin/issuecontainer/shared/issue-container.model';
 
 
 @Injectable({
@@ -22,6 +23,12 @@ export class IssueService {
         if (data['count'] !== undefined) {
             const count = +data['count'];
             ISSUE_CONSTANT.summary.count$.emit(count);
+        } else if (data['container'] !== undefined) {
+            Object.entries(data['container']).forEach( entry => {
+                const container_id = entry[0];
+                const constainer = entry[1] as IssueContainer;
+                ISSUE_CONSTANT.constainer_urls[container_id] = constainer.url;
+            });
         }
     }
 
@@ -88,5 +95,4 @@ export class IssueService {
             return throwError(error);
         };
     }
-
 }

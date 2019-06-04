@@ -18,6 +18,9 @@ public class Initializer {
 	private IssueService issueService;
 	
 	@EJB
+	private IssueContainerService issueContainerService;
+	
+	@EJB
 	private PatchService patchService;
 	
 	@EJB
@@ -26,6 +29,7 @@ public class Initializer {
 	@PostConstruct
 	public void init() {
 		LOG.info("Initialize services");
+		issueContainerService.initialize();
 		issueService.getCount();
 		patchService.getCount();
 		releaseService.getCount();

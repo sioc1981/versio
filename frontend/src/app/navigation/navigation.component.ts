@@ -21,6 +21,7 @@ import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { ADMIN_CONSTANT } from '../admin/shared/admin.constant';
+import { ISSUE_CONTAINER_CONSTANT } from '../admin/issuecontainer/shared/issue-container.constant';
 
 class Property {
     key: string;
@@ -193,8 +194,14 @@ export class NavigationComponent implements OnInit, OnDestroy {
             title: ADMIN_CONSTANT.title,
             iconStyleClass: ADMIN_CONSTANT.iconStyleClass,
             url: ADMIN_CONSTANT.url,
+            children: [
+                {
+                    title: ISSUE_CONTAINER_CONSTANT.title,
+                    iconStyleClass: ISSUE_CONTAINER_CONSTANT.iconStyleClass,
+                    url: ISSUE_CONTAINER_CONSTANT.url
+                }]
         };
-        res[this.ADMIN_INDEX] =  adminItem;
+        res[this.ADMIN_INDEX] = adminItem;
     }
 
 

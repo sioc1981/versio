@@ -58,6 +58,7 @@ import { AuthenticationService } from './auth/authentication.service';
 import { AdminComponent } from './admin/admin.component';
 import { ApplicationsComponent } from './admin/application/applications/applications.component';
 import { ForbiddenPageComponent } from './misc/forbidden-page.component';
+import { IssueContainerComponent } from './admin/issuecontainer/issuecontainer.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -92,7 +93,8 @@ defineLocale('fr', frLocale);
         ReleaseCardChartContainerComponent,
         AdminComponent,
         ApplicationsComponent,
-        ForbiddenPageComponent
+        ForbiddenPageComponent,
+        IssueContainerComponent
     ],
     imports: [
         AboutModalModule,

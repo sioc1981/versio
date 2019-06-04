@@ -1,0 +1,43 @@
+<div class="col-lg-12">
+    <ol class="fas breadcrumb">
+        <li class="breadcrumb-item">
+            <a [routerLink]="['/admin']">
+                Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            Issue containers
+        </li>
+    </ol>
+</div>
+
+
+<div class="col-sm-12">
+    <div class="form-group">
+        <pfng-list id="myList" [items]="items" [itemTemplate]="itemTemplate" [actionTemplate]="actionTemplate">
+            <ng-template #itemTemplate let-item="item" let-index="index">
+                <div class="list-pf-left" [ngSwitch]="item.id">
+                    <img src="assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small"
+                        *ngSwitchCase="'MANTIS'" />
+                    <img src="assets/images/jira.svg" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'JIRA'" />
+                </div>
+                <div class="list-pf-content-wrapper">
+                    <div class="list-pf-main-content">
+                        <div class="list-pf-title">
+                            {{item.name}}
+                        </div>
+                    </div>
+                    <div class="list-pf-additional-content" style="justify-content:flex-start; flex-basis: 100%">
+                        <input class="form-control" id="description" name="Issue container url" type="text" required
+                            [(ngModel)]="item.url">
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #actionTemplate let-item="item" let-index="index">
+                <pfng-action class="list-pf-actions" [config]="issueContainerActionConfig"
+                    (onActionSelect)="handleAction($event, item)">
+                </pfng-action>
+            </ng-template>
+        </pfng-list>
+    </div>
+</div>
