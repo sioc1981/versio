@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ReleaseService } from './shared/release.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
@@ -49,7 +50,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private releaseService: ReleaseService, private modalService: BsModalService,
-        private auth: AuthenticationService) { }
+        private auth: AuthenticationService, private route: ActivatedRoute ) { }
 
     ngOnInit() {
         this.reloadData();
@@ -184,6 +185,29 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             totalItems: this.filteredReleases.length
         } as PaginationConfig;
 
+        this.route.paramMap.subscribe( params => {
+            const filters: string[] = params.getAll( 'filter' );
+            if ( filters.length > 0 ) {
+                this.filterConfig.appliedFilters = [];
+                this.filterConfig.appliedFilters
+                filters.forEach( filter => {
+                    this.addFilterFromParam(filter, 'version_', 0);
+                    this.addFilterFromParam(filter, 'issue_', 1);
+                } );
+                this.applyFilters();
+            }
+        });
+
+    }
+    
+    addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
+        if ( paramFilter.lastIndexOf(paramPrefix) === 0 ) {
+            const value = paramFilter.slice( paramPrefix.length );
+            this.filterConfig.appliedFilters.push( {
+                field: this.filterConfig.fields[index],
+                value: value
+            } as Filter );
+        }
     }
 
     /**

@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Patch } from './shared/patch.model';
 import { PatchService } from './shared/patch.service';
 import {
@@ -14,17 +15,17 @@ import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { AuthenticationService } from '../auth/authentication.service';
 
-@Component({
+@Component( {
     encapsulation: ViewEncapsulation.None,
     selector: 'app-patch',
     templateUrl: './patch.component.html',
     styleUrls: ['./patch.component.less']
-})
+} )
 export class PatchComponent implements OnInit, OnDestroy {
-    @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
-    @ViewChild('createPatch') createPatchTemplate: TemplateRef<any>;
-    @ViewChild('importPatch') importPatchTemplate: TemplateRef<any>;
-    @ViewChild('updatePatch') updatePatchTemplate: TemplateRef<any>;
+    @ViewChild( 'wizardTemplate' ) wizardTemplate: TemplateRef<any>;
+    @ViewChild( 'createPatch' ) createPatchTemplate: TemplateRef<any>;
+    @ViewChild( 'importPatch' ) importPatchTemplate: TemplateRef<any>;
+    @ViewChild( 'updatePatch' ) updatePatchTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
     actionConfig: ActionConfig;
@@ -35,7 +36,7 @@ export class PatchComponent implements OnInit, OnDestroy {
     toolbarConfig: ToolbarConfig;
     currentSortField: SortField;
 
-    patches: Patch[];
+    patches: Patch[] = [];
     filteredPatches: Patch[] = [];
     items: Patch[] = [];
 
@@ -47,8 +48,8 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService,
-        private zone: NgZone) { }
+    constructor( private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService,
+        private zone: NgZone, private route: ActivatedRoute ) { }
 
     ngOnInit() {
         this.reloadData();
@@ -118,8 +119,8 @@ export class PatchComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
-        this.auth.isLoggedIn().then(loggedIn => {
-            if (loggedIn) {
+        this.auth.isLoggedIn().then( loggedIn => {
+            if ( loggedIn ) {
                 this.actionConfig = {
                     primaryActions: [{
                         id: 'addPatch',
@@ -141,7 +142,7 @@ export class PatchComponent implements OnInit, OnDestroy {
                     }]
                 } as ActionConfig;
             }
-        });
+        } );
 
         this.sortConfig = {
             fields: [{
@@ -191,39 +192,64 @@ export class PatchComponent implements OnInit, OnDestroy {
             totalItems: this.filteredPatches.length
         } as PaginationConfig;
 
+        this.route.paramMap.subscribe( params => {
+            const filters: string[] = params.getAll( 'filter' );
+            if ( filters.length > 0 ) {
+                this.filterConfig.appliedFilters = [];
+                this.filterConfig.appliedFilters
+                filters.forEach( filter => {
+                    this.addFilterFromParam(filter, 'version_', 0);
+                    this.addFilterFromParam(filter, 'sequence_', 1);
+                    this.addFilterFromParam(filter, 'issue_', 2);
+                } );
+                this.applyFilters();
+            }
+        });
+
     }
+    
+    addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
+        if ( paramFilter.lastIndexOf(paramPrefix) === 0 ) {
+            const value = paramFilter.slice( paramPrefix.length );
+            this.filterConfig.appliedFilters.push( {
+                field: this.filterConfig.fields[index],
+                value: value
+            } as Filter );
+        }
+    }
+    
     /**
        * Clean up subscriptions
        */
     ngOnDestroy(): void {
-        this.subscriptions.forEach(sub => sub.unsubscribe);
+        this.subscriptions.forEach( sub => sub.unsubscribe );
     }
 
     reloadData(): void {
-        this.subscriptions.push(this.patchService.getPatchs()
-            .subscribe(newPatchs => {
+        this.subscriptions.push( this.patchService.getPatchs()
+            .subscribe( newPatchs => {
                 this.patches = newPatchs;
-                this.patches = this.patches.sort((item1: any, item2: any) => this.compare(item1, item2));
+                this.patches = this.patches.sort(( item1: any, item2: any ) => this.compare( item1, item2 ) );
                 this.applyFilters();
-            }));
+            } ) );
     }
 
     getPatch(): Patch {
         return this.selectedPatch;
     }
 
-    openModal(template: TemplateRef<any>): void {
-        this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
+    openModal( template: TemplateRef<any> ): void {
+        this.modalRef = this.modalService.show( template, { class: 'modal-lg' } );
     }
 
     applyFilters(): void {
         this.filteredPatches = [];
-        if (this.filterConfig.appliedFilters && this.filterConfig.appliedFilters.length > 0) {
-            this.patches.forEach((item) => {
-                if (this.matchesFilters(item, this.filterConfig.appliedFilters)) {
-                    this.filteredPatches.push(item);
+        if ( this.filterConfig.appliedFilters && this.filterConfig.appliedFilters.length > 0 ) {
+            this.patches.forEach(( item ) => {
+                if ( this.matchesFilters( item, this.filterConfig.appliedFilters ) ) {
+                    this.filteredPatches.push( item );
                 }
-            });
+            } );
         } else {
             this.filteredPatches = this.patches;
         }
@@ -233,26 +259,26 @@ export class PatchComponent implements OnInit, OnDestroy {
         this.updateItems();
     }
 
-    filterChanged($event: FilterEvent): void {
+    filterChanged( $event: FilterEvent ): void {
         this.applyFilters();
     }
 
-    matchesFilter(item: any, filter: Filter): boolean {
+    matchesFilter( item: any, filter: Filter ): boolean {
         let match = true;
-        switch (filter.field.id) {
+        switch ( filter.field.id ) {
 
             case 'sequence':
-                match = item.sequenceNumber.indexOf(filter.value) !== -1;
+                match = item.sequenceNumber.indexOf( filter.value ) !== -1;
                 break;
             case 'version':
-                match = item.release.version.versionNumber.indexOf(filter.value) !== -1;
+                match = item.release.version.versionNumber.indexOf( filter.value ) !== -1;
                 break;
             case 'issue':
                 let issueMatch = false;
-                item.issues.forEach(issue => {
-                    issueMatch = issueMatch || issue.reference.indexOf(filter.value) !== -1
-                        || issue.description.indexOf(filter.value) !== -1;
-                });
+                item.issues.forEach( issue => {
+                    issueMatch = issueMatch || issue.reference.indexOf( filter.value ) !== -1
+                        || issue.description.indexOf( filter.value ) !== -1;
+                } );
                 match = issueMatch;
                 break;
             case 'onlyDeployed':
@@ -269,90 +295,90 @@ export class PatchComponent implements OnInit, OnDestroy {
         return match;
     }
 
-    matchesFilters(item: any, filters: Filter[]): boolean {
-        if (filters.length === 0) {
+    matchesFilters( item: any, filters: Filter[] ): boolean {
+        if ( filters.length === 0 ) {
             return true;
         }
         let matches = true;
         let allMatches = new Map<string, boolean>();
-        filters.forEach((filter) => {
-            if (allMatches.has(filter.field.id)) {
-                allMatches = allMatches.set(filter.field.id, allMatches.get(filter.field.id) || this.matchesFilter(item, filter));
+        filters.forEach(( filter ) => {
+            if ( allMatches.has( filter.field.id ) ) {
+                allMatches = allMatches.set( filter.field.id, allMatches.get( filter.field.id ) || this.matchesFilter( item, filter ) );
             } else {
-                allMatches = allMatches.set(filter.field.id, this.matchesFilter(item, filter));
+                allMatches = allMatches.set( filter.field.id, this.matchesFilter( item, filter ) );
             }
-        });
-        allMatches.forEach(value => {
+        } );
+        allMatches.forEach( value => {
             matches = matches && value;
-        });
+        } );
         return matches;
     }
 
-    handleAction(action: Action, item?: any): void {
-        if (action.id === 'addPatch') {
-            this.openModal(this.createPatchTemplate);
-        } else if (action.id === 'editPatch') {
+    handleAction( action: Action, item?: any ): void {
+        if ( action.id === 'addPatch' ) {
+            this.openModal( this.createPatchTemplate );
+        } else if ( action.id === 'editPatch' ) {
             this.selectedPatch = item;
-            this.openModal(this.updatePatchTemplate);
-        } else if (action.id === 'importPatch') {
-            this.openModal(this.importPatchTemplate);
+            this.openModal( this.updatePatchTemplate );
+        } else if ( action.id === 'importPatch' ) {
+            this.openModal( this.importPatchTemplate );
         } else {
-            console.log('handleAction: unknown action: ' + action.id);
+            console.log( 'handleAction: unknown action: ' + action.id );
         }
     }
 
-    handlePageSize($event: PaginationEvent) {
+    handlePageSize( $event: PaginationEvent ) {
         this.updateItems();
     }
 
-    handlePageNumber($event: PaginationEvent) {
+    handlePageNumber( $event: PaginationEvent ) {
         this.updateItems();
     }
 
-    compare(item1: any, item2: any): number {
+    compare( item1: any, item2: any ): number {
         let compValue = 0;
-        if (this.currentSortField.id === 'version') {
-            compValue = this.compareVersion(item1, item2);
-        } else if (this.currentSortField.id === 'sequenceNumber') {
-            compValue = this.compareSequenceNumber(item1, item2);
-        } else if (this.currentSortField.id === 'buildDate') {
-            compValue = this.compareBuildDate(item1, item2);
-        } else if (this.currentSortField.id === 'qualificationDate') {
-            compValue = this.compareDeployDate(item1, item2, 'qualification');
-        } else if (this.currentSortField.id === 'keyUserDate') {
-            compValue = this.compareDeployDate(item1, item2, 'keyUser');
-        } else if (this.currentSortField.id === 'pilotDate') {
-            compValue = this.compareDeployDate(item1, item2, 'pilot');
-        } else if (this.currentSortField.id === 'productionDate') {
-            compValue = this.compareDeployDate(item1, item2, 'production');
+        if ( this.currentSortField.id === 'version' ) {
+            compValue = this.compareVersion( item1, item2 );
+        } else if ( this.currentSortField.id === 'sequenceNumber' ) {
+            compValue = this.compareSequenceNumber( item1, item2 );
+        } else if ( this.currentSortField.id === 'buildDate' ) {
+            compValue = this.compareBuildDate( item1, item2 );
+        } else if ( this.currentSortField.id === 'qualificationDate' ) {
+            compValue = this.compareDeployDate( item1, item2, 'qualification' );
+        } else if ( this.currentSortField.id === 'keyUserDate' ) {
+            compValue = this.compareDeployDate( item1, item2, 'keyUser' );
+        } else if ( this.currentSortField.id === 'pilotDate' ) {
+            compValue = this.compareDeployDate( item1, item2, 'pilot' );
+        } else if ( this.currentSortField.id === 'productionDate' ) {
+            compValue = this.compareDeployDate( item1, item2, 'production' );
         }
 
-        if (compValue === 0) {
-            compValue = this.compareVersion(item1, item2);
+        if ( compValue === 0 ) {
+            compValue = this.compareVersion( item1, item2 );
         }
-        if (!this.isAscendingSort) {
+        if ( !this.isAscendingSort ) {
             compValue = compValue * -1;
         }
         return compValue;
     }
 
-    compareVersion(item1: any, item2: any): number {
+    compareVersion( item1: any, item2: any ): number {
         let compValue = 0;
         const sourceRelease1 = item1.release.version.versionNumber;
         const sourceRelease2 = item2.release.version.versionNumber;
-        compValue = sourceRelease1.localeCompare(sourceRelease2);
+        compValue = sourceRelease1.localeCompare( sourceRelease2 );
         return compValue;
     }
 
-    compareSequenceNumber(item1: any, item2: any): number {
+    compareSequenceNumber( item1: any, item2: any ): number {
         let compValue = 0;
         const seqNum1 = item1.sequenceNumber;
         const seqNum2 = item2.sequenceNumber;
-        compValue = seqNum1.localeCompare(seqNum2);
+        compValue = seqNum1.localeCompare( seqNum2 );
         return compValue;
     }
 
-    compareBuildDate(item1: any, item2: any): number {
+    compareBuildDate( item1: any, item2: any ): number {
         let compValue = 0;
         const sourceRelease1 = item1.release.buildDate;
         const sourceRelease2 = item2.release.buildDate;
@@ -360,7 +386,7 @@ export class PatchComponent implements OnInit, OnDestroy {
         return compValue;
     }
 
-    compareDeployDate(item1: any, item2: any, platform: string): number {
+    compareDeployDate( item1: any, item2: any, platform: string ): number {
         let compValue = 0;
         const sourceRelease1 = item1.release[platform] ? item1.release[platform].deployDate : 0;
         const sourceRelease2 = item2.release[platform] ? item2.release[platform].deployDate : 0;
@@ -370,27 +396,27 @@ export class PatchComponent implements OnInit, OnDestroy {
 
 
     // Handle sort changes
-    handleSortChanged($event: SortEvent): void {
+    handleSortChanged( $event: SortEvent ): void {
         this.currentSortField = $event.field;
         this.isAscendingSort = $event.isAscending;
-        this.patches.sort((item1: any, item2: any) => this.compare(item1, item2));
+        this.patches.sort(( item1: any, item2: any ) => this.compare( item1, item2 ) );
         this.applyFilters();
     }
 
     updateItems() {
-        this.items = this.filteredPatches.slice((this.paginationConfig.pageNumber - 1) * this.paginationConfig.pageSize,
-            this.paginationConfig.totalItems).slice(0, this.paginationConfig.pageSize);
+        this.items = this.filteredPatches.slice(( this.paginationConfig.pageNumber - 1 ) * this.paginationConfig.pageSize,
+            this.paginationConfig.totalItems ).slice( 0, this.paginationConfig.pageSize );
     }
 
-    onWizardClose(patchChanged: Patch) {
-        if (patchChanged) {
+    onWizardClose( patchChanged: Patch ) {
+        if ( patchChanged ) {
             this.reloadData();
         }
         this.modalRef.hide();
     }
 
-    onImportWizardClose(importSuccessfull: boolean) {
-        if (importSuccessfull) {
+    onImportWizardClose( importSuccessfull: boolean ) {
+        if ( importSuccessfull ) {
             this.reloadData();
         }
         this.modalRef.hide();
