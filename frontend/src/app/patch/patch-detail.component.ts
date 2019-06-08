@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
     WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
-    PaginationEvent, Filter, FilterEvent
+    PaginationEvent, Filter, FilterEvent, SortField, SortEvent
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { PATCH_CONSTANT, PatchService } from '../patch/shared/patch.service';
@@ -54,7 +54,7 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
     issueSortConfig: SortConfig;
     issueToolbarConfig: ToolbarConfig;
     issuePaginationConfig: PaginationConfig;
-
+    currentIssuesSortField: SortField;
 
     private subscriptions: Subscription[] = [];
     constructor(private patchService: PatchService, private route: ActivatedRoute, private modalService: BsModalService,
@@ -115,14 +115,29 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
+        this.issueSortConfig = {
+            fields: [{
+                id: 'reference',
+                title: 'Reference',
+                sortType: 'alpha'
+            }, {
+                id: 'container',
+                title: 'Container',
+                sortType: 'alpha'
+            }],
+            isAscending: this.isAscendingSortForIssues
+        } as SortConfig;
+
+        this.currentIssuesSortField = this.issueSortConfig.fields[0];
+
         this.issueToolbarConfig = {
-            filterConfig: this.issueFilterConfig
+            filterConfig: this.issueFilterConfig,
+            sortConfig: this.issueSortConfig
         } as ToolbarConfig;
 
         this.issuePaginationConfig = {
             pageNumber: 1,
             pageSize: 5,
-            pageSizeIncrements: [3, 5, 10],
             totalItems: this.filteredIssues.length
         } as PaginationConfig;
 
@@ -229,6 +244,50 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
         return matches;
     }
 
+    compareIssue(item1: any, item2: any): number {
+        let compValue = 0;
+        if (this.currentIssuesSortField.id === 'reference') {
+            compValue = this.compareReference(item1, item2);
+        } else if (this.currentIssuesSortField.id === 'container') {
+            compValue = this.compareContainer(item1, item2);
+        }
+
+        if (compValue === 0) {
+            compValue = this.compareReference(item1, item2);
+        }
+        if (!this.isAscendingSortForIssues) {
+            compValue = compValue * -1;
+        }
+        return compValue;
+    }
+
+    compareReference(item1: any, item2: any): number {
+        let compValue = 0;
+        const reference1 = item1.reference;
+        const reference2 = item2.reference;
+        compValue = reference1.localeCompare(reference2);
+        return compValue;
+    }
+
+    compareContainer(item1: any, item2: any): number {
+        let compValue = 0;
+        const container1 = item1.container;
+        const container2 = item2.container;
+        compValue = container1.localeCompare(container2);
+        return compValue;
+    }
+
+    // Handle sort changes
+    handleSortChanged($event: SortEvent, patchDetailTabType: PatchDetailTab): void {
+        switch (patchDetailTabType) {
+            case PatchDetailTab.RELEASE_NOTE:
+                this.currentIssuesSortField = $event.field;
+                this.isAscendingSortForIssues = $event.isAscending;
+                this.patch.issues.sort((item1: any, item2: any) => this.compareIssue(item1, item2));
+                this.applyIssueFilters();
+                break;
+        }
+    }
 
     handlePageSize($event: PaginationEvent, patchDetailTabType: PatchDetailTab) {
         switch (patchDetailTabType) {

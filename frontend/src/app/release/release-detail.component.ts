@@ -56,6 +56,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     issueSortConfig: SortConfig;
     issueToolbarConfig: ToolbarConfig;
     issuePaginationConfig: PaginationConfig;
+    currentIssuesSortField: SortField;
 
     patches: Patch[];
     filteredPatches: Patch[] = [];
@@ -74,6 +75,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     allIssueSortConfig: SortConfig;
     allIssueToolbarConfig: ToolbarConfig;
     allIssuePaginationConfig: PaginationConfig;
+    currentAllIssuesSortField: SortField;
 
     private subscriptions: Subscription[] = [];
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService,
@@ -134,8 +136,24 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
+        this.issueSortConfig = {
+            fields: [{
+                id: 'reference',
+                title: 'Reference',
+                sortType: 'alpha'
+            }, {
+                id: 'container',
+                title: 'Container',
+                sortType: 'alpha'
+            }],
+            isAscending: this.isAscendingSortForIssues
+        } as SortConfig;
+
+        this.currentIssuesSortField = this.issueSortConfig.fields[0];
+
         this.issueToolbarConfig = {
-            filterConfig: this.issueFilterConfig
+            filterConfig: this.issueFilterConfig,
+            sortConfig: this.issueSortConfig
         } as ToolbarConfig;
 
         this.issuePaginationConfig = {
@@ -278,6 +296,21 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             appliedFilters: []
         } as FilterConfig;
 
+        this.allIssueSortConfig = {
+            fields: [{
+                id: 'reference',
+                title: 'Reference',
+                sortType: 'alpha'
+            }, {
+                id: 'container',
+                title: 'Container',
+                sortType: 'alpha'
+            }],
+            isAscending: this.isAscendingSortForAllIssues
+        } as SortConfig;
+
+        this.currentAllIssuesSortField = this.allIssueSortConfig.fields[0];
+
         this.allIssuePaginationConfig = {
             pageNumber: 1,
             pageSize: 5,
@@ -286,7 +319,8 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as PaginationConfig;
 
         this.allIssueToolbarConfig = {
-            filterConfig: this.allIssueFilterConfig
+            filterConfig: this.allIssueFilterConfig,
+            sortConfig: this.allIssueSortConfig
         } as ToolbarConfig;
 
         this.route.paramMap.subscribe(params => {
@@ -314,6 +348,8 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         this.subscriptions.push(this.releaseService.searchReleaseFull(this.versionNumber)
             .subscribe(newRelease => {
                 this.releaseFull = newRelease; this.release = this.releaseFull.release;
+                this.releaseFull.issues.sort((item1: any, item2: any) => this.compareIssue(item1, item2, this.currentIssuesSortField,
+                    this.isAscendingSortForIssues));
                 this.releaseFull.patches.sort((item1: any, item2: any) => this.comparePatch(item1, item2));
                 this.allOriginalIssues = Array.from(this.releaseFull.issues);
                 const issueReferences = this.allOriginalIssues.map(issue => issue.reference);
@@ -321,6 +357,8 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                     patch.issues.filter(issue => issueReferences.every(ref => ref !== issue.reference))
                         .forEach(issue => { this.allOriginalIssues.push(issue); issueReferences.push(issue.reference); });
                 });
+                this.allOriginalIssues.sort((item1: any, item2: any) => this.compareIssue(item1, item2, this.currentAllIssuesSortField,
+                    this.isAscendingSortForAllIssues));
                 this.applyIssueFilters(); this.applyPatchFilters(); this.applyAllIssueFilters();
             },
                 _ => this.loadingFailed = true,
@@ -470,11 +508,49 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         return compValue;
     }
 
+    compareIssue(item1: any, item2: any, sortField: SortField, ascendingSort: boolean): number {
+        let compValue = 0;
+        if (sortField.id === 'reference') {
+            compValue = this.compareReference(item1, item2);
+        } else if (sortField.id === 'container') {
+            compValue = this.compareContainer(item1, item2);
+        }
+
+        if (compValue === 0) {
+            compValue = this.compareReference(item1, item2);
+        }
+        if (!ascendingSort) {
+            compValue = compValue * -1;
+        }
+        return compValue;
+    }
+
+    compareReference(item1: any, item2: any): number {
+        let compValue = 0;
+        const reference1 = item1.reference;
+        const reference2 = item2.reference;
+        compValue = reference1.localeCompare(reference2);
+        return compValue;
+    }
+
+    compareContainer(item1: any, item2: any): number {
+        let compValue = 0;
+        const container1 = item1.container;
+        const container2 = item2.container;
+        compValue = container1.localeCompare(container2);
+        return compValue;
+    }
+
     // Handle sort changes
     handleSortChanged($event: SortEvent, releaseDetailTabType: ReleaseDetailTab): void {
 
         switch (releaseDetailTabType) {
             case ReleaseDetailTab.RELEASE_NOTE:
+                this.currentIssuesSortField = $event.field;
+                this.isAscendingSortForIssues = $event.isAscending;
+                this.releaseFull.issues.sort((item1: any, item2: any) => this.compareIssue(item1, item2, this.currentIssuesSortField,
+                    this.isAscendingSortForIssues));
+                this.applyIssueFilters();
                 break;
             case ReleaseDetailTab.PATCHES:
                 this.currentPatchSortField = $event.field;
@@ -483,6 +559,11 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                 this.applyPatchFilters();
                 break;
             case ReleaseDetailTab.ALL_ISSUES:
+                this.currentAllIssuesSortField = $event.field;
+                this.isAscendingSortForAllIssues = $event.isAscending;
+                this.allOriginalIssues.sort((item1: any, item2: any) => this.compareIssue(item1, item2, this.currentAllIssuesSortField,
+                    this.isAscendingSortForAllIssues));
+                this.applyAllIssueFilters();
                 break;
         }
     }

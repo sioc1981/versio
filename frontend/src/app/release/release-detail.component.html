@@ -126,7 +126,8 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <pfng-toolbar [config]="issueToolbarConfig"
-                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.RELEASE_NOTE)">
+                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.RELEASE_NOTE)"
+                                    (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.RELEASE_NOTE)">
                                 </pfng-toolbar>
                             </div>
                         </div>
@@ -225,7 +226,8 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <pfng-toolbar [config]="allIssueToolbarConfig"
-                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.ALL_ISSUES)">
+                                    (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.ALL_ISSUES)"
+                                    (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.ALL_ISSUES)">
                                 </pfng-toolbar>
                             </div>
                         </div>

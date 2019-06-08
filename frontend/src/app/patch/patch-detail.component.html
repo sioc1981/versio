@@ -136,7 +136,8 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <pfng-toolbar [config]="issueToolbarConfig"
-                                    (onFilterChange)="filterChanged($event, PatchDetailTabEnum.RELEASE_NOTE)">
+                                    (onFilterChange)="filterChanged($event, PatchDetailTabEnum.RELEASE_NOTE)"
+                                    (onSortChange)="handleSortChanged($event, PatchDetailTabEnum.RELEASE_NOTE)">
                                 </pfng-toolbar>
                             </div>
                         </div>
