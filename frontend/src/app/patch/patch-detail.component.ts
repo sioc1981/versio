@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/c
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
-    WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
-    PaginationEvent, Filter, FilterEvent, SortField, SortEvent
+    EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
+    PaginationEvent, Filter, FilterEvent, SortField, SortEvent, CopyService, FilterField
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { PATCH_CONSTANT, PatchService } from '../patch/shared/patch.service';
@@ -12,7 +12,7 @@ import { Issue } from '../issue/shared/issue.model';
 import { Patch } from '../patch/shared/patch.model';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { AuthenticationService } from '../auth/authentication.service';
-
+import { Location } from '@angular/common';
 
 enum PatchDetailTab {
     OVERVIEW,
@@ -33,7 +33,9 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
 
     versionNumber: string;
     sequenceNumber: string;
-    currentTab = '';
+    currentTab: PatchDetailTab = PatchDetailTab.OVERVIEW;
+
+    viewAtStartup = '';
 
     loading = true;
     loadingFailed = false;
@@ -50,6 +52,7 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
     filteredIssues: Issue[] = [];
     isAscendingSortForIssues = true;
     issueActionConfig: ActionConfig;
+    issueToolbarActionConfig: ActionConfig;
     issueFilterConfig: FilterConfig;
     issueSortConfig: SortConfig;
     issueToolbarConfig: ToolbarConfig;
@@ -58,7 +61,7 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
     constructor(private patchService: PatchService, private route: ActivatedRoute, private modalService: BsModalService,
-        private auth: AuthenticationService) { }
+        private auth: AuthenticationService, private loc: Location, private copyService: CopyService) { }
 
     ngOnInit() {
         this.errorConfig = {
@@ -83,6 +86,14 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
                 id: 'openIssue',
                 title: 'Open issue',
                 tooltip: 'Open issue in an new tab'
+            }]
+        } as ActionConfig;
+
+        this.issueToolbarActionConfig = {
+            primaryActions: [{
+                id: 'copyURL',
+                title: 'Copy URL',
+                tooltip: 'Copy URL with current filters'
             }]
         } as ActionConfig;
 
@@ -131,6 +142,7 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
         this.currentIssuesSortField = this.issueSortConfig.fields[0];
 
         this.issueToolbarConfig = {
+            actionConfig: this.issueToolbarActionConfig,
             filterConfig: this.issueFilterConfig,
             sortConfig: this.issueSortConfig
         } as ToolbarConfig;
@@ -144,11 +156,55 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
         this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
             this.sequenceNumber = params.get('sequence');
-            this.currentTab = params.get('view');
+            this.viewAtStartup = params.get('view');
+            this.currentTab = PatchDetailTab[this.viewAtStartup];
             if (params.has('version') && params.has('sequence')) {
                 this.reloadData();
             }
+            this.route.queryParamMap.subscribe(queryParams => {
+                const filters: string[] = queryParams.getAll('filter');
+                if (filters.length > 0) {
+                    this.issueFilterConfig.appliedFilters = [];
+                    filters.forEach(filter => {
+                        this.issueFilterConfig.fields.forEach(ff => {
+                            if (ff.queries) {
+                                this.addFilterQueryFromParam(filter, ff, this.issueFilterConfig);
+                            } else {
+                                this.addFilterFromParam(filter, ff, this.issueFilterConfig);
+                            }
+                        });
+                    });
+                    this.applyIssueFilters();
+                }
+            });
         });
+
+    }
+
+    addFilterFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            filterConf.appliedFilters.push({
+                field: filterField,
+                value: value
+            } as Filter);
+        }
+    }
+
+    addFilterQueryFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            const filterQuery = filterField.queries.find(q => q.id === value);
+            if (filterQuery) {
+                filterConf.appliedFilters.push({
+                    field: filterField,
+                    query: filterQuery,
+                    value: filterQuery.value
+                } as Filter);
+            }
+        }
     }
 
     /**
@@ -178,11 +234,15 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
     }
 
     handleAction(action: Action, item?: any): void {
+        console.log('action: ', action.id);
         if (action.id === 'editPatch') {
             this.openModal(this.updatePatchTemplate);
         } else if (action.id === 'openIssue') {
             const url = ISSUE_CONSTANT.constainer_urls[item.container] + item.reference;
             window.open(url, '_blank');
+        } else if (action.id === 'copyURL') {
+            this.copyURL();
+        } else {
         }
     }
 
@@ -242,6 +302,30 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
             matches = matches && value;
         });
         return matches;
+    }
+
+    copyURL() {
+        const angularRoute = this.loc.path();
+        const fullUrl = window.location.href;
+        const domainAndApp = fullUrl.replace(angularRoute, '');
+        let urlToCopy = domainAndApp;
+        this.route.snapshot.url.forEach(us => {
+            if (this.viewAtStartup !== us.path) {
+                urlToCopy = urlToCopy.concat('/', us.path);
+            }
+        });
+        if (this.currentTab === PatchDetailTab.RELEASE_NOTE) {
+            urlToCopy = urlToCopy.concat('/', PatchDetailTab[PatchDetailTab.RELEASE_NOTE]);
+        }
+        if (this.issueFilterConfig.appliedFilters.length > 0) {
+            let first = true;
+            this.issueFilterConfig.appliedFilters.forEach(af => {
+                urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=', af.field.id, '_', af.query ? af.query.id : af.value);
+                first = false;
+            });
+        }
+        console.log(urlToCopy);
+        this.copyService.copy(urlToCopy);
     }
 
     compareIssue(item1: any, item2: any): number {

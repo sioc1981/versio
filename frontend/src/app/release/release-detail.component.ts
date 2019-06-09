@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
     WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
-    PaginationEvent, Filter, FilterEvent, SortField, SortEvent
+    PaginationEvent, Filter, FilterEvent, SortField, SortEvent, FilterField, CopyService
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { PATCH_CONSTANT } from '../patch/shared/patch.service';
@@ -13,7 +13,7 @@ import { Issue } from '../issue/shared/issue.model';
 import { Patch } from '../patch/shared/patch.model';
 import { ReleaseFull, Release } from './shared/release.model';
 import { AuthenticationService } from '../auth/authentication.service';
-
+import { Location } from '@angular/common';
 
 enum ReleaseDetailTab {
     OVERVIEW,
@@ -34,7 +34,8 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     ReleaseDetailTabEnum = ReleaseDetailTab;
 
     versionNumber: string;
-    currentTab = '';
+    currentTab = ReleaseDetailTab.OVERVIEW;
+    viewAtStartup = '';
 
     loading = true;
     loadingFailed = false;
@@ -43,6 +44,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     issueIconStyleClass = ISSUE_CONSTANT.iconStyleClass;
     patchIconStyleClass = PATCH_CONSTANT.iconStyleClass;
 
+    globalActionConfig: ActionConfig;
     actionConfig: ActionConfig;
 
     releaseFull: ReleaseFull;
@@ -79,17 +81,25 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService,
-        private auth: AuthenticationService) { }
+        private auth: AuthenticationService, private loc: Location, private copyService: CopyService) { }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.errorConfig = {
             iconStyleClass: 'pficon-error-circle-o',
             title: 'Error'
         } as EmptyStateConfig;
 
+        this.actionConfig = {
+            primaryActions: [{
+                id: 'copyURL',
+                title: 'Copy URL',
+                tooltip: 'Copy URL with current filters'
+            }]
+        } as ActionConfig;
+
         this.auth.isLoggedIn().then(loggedIn => {
             if (loggedIn) {
-                this.actionConfig = {
+                this.globalActionConfig = {
                     primaryActions: [{
                         id: 'editRelease',
                         title: 'Edit release',
@@ -152,6 +162,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         this.currentIssuesSortField = this.issueSortConfig.fields[0];
 
         this.issueToolbarConfig = {
+            actionConfig: this.actionConfig,
             filterConfig: this.issueFilterConfig,
             sortConfig: this.issueSortConfig
         } as ToolbarConfig;
@@ -263,6 +274,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as PaginationConfig;
 
         this.patchToolbarConfig = {
+            actionConfig: this.actionConfig,
             filterConfig: this.patchFilterConfig,
             sortConfig: this.patchSortConfig
         } as ToolbarConfig;
@@ -319,17 +331,82 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as PaginationConfig;
 
         this.allIssueToolbarConfig = {
+            actionConfig: this.actionConfig,
             filterConfig: this.allIssueFilterConfig,
             sortConfig: this.allIssueSortConfig
         } as ToolbarConfig;
 
         this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
-            this.currentTab = params.get('view');
+            this.viewAtStartup = params.get('view');
+            this.currentTab = ReleaseDetailTab[this.viewAtStartup];
             if (params.has('version')) {
                 this.reloadData();
             }
+
+            if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
+                const filterConf: FilterConfig = this.getCurrentFilterConfig();
+
+                this.route.queryParamMap.subscribe(queryParams => {
+                    const filters: string[] = queryParams.getAll('filter');
+                    if (filters.length > 0) {
+                        filterConf.appliedFilters = [];
+                        filters.forEach(filter => {
+                            filterConf.fields.forEach(ff => {
+                                if (ff.queries) {
+                                    this.addFilterQueryFromParam(filter, ff, filterConf);
+                                } else {
+                                    this.addFilterFromParam(filter, ff, filterConf);
+                                }
+                            });
+                        });
+                        this.applyIssueFilters();
+                    }
+                });
+            }
         });
+    }
+
+    getCurrentFilterConfig(): FilterConfig {
+        let filterConf: FilterConfig = {} as FilterConfig;
+        switch (this.currentTab) {
+            case ReleaseDetailTab.ALL_ISSUES:
+                filterConf = this.allIssueFilterConfig;
+                break;
+            case ReleaseDetailTab.PATCHES:
+                filterConf = this.patchFilterConfig;
+                break;
+            default:
+                filterConf = this.issueFilterConfig;
+                break;
+        }
+        return filterConf;
+    }
+
+    addFilterFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            filterConf.appliedFilters.push({
+                field: filterField,
+                value: value
+            } as Filter);
+        }
+    }
+
+    addFilterQueryFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            const filterQuery = filterField.queries.find(q => q.id === value);
+            if (filterQuery) {
+                filterConf.appliedFilters.push({
+                    field: filterField,
+                    query: filterQuery,
+                    value: filterQuery.value
+                } as Filter);
+            }
+        }
     }
 
     /**
@@ -375,6 +452,10 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } else if (action.id === 'openIssue') {
             const url = ISSUE_CONSTANT.constainer_urls[item.container] + item.reference;
             window.open(url, '_blank');
+        } else if (action.id === 'copyURL') {
+            this.copyURL();
+        } else {
+            console.log('handleAction: unknown action: ' + action.id);
         }
     }
 
@@ -456,6 +537,30 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             matches = matches && value;
         });
         return matches;
+    }
+
+    copyURL() {
+        const angularRoute = this.loc.path();
+        const fullUrl = window.location.href;
+        const domainAndApp = fullUrl.replace(angularRoute, '');
+        let urlToCopy = domainAndApp;
+        this.route.snapshot.url.forEach(us => {
+            if (this.viewAtStartup !== us.path) {
+                urlToCopy = urlToCopy.concat('/', us.path);
+            }
+        });
+        if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
+            urlToCopy = urlToCopy.concat('/', ReleaseDetailTab[this.currentTab]);
+            const filterConf: FilterConfig = this.getCurrentFilterConfig();
+            if (filterConf.appliedFilters.length > 0) {
+                let first = true;
+                filterConf.appliedFilters.forEach(af => {
+                    urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=', af.field.id, '_', af.query ? af.query.id : af.value);
+                    first = false;
+                });
+            }
+        }
+        this.copyService.copy(urlToCopy);
     }
 
     comparePatch(item1: any, item2: any): number {

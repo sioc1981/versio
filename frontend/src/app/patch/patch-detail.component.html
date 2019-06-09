@@ -25,7 +25,7 @@
     <ng-template #loaded>
         <div *ngIf="patch; else error">
             <tabset #staticTabs>
-                <tab #tab_overview>
+                <tab #tab_overview (select)="currentTab = PatchDetailTabEnum.OVERVIEW">
                     <ng-template tabHeading>
                         <span>Overview</span>
                     </ng-template>
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                 </tab>
-                <tab #tab_releasenote [active]="currentTab === 'releasenote'">
+                <tab #tab_releasenote [active]="currentTab === PatchDetailTabEnum.RELEASE_NOTE" (select)="currentTab = PatchDetailTabEnum.RELEASE_NOTE">
                     <ng-template tabHeading>
                         <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Release note
                             ({{patch.issues.length}})</span>
@@ -135,7 +135,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <pfng-toolbar [config]="issueToolbarConfig"
+                                <pfng-toolbar [config]="issueToolbarConfig" (onActionSelect)="handleAction($event)"
                                     (onFilterChange)="filterChanged($event, PatchDetailTabEnum.RELEASE_NOTE)"
                                     (onSortChange)="handleSortChanged($event, PatchDetailTabEnum.RELEASE_NOTE)">
                                 </pfng-toolbar>

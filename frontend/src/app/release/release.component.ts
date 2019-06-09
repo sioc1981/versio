@@ -7,7 +7,8 @@ import {
     PaginationEvent,
     SortEvent,
     SortField,
-    CopyService
+    CopyService,
+    FilterField
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -197,11 +198,13 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             if (filters.length > 0) {
                 this.filterConfig.appliedFilters = [];
                 filters.forEach(filter => {
-                    this.addFilterFromParam(filter, 'version_', 0);
-                    this.addFilterFromParam(filter, 'issue_', 1);
-                    this.addFilterQueryFromParam(filter, 'onlyDeployed_', 2);
-                    this.addFilterQueryFromParam(filter, 'deployedOn_', 3);
-                    this.addFilterQueryFromParam(filter, 'missingOn_', 4);
+                    this.filterConfig.fields.forEach(ff => {
+                        if (ff.queries) {
+                            this.addFilterQueryFromParam(filter, ff, this.filterConfig);
+                        } else {
+                            this.addFilterFromParam(filter, ff, this.filterConfig);
+                        }
+                    });
                 });
                 this.applyFilters();
             }
@@ -209,23 +212,25 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
     }
 
-    addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
+    addFilterFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
         if (paramFilter.lastIndexOf(paramPrefix) === 0) {
             const value = paramFilter.slice(paramPrefix.length);
-            this.filterConfig.appliedFilters.push({
-                field: this.filterConfig.fields[index],
+            filterConf.appliedFilters.push({
+                field: filterField,
                 value: value
             } as Filter);
         }
     }
 
-    addFilterQueryFromParam(paramFilter: string, paramPrefix: string, index: number): void {
+    addFilterQueryFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
         if (paramFilter.lastIndexOf(paramPrefix) === 0) {
             const value = paramFilter.slice(paramPrefix.length);
-            const filterQuery = this.filterConfig.fields[index].queries.find(q => q.id === value);
+            const filterQuery = filterField.queries.find(q => q.id === value);
             if (filterQuery) {
-                this.filterConfig.appliedFilters.push({
-                    field: this.filterConfig.fields[index],
+                filterConf.appliedFilters.push({
+                    field: filterField,
                     query: filterQuery,
                     value: filterQuery.value
                 } as Filter);
@@ -354,7 +359,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
         if (this.filterConfig.appliedFilters.length > 0) {
             let first = true;
             this.filterConfig.appliedFilters.forEach(af => {
-                urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=' , af.field.id , '_' , af.query ? af.query.id : af.value);
+                urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=', af.field.id, '_', af.query ? af.query.id : af.value);
                 first = false;
             });
         }

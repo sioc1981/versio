@@ -9,7 +9,7 @@
             {{versionNumber}}
         </li>
         <span style="float: right">
-            <pfng-action class="my-actions" [config]="actionConfig" (onActionSelect)="handleAction($event)">
+            <pfng-action class="my-actions" [config]="globalActionConfig" (onActionSelect)="handleAction($event)">
             </pfng-action>
         </span>
     </ol>
@@ -25,7 +25,7 @@
     <ng-template #loaded>
         <div *ngIf="release; else error">
             <tabset #staticTabs>
-                <tab #tab_overview>
+                <tab #tab_overview (select)="currentTab = ReleaseDetailTabEnum.OVERVIEW">
                     <ng-template tabHeading>
                         <span>Overview</span>
                     </ng-template>
@@ -117,7 +117,7 @@
                         </div>
                     </div>
                 </tab>
-                <tab #tab_releasenote [active]="currentTab === 'releasenote'">
+                <tab #tab_releasenote [active]="currentTab ===  ReleaseDetailTabEnum.RELEASE_NOTE" (select)="currentTab = ReleaseDetailTabEnum.RELEASE_NOTE">
                     <ng-template tabHeading>
                         <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Release note
                             ({{releaseFull.issues.length}})</span>
@@ -125,7 +125,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <pfng-toolbar [config]="issueToolbarConfig"
+                                <pfng-toolbar [config]="issueToolbarConfig" (onActionSelect)="handleAction($event)"
                                     (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.RELEASE_NOTE)"
                                     (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.RELEASE_NOTE)">
                                 </pfng-toolbar>
@@ -166,7 +166,7 @@
 
                     </div>
                 </tab>
-                <tab #tab_patches [active]="currentTab === 'patches'">
+                <tab #tab_patches [active]="currentTab === ReleaseDetailTabEnum.PATCHES" (select)="currentTab = ReleaseDetailTabEnum.PATCHES">
                     <ng-template tabHeading>
                         <span class="fas {{patchIconStyleClass}}"></span> <span class="padding-left-5">Patches
                             ({{releaseFull.patches.length}})</span>
@@ -174,7 +174,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <pfng-toolbar [config]="patchToolbarConfig"
+                                <pfng-toolbar [config]="patchToolbarConfig" (onActionSelect)="handleAction($event)"
                                     (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.PATCHES)"
                                     (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.PATCHES)">
                                 </pfng-toolbar>
@@ -217,7 +217,7 @@
 
                     </div>
                 </tab>
-                <tab #tab_all_issues [active]="currentTab === 'patches'">
+                <tab #tab_all_issues [active]="currentTab === ReleaseDetailTabEnum.ALL_ISSUES" (select)="currentTab = ReleaseDetailTabEnum.ALL_ISSUES">
                     <ng-template tabHeading>
                         <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">All Issues
                             ({{allOriginalIssues.length}})</span>
@@ -225,7 +225,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <pfng-toolbar [config]="allIssueToolbarConfig"
+                                <pfng-toolbar [config]="allIssueToolbarConfig" (onActionSelect)="handleAction($event)"
                                     (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.ALL_ISSUES)"
                                     (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.ALL_ISSUES)">
                                 </pfng-toolbar>

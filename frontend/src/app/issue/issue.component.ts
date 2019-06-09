@@ -7,7 +7,8 @@ import {
     PaginationEvent,
     SortField,
     SortEvent,
-    CopyService
+    CopyService,
+    FilterField
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -89,10 +90,18 @@ export class IssueComponent implements OnInit, OnDestroy {
             }]
         } as ActionConfig;
 
+        this.actionConfig = {
+            primaryActions: [{
+                id: 'copyURL',
+                title: 'Copy URL',
+                tooltip: 'Copy URL with current filters'
+            }]
+        } as ActionConfig;
+
         this.auth.isLoggedIn().then(loggedIn => {
             if (loggedIn) {
-                this.actionConfig = {
-                    primaryActions: [{
+                this.actionConfig.primaryActions.unshift(
+                    {
                         id: 'addIssue',
                         title: 'Add new issue',
                         tooltip: 'Add a new issue'
@@ -100,13 +109,7 @@ export class IssueComponent implements OnInit, OnDestroy {
                         id: 'importIssues',
                         title: 'Import issues',
                         tooltip: 'Import new issues'
-                    }, {
-                        id: 'copyURL',
-                        title: 'Copy URL',
-                        tooltip: 'Copy URL with current filters'
-                    }]
-                } as ActionConfig;
-                this.toolbarConfig.actionConfig = this.actionConfig;
+                    });
 
                 this.issueActionConfig.primaryActions.push({
                     id: 'editIssue',
@@ -153,8 +156,13 @@ export class IssueComponent implements OnInit, OnDestroy {
             if (filters.length > 0) {
                 this.filterConfig.appliedFilters = [];
                 filters.forEach(filter => {
-                    this.addFilterFromParam(filter, 'reference_', 0);
-                    this.addFilterFromParam(filter, 'description_', 1);
+                    this.filterConfig.fields.forEach(ff => {
+                        if (ff.queries) {
+                            this.addFilterQueryFromParam(filter, ff, this.filterConfig);
+                        } else {
+                            this.addFilterFromParam(filter, ff, this.filterConfig);
+                        }
+                    });
                 });
                 this.applyFilters();
             }
@@ -162,13 +170,29 @@ export class IssueComponent implements OnInit, OnDestroy {
         this.getIssues();
     }
 
-    addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
+    addFilterFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
         if (paramFilter.lastIndexOf(paramPrefix) === 0) {
             const value = paramFilter.slice(paramPrefix.length);
-            this.filterConfig.appliedFilters.push({
-                field: this.filterConfig.fields[index],
+            filterConf.appliedFilters.push({
+                field: filterField,
                 value: value
             } as Filter);
+        }
+    }
+
+    addFilterQueryFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            const filterQuery = filterField.queries.find(q => q.id === value);
+            if (filterQuery) {
+                filterConf.appliedFilters.push({
+                    field: filterField,
+                    query: filterQuery,
+                    value: filterQuery.value
+                } as Filter);
+            }
         }
     }
 
@@ -182,7 +206,7 @@ export class IssueComponent implements OnInit, OnDestroy {
     getIssues(): void {
         this.subscriptions.push(this.issueService.getIssues()
             .subscribe(newIssues => {
-            this.issues = newIssues;
+                this.issues = newIssues;
                 this.issues.sort((item1: any, item2: any) => this.compare(item1, item2));
                 this.applyFilters();
             }));

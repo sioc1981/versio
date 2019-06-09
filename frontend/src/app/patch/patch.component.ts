@@ -8,7 +8,8 @@ import {
     PaginationEvent,
     SortEvent,
     SortField,
-    CopyService
+    CopyService,
+    FilterField
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -203,9 +204,13 @@ export class PatchComponent implements OnInit, OnDestroy {
             if ( filters.length > 0 ) {
                 this.filterConfig.appliedFilters = [];
                 filters.forEach( filter => {
-                    this.addFilterFromParam(filter, 'version_', 0);
-                    this.addFilterFromParam(filter, 'sequence_', 1);
-                    this.addFilterFromParam(filter, 'issue_', 2);
+                        this.filterConfig.fields.forEach(ff => {
+                            if (ff.queries) {
+                                this.addFilterQueryFromParam(filter, ff, this.filterConfig);
+                            } else {
+                                this.addFilterFromParam(filter, ff, this.filterConfig);
+                            }
+                        });
                 } );
                 this.applyFilters();
             }
@@ -213,13 +218,29 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     }
 
-    addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
-        if ( paramFilter.lastIndexOf(paramPrefix) === 0 ) {
-            const value = paramFilter.slice( paramPrefix.length );
-            this.filterConfig.appliedFilters.push( {
-                field: this.filterConfig.fields[index],
+    addFilterFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            filterConf.appliedFilters.push({
+                field: filterField,
                 value: value
-            } as Filter );
+            } as Filter);
+        }
+    }
+
+    addFilterQueryFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {
+        const paramPrefix = filterField.id + '_';
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            const filterQuery = filterField.queries.find(q => q.id === value);
+            if (filterQuery) {
+                filterConf.appliedFilters.push({
+                    field: filterField,
+                    query: filterQuery,
+                    value: filterQuery.value
+                } as Filter);
+            }
         }
     }
 
