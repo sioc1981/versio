@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReleaseService } from './shared/release.service';
 import {
-    WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
+    FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
     PaginationConfig,
     PaginationEvent,
     SortEvent,
-    SortField
+    SortField,
+    CopyService
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -15,6 +16,7 @@ import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { ReleaseFull } from './shared/release.model';
 import { AuthenticationService } from '../auth/authentication.service';
+import { Location } from '@angular/common';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -50,7 +52,8 @@ export class ReleaseComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private releaseService: ReleaseService, private modalService: BsModalService,
-        private auth: AuthenticationService, private route: ActivatedRoute ) { }
+        private auth: AuthenticationService, private route: ActivatedRoute, private loc: Location,
+        private copyService: CopyService) { }
 
     ngOnInit() {
         this.reloadData();
@@ -126,6 +129,10 @@ export class ReleaseComponent implements OnInit, OnDestroy {
                         id: 'importRelease',
                         title: 'Import releases',
                         tooltip: 'Import releases'
+                    }, {
+                        id: 'copyURL',
+                        title: 'Copy URL',
+                        tooltip: 'Copy URL with current filters'
                     }]
                 } as ActionConfig;
                 this.toolbarConfig.actionConfig = this.actionConfig;
@@ -185,28 +192,44 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             totalItems: this.filteredReleases.length
         } as PaginationConfig;
 
-        this.route.paramMap.subscribe( params => {
-            const filters: string[] = params.getAll( 'filter' );
-            if ( filters.length > 0 ) {
+        this.route.queryParamMap.subscribe(params => {
+            const filters: string[] = params.getAll('filter');
+            if (filters.length > 0) {
                 this.filterConfig.appliedFilters = [];
-                this.filterConfig.appliedFilters
-                filters.forEach( filter => {
+                filters.forEach(filter => {
                     this.addFilterFromParam(filter, 'version_', 0);
                     this.addFilterFromParam(filter, 'issue_', 1);
-                } );
+                    this.addFilterQueryFromParam(filter, 'onlyDeployed_', 2);
+                    this.addFilterQueryFromParam(filter, 'deployedOn_', 3);
+                    this.addFilterQueryFromParam(filter, 'missingOn_', 4);
+                });
                 this.applyFilters();
             }
         });
 
     }
-    
+
     addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
-        if ( paramFilter.lastIndexOf(paramPrefix) === 0 ) {
-            const value = paramFilter.slice( paramPrefix.length );
-            this.filterConfig.appliedFilters.push( {
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            this.filterConfig.appliedFilters.push({
                 field: this.filterConfig.fields[index],
                 value: value
-            } as Filter );
+            } as Filter);
+        }
+    }
+
+    addFilterQueryFromParam(paramFilter: string, paramPrefix: string, index: number): void {
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            const filterQuery = this.filterConfig.fields[index].queries.find(q => q.id === value);
+            if (filterQuery) {
+                this.filterConfig.appliedFilters.push({
+                    field: this.filterConfig.fields[index],
+                    query: filterQuery,
+                    value: filterQuery.value
+                } as Filter);
+            }
         }
     }
 
@@ -305,6 +328,8 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             this.openModal(this.updateReleaseTemplate);
         } else if (action.id === 'importRelease') {
             this.openModal(this.importReleaseTemplate);
+        } else if (action.id === 'copyURL') {
+            this.copyURL();
         } else {
             console.log('handleAction: unknown action: ' + action.id);
         }
@@ -316,6 +341,24 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
     handlePageNumber($event: PaginationEvent) {
         this.updateItems();
+    }
+
+    copyURL() {
+        const angularRoute = this.loc.path();
+        const fullUrl = window.location.href;
+        const domainAndApp = fullUrl.replace(angularRoute, '');
+        let urlToCopy = domainAndApp;
+        this.route.snapshot.url.forEach(us => {
+            urlToCopy = urlToCopy.concat('/', us.path);
+        });
+        if (this.filterConfig.appliedFilters.length > 0) {
+            let first = true;
+            this.filterConfig.appliedFilters.forEach(af => {
+                urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=' , af.field.id , '_' , af.query ? af.query.id : af.value);
+                first = false;
+            });
+        }
+        this.copyService.copy(urlToCopy);
     }
 
     compare(item1: any, item2: any): number {

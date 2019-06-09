@@ -3,17 +3,19 @@ import { ActivatedRoute } from '@angular/router';
 import { Patch } from './shared/patch.model';
 import { PatchService } from './shared/patch.service';
 import {
-    WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
+    FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
     PaginationConfig,
     PaginationEvent,
     SortEvent,
-    SortField
+    SortField,
+    CopyService
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { Subscription } from 'rxjs';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { AuthenticationService } from '../auth/authentication.service';
+import { Location } from '@angular/common';
 
 @Component( {
     encapsulation: ViewEncapsulation.None,
@@ -49,7 +51,7 @@ export class PatchComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor( private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService,
-        private zone: NgZone, private route: ActivatedRoute ) { }
+        private zone: NgZone, private route: ActivatedRoute, private loc: Location, private copyService: CopyService ) { }
 
     ngOnInit() {
         this.reloadData();
@@ -130,6 +132,10 @@ export class PatchComponent implements OnInit, OnDestroy {
                         id: 'importPatch',
                         title: 'Import patches',
                         tooltip: 'Import patches'
+                    }, {
+                        id: 'copyURL',
+                        title: 'Copy URL',
+                        tooltip: 'Copy URL with current filters'
                     }]
                 } as ActionConfig;
                 this.toolbarConfig.actionConfig = this.actionConfig;
@@ -192,7 +198,7 @@ export class PatchComponent implements OnInit, OnDestroy {
             totalItems: this.filteredPatches.length
         } as PaginationConfig;
 
-        this.route.paramMap.subscribe( params => {
+        this.route.queryParamMap.subscribe( params => {
             const filters: string[] = params.getAll( 'filter' );
             if ( filters.length > 0 ) {
                 this.filterConfig.appliedFilters = [];
@@ -321,6 +327,8 @@ export class PatchComponent implements OnInit, OnDestroy {
             this.openModal( this.updatePatchTemplate );
         } else if ( action.id === 'importPatch' ) {
             this.openModal( this.importPatchTemplate );
+        } else if (action.id === 'copyURL') {
+            this.copyURL();
         } else {
             console.log( 'handleAction: unknown action: ' + action.id );
         }
@@ -332,6 +340,24 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     handlePageNumber( $event: PaginationEvent ) {
         this.updateItems();
+    }
+
+    copyURL() {
+        const angularRoute = this.loc.path();
+        const fullUrl = window.location.href;
+        const domainAndApp = fullUrl.replace(angularRoute, '');
+        let urlToCopy = domainAndApp;
+        this.route.snapshot.url.forEach(us => {
+            urlToCopy = urlToCopy.concat('/', us.path);
+        });
+        if (this.filterConfig.appliedFilters.length > 0) {
+            let first = true;
+            this.filterConfig.appliedFilters.forEach(af => {
+                urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=' , af.field.id , '_' , af.query ? af.query.id : af.value);
+                first = false;
+            });
+        }
+        this.copyService.copy(urlToCopy);
     }
 
     compare( item1: any, item2: any ): number {

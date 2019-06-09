@@ -17,7 +17,7 @@ import { KeycloakAngularModule } from 'keycloak-angular';
 import {
     AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
     ActionModule, ToastNotificationListModule, NotificationService, TableModule, ToolbarModule,
-    PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule, EmptyStateModule
+    PaginationModule, CardModule, UtilizationDonutChartModule, DonutChartModule, EmptyStateModule, CopyService,
 } from 'patternfly-ng';
 
 import { AppComponent } from './app.component';
@@ -133,6 +133,7 @@ defineLocale('fr', frLocale);
         deps: [AuthenticationService]
     },
         BsDropdownConfig,
+        CopyService,
         NotificationService,
         SseService,
     { provide: LOCALE_ID, useValue: 'fr' }

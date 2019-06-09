@@ -6,7 +6,8 @@ import {
     PaginationConfig,
     PaginationEvent,
     SortField,
-    SortEvent
+    SortEvent,
+    CopyService
 } from 'patternfly-ng';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -14,6 +15,7 @@ import { Subscription } from 'rxjs';
 import { Issue } from './shared/issue.model';
 import { ISSUE_CONSTANT } from './shared/issue.constant';
 import { AuthenticationService } from '../auth/authentication.service';
+import { Location } from '@angular/common';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -47,11 +49,9 @@ export class IssueComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private modalService: BsModalService, private auth: AuthenticationService,
-            private route: ActivatedRoute ) { }
+        private route: ActivatedRoute, private loc: Location, private copyService: CopyService) { }
 
     ngOnInit() {
-        this.getIssues();
-
         this.filterConfig = {
             fields: [{
                 id: 'reference',
@@ -100,6 +100,10 @@ export class IssueComponent implements OnInit, OnDestroy {
                         id: 'importIssues',
                         title: 'Import issues',
                         tooltip: 'Import new issues'
+                    }, {
+                        id: 'copyURL',
+                        title: 'Copy URL',
+                        tooltip: 'Copy URL with current filters'
                     }]
                 } as ActionConfig;
                 this.toolbarConfig.actionConfig = this.actionConfig;
@@ -144,28 +148,27 @@ export class IssueComponent implements OnInit, OnDestroy {
             totalItems: this.filteredIssues.length
         } as PaginationConfig;
 
-        this.route.paramMap.subscribe( params => {
-            const filters: string[] = params.getAll( 'filter' );
-            if ( filters.length > 0 ) {
+        this.route.queryParamMap.subscribe(params => {
+            const filters: string[] = params.getAll('filter');
+            if (filters.length > 0) {
                 this.filterConfig.appliedFilters = [];
-                this.filterConfig.appliedFilters
-                filters.forEach( filter => {
+                filters.forEach(filter => {
                     this.addFilterFromParam(filter, 'reference_', 0);
                     this.addFilterFromParam(filter, 'description_', 1);
-                } );
+                });
                 this.applyFilters();
             }
         });
-
+        this.getIssues();
     }
-    
+
     addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
-        if ( paramFilter.lastIndexOf(paramPrefix) === 0 ) {
-            const value = paramFilter.slice( paramPrefix.length );
-            this.filterConfig.appliedFilters.push( {
+        if (paramFilter.lastIndexOf(paramPrefix) === 0) {
+            const value = paramFilter.slice(paramPrefix.length);
+            this.filterConfig.appliedFilters.push({
                 field: this.filterConfig.fields[index],
                 value: value
-            } as Filter );
+            } as Filter);
         }
     }
 
@@ -178,7 +181,11 @@ export class IssueComponent implements OnInit, OnDestroy {
 
     getIssues(): void {
         this.subscriptions.push(this.issueService.getIssues()
-            .subscribe(newIssues => { this.issues = newIssues; this.applyFilters(); }));
+            .subscribe(newIssues => {
+            this.issues = newIssues;
+                this.issues.sort((item1: any, item2: any) => this.compare(item1, item2));
+                this.applyFilters();
+            }));
     }
 
     closeModal($event: WizardEvent): void {
@@ -252,9 +259,29 @@ export class IssueComponent implements OnInit, OnDestroy {
         } else if (action.id === 'openIssue') {
             const url = ISSUE_CONSTANT.constainer_urls[item.container] + item.reference;
             window.open(url, '_blank');
+        } else if (action.id === 'copyURL') {
+            this.copyURL();
         } else {
             console.log('handleAction: unknown action: ' + action.id);
         }
+    }
+
+    copyURL() {
+        const angularRoute = this.loc.path();
+        const fullUrl = window.location.href;
+        const domainAndApp = fullUrl.replace(angularRoute, '');
+        let urlToCopy = domainAndApp;
+        this.route.snapshot.url.forEach(us => {
+            urlToCopy = urlToCopy.concat('/', us.path);
+        });
+        if (this.filterConfig.appliedFilters.length > 0) {
+            let first = true;
+            this.filterConfig.appliedFilters.forEach(af => {
+                urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=', af.field.id, '_', af.query ? af.query.id : af.value);
+                first = false;
+            });
+        }
+        this.copyService.copy(urlToCopy);
     }
 
     handlePageSize($event: PaginationEvent) {
