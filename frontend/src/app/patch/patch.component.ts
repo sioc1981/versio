@@ -196,7 +196,6 @@ export class PatchComponent implements OnInit, OnDestroy {
             const filters: string[] = params.getAll( 'filter' );
             if ( filters.length > 0 ) {
                 this.filterConfig.appliedFilters = [];
-                this.filterConfig.appliedFilters
                 filters.forEach( filter => {
                     this.addFilterFromParam(filter, 'version_', 0);
                     this.addFilterFromParam(filter, 'sequence_', 1);
@@ -207,7 +206,7 @@ export class PatchComponent implements OnInit, OnDestroy {
         });
 
     }
-    
+
     addFilterFromParam(paramFilter: string, paramPrefix: string, index: number): void {
         if ( paramFilter.lastIndexOf(paramPrefix) === 0 ) {
             const value = paramFilter.slice( paramPrefix.length );
@@ -217,7 +216,7 @@ export class PatchComponent implements OnInit, OnDestroy {
             } as Filter );
         }
     }
-    
+
     /**
        * Clean up subscriptions
        */

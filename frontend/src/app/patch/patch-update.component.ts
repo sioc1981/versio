@@ -71,6 +71,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
     issues: Issue[];
     issuesListConfig: ListConfig;
     selectIssue: Issue;
+    selectedIssues: Issue[];
 
     private subscriptions: Subscription[] = [];
 
@@ -86,6 +87,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.data.pilot = this.initPlatformHistory(this.data.pilot);
         this.data.production = this.initPlatformHistory(this.data.production);
         this.data.issues.forEach(i => i.selected = true);
+        this.selectedIssues = [...this.data.issues];
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
         this.getIssues();
@@ -181,7 +183,7 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
         this.issuesListConfig = {
             dblClick: false,
-            multiSelect: false,
+            multiSelect: true,
             selectItems: false,
             selectionMatchProp: 'reference',
             showCheckbox: true,
@@ -261,6 +263,8 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         }
         if ($event.step.config.id === 'step1a') {
             this.updateVersion();
+        } else if ($event.step.config.id === 'step1b') {
+            this.updateIssues();
         } else if ($event.step.config.id === 'step3a') {
             this.wizardConfig.nextTitle = 'Deploy';
         } else if ($event.step.config.id === 'step3b') {
@@ -272,20 +276,18 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
 
 
     updateVersion(): void {
-        this.step1aConfig.nextEnabled = (this.data.release !== undefined);
-        this.setNavAway(this.step1Config.nextEnabled);
+        this.step1aConfig.nextEnabled = (this.data.release !== undefined && this.data.sequenceNumber !== undefined);
+        this.setNavAway(this.step1aConfig.nextEnabled);
     }
 
     updateIssues(): void {
         this.step1bConfig.nextEnabled = (this.data.issues !== undefined && this.data.issues.length > 0);
-        this.setNavAway(this.step2Config.nextEnabled);
+        this.setNavAway(this.step1bConfig.nextEnabled);
     }
 
     // Private
 
     private setNavAway(allow: boolean) {
-        this.step1aConfig.allowNavAway = allow;
-
         this.step1Config.allowClickNav = allow;
         this.step1aConfig.allowClickNav = allow;
         this.step1bConfig.allowClickNav = allow;
@@ -307,6 +309,13 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
         this.updateIssues();
     }
 
+    onVersionChange(newValue: string): void {
+        if (!newValue || newValue.trim().length === 0) {
+            this.data.release = undefined;
+            this.updateVersion();
+        }
+    }
+
     onSelectVersion(event: TypeaheadMatch): void {
         this.data.release = event.item;
         this.updateVersion();
@@ -323,10 +332,19 @@ export class PatchUpdateComponent implements OnInit, OnDestroy {
     }
 
     private addIssue(issue: Issue) {
-        if (issue && this.data.issues.filter(i => i.reference === issue.reference).length === 0) {
+        if (issue && this.selectedIssues.filter(i => i.reference === issue.reference).length === 0) {
             issue.selected = true;
             this.data.issues.push(issue);
             this.updateIssues();
+        }
+
+        if (issue) {
+            const exisingIssues = this.selectedIssues.filter(i => i.reference === issue.reference);
+            if (exisingIssues.length === 0) {
+                this.selectedIssues.push(issue);
+            } else {
+                exisingIssues.forEach(i => i.selected = true);
+            }
         }
     }
 

@@ -71,6 +71,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     issues: Issue[];
     issuesListConfig: ListConfig;
     selectIssue: Issue;
+    selectedIssues: Issue[];
 
     private subscriptions: Subscription[] = [];
 
@@ -87,6 +88,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.data.release.pilot = this.initPlatformHistory(this.data.release.pilot);
         this.data.release.production = this.initPlatformHistory(this.data.release.production);
         this.data.issues.forEach(i => i.selected = true);
+        this.selectedIssues = [...this.data.issues];
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
         this.getIssues();
@@ -102,14 +104,14 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
             expandReviewDetails: true,
             nextEnabled: false,
             priority: 0,
-            title: 'Release'
+            title: 'Identification'
         } as WizardStepConfig;
         this.step1bConfig = {
             id: 'step1b',
             expandReviewDetails: true,
             nextEnabled: false,
             priority: 1,
-            title: 'Issues'
+            title: 'Release Note'
         } as WizardStepConfig;
 
         // Step 2
@@ -182,7 +184,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
         this.issuesListConfig = {
             dblClick: false,
-            multiSelect: false,
+            multiSelect: true,
             selectItems: false,
             selectionMatchProp: 'reference',
             showCheckbox: true,
@@ -274,6 +276,8 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         }
         if ($event.step.config.id === 'step1a') {
             this.updateVersion();
+        } else if ($event.step.config.id === 'step1b') {
+            this.updateIssues();
         } else if ($event.step.config.id === 'step3a') {
             this.wizardConfig.nextTitle = 'Deploy';
         } else if ($event.step.config.id === 'step3b') {
@@ -333,6 +337,15 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
             issue.selected = true;
             this.data.issues.push(issue);
             this.updateIssues();
+        }
+
+        if (issue) {
+            const exisingIssues = this.selectedIssues.filter(i => i.reference === issue.reference);
+            if (exisingIssues.length === 0) {
+                this.selectedIssues.push(issue);
+            } else {
+                exisingIssues.forEach(i => i.selected = true);
+            }
         }
     }
 

@@ -1,24 +1,45 @@
 <pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()" (onNext)="nextClicked($event)"
     (onStepChange)="stepChanged($event)">
     <pfng-wizard-step [config]="step1Config">
-        <form class="form-horizontal">
-            <div class="form-group required">
-                <label class="col-sm-4 control-label required-pf" for="releaseNumber">Release Number</label>
-                <div class="col-sm-8">
+        <!-- Step 1A: Details -->
+        <pfng-wizard-substep [config]="step1aConfig" [reviewTemplate]="step1aReviewTemplate">
+            <form class="form-horizontal">
+                <div class="form-group required">
+                    <label class="col-sm-4 control-label  required-pf" for="myList">Version</label>
+                    <div class="col-sm-8">
                     <input class="form-control" id="versionNumber" name="Release Number" type="text" required
                         [(ngModel)]="data.release.version.versionNumber" (ngModelChange)="updateName()">
+                    </div>
                 </div>
-            </div>
-        </form>
-    </pfng-wizard-step>
-    <pfng-wizard-step [config]="step2Config">
-        <form class="form-horizontal">
-            <div class="form-group required">
-                <label class="col-sm-4 control-label  required-pf" for="name">Issues</label>
-            </div>
-            <div class="col-sm-12">
-                <div class="col-sm-6" style="overflow-y: auto;">
-                    <pfng-list id="myList" [config]="issuesListConfig" [items]="data.issues"
+            </form>
+        </pfng-wizard-substep>
+        <!-- Step 1B: Settings -->
+        <pfng-wizard-substep [config]="step1bConfig" [reviewTemplate]="step1bReviewTemplate">
+            <form class="form-horizontal">
+                <div class="col-sm-12">
+                    <form class="form-horizontal">
+                        <div class="form-group required">
+                            <label class="col-sm-4 control-label required-pf" for="issueReference">Add existing
+                                issue</label>
+                            <div class="col-sm-4" style="border-right: 1px solid;">
+                                <input class="form-control" id="issueReference" name="issueReference"
+                                    [(ngModel)]="selectIssue" [ngModelOptions]="{standalone: true}"
+                                    typeaheadOptionField="reference" [typeahead]="issues" [typeaheadScrollable]="true"
+                                    [typeaheadMinLength]="0" (typeaheadOnSelect)="onSelectIssue($event)"
+                                    autocomplete="off">
+                            </div>
+                            <div class="col-sm-4" style="border-left: 1px">
+                                <button (click)="openCreateIssue()">Create New Issue</button>
+                            </div>
+                        </div>
+                    </form>
+                    <ng-template #createIssue>
+                        <app-issue-create (close)="onCreateIssueClose($event)"></app-issue-create>
+                    </ng-template>
+                </div>
+                <hr />
+                <div class="col-sm-12" style="overflow-y: auto;">
+                    <pfng-list id="myList" [config]="issuesListConfig" [items]="selectedIssues"
                         [itemTemplate]="issuesTemplate" (onSelectionChange)="handleIssuesSelectionChange($event)">
                         <ng-template #issuesTemplate let-item="item" let-index="index">
                             <div class="list-pf-content-wrapper">
@@ -39,45 +60,257 @@
                         </ng-template>
                     </pfng-list>
                 </div>
-                <div class="col-sm-6">
-                    <form class="form-horizontal">
-                        <div class="form-group required">
-                            <label class="col-sm-6 control-label required-pf" for="issueReference">Add existing
-                                issue</label>
-                            <div class="col-sm-6">
-                                <input class="form-control" id="issueReference" name="issueReference"
-                                    [(ngModel)]="selectIssue" [ngModelOptions]="{standalone: true}"
-                                    typeaheadOptionField="reference" [typeahead]="issues" [typeaheadScrollable]="true"
-                                    [typeaheadMinLength]="0" (typeaheadOnSelect)="onSelectIssue($event)"
-                                    autocomplete="off">
-                            </div>
-                        </div>
-                    </form>
-                    <hr />
-                    <div class="col-sm-12">
-                        <button (click)="openCreateIssue()">Create New Issue</button>
+            </form>
+        </pfng-wizard-substep>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="step2Config">
+        <!-- Step 2A: Details -->
+        <pfng-wizard-substep [config]="step2aConfig" [reviewTemplate]="step2aReviewTemplate">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Build Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.buildDate" [ngModelOptions]="{standalone: true}">
                     </div>
-                    <ng-template #createIssue>
-                        <app-issue-create (close)="onCreateIssueClose($event)"></app-issue-create>
-                    </ng-template>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="fermentum">Package Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.packageDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+            </form>
+        </pfng-wizard-substep>
+        <!-- Step 2B: Settings -->
+        <pfng-wizard-substep [config]="step2bConfig" [reviewTemplate]="step2bReviewTemplate">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.qualification.deployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.qualification.validationDate"
+                            [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.qualification.undeployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+            </form>
+        </pfng-wizard-substep>
+        <!-- Step 2C: Settings -->
+        <pfng-wizard-substep [config]="step2cConfig" [reviewTemplate]="step2cReviewTemplate">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.keyUser.deployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.keyUser.validationDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.keyUser.undeployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+            </form>
+        </pfng-wizard-substep>
+        <!-- Step 2D: Settings -->
+        <pfng-wizard-substep [config]="step2dConfig" [reviewTemplate]="step2dReviewTemplate">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.pilot.deployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.pilot.validationDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.pilot.undeployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+            </form>
+        </pfng-wizard-substep>
+        <!-- Step 2E: Settings -->
+        <pfng-wizard-substep [config]="step2eConfig" [reviewTemplate]="step2eReviewTemplate">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Deploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.production.deployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="fermentum">Validation Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.production.validationDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="aliquam">Undeploy Date</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" #dp="bsDatepicker" bsDatepicker
+                            [(ngModel)]="data.release.production.undeployDate" [ngModelOptions]="{standalone: true}">
+                    </div>
+                </div>
+            </form>
+        </pfng-wizard-substep>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="step3Config">
+        <!-- Step 3A: Review -->
+        <pfng-wizard-substep [config]="step3aConfig">
+            <pfng-wizard-review></pfng-wizard-review>
+        </pfng-wizard-substep>
+        <!-- Step 3B: Deploy -->
+        <pfng-wizard-substep [config]="step3bConfig" (onShow)="startDeploy()">
+            <div class="wizard-pf-contents">
+                <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+                    <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+                    <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
+                </div>
+                <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
+                    <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
+                    <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
+                </div>
+                <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+                    <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+                    <h3 class="blank-slate-pf-main-action">Creation failed</h3>
                 </div>
             </div>
-        </form>
-    </pfng-wizard-step>
-    <pfng-wizard-step [config]="step3Config" (onShow)="startDeploy()">
-        <div class="wizard-pf-contents">
-            <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
-                <div class="spinner spinner-lg blank-slate-pf-icon"></div>
-                <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
-            </div>
-            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
-                <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
-                <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
-            </div>
-            <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
-                <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
-                <h3 class="blank-slate-pf-main-action">Creation failed</h3>
-            </div>
-        </div>
+        </pfng-wizard-substep>
     </pfng-wizard-step>
 </pfng-wizard>
+<!-- Step 1A: Details -->
+<ng-template #step1aReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Version:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.version.versionNumber}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 1B: Settings -->
+<ng-template #step1bReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Issues:</span>
+        </div>
+        <div class="wizard-pf-review-item" *ngFor="let item of data.issues">
+            <span class="wizard-pf-review-item-value">{{item.reference}} - {{item.description}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 2A: Details -->
+<ng-template #step2aReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Build Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.buildDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Package Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.packageDate | date}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 2B: Settings -->
+<ng-template #step2bReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Deploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.qualification.deployDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Validation Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.qualification.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.qualification.undeployDate | date}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 2C: Settings -->
+<ng-template #step2cReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Deploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.keyUser.deployDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Validation Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.keyUser.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.keyUser.undeployDate | date}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 2D: Settings -->
+<ng-template #step2dReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Deploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.pilot.deployDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Validation Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.pilot.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.pilot.undeployDate | date}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 2E: Settings -->
+<ng-template #step2eReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Deploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.production.deployDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Validation Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.production.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.production.undeployDate | date}}</span>
+        </div>
+    </form>
+</ng-template>

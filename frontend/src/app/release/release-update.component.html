@@ -46,7 +46,7 @@
                 </div>
                 <hr />
                 <div class="col-sm-12" style="overflow-y: auto;">
-                    <pfng-list id="myList" [config]="issuesListConfig" [items]="data.issues"
+                    <pfng-list id="myList" [config]="issuesListConfig" [items]="selectedIssues"
                         [itemTemplate]="issuesTemplate" (onSelectionChange)="handleIssuesSelectionChange($event)">
                         <ng-template #issuesTemplate let-item="item" let-index="index">
                             <div class="list-pf-content-wrapper">
