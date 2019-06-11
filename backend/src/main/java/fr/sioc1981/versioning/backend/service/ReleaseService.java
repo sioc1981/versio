@@ -262,21 +262,22 @@ public class ReleaseService {
 			return String.valueOf(Math.min(v1.getBaseNumber(), v2.getBaseNumber()));
 		}
 		base.append(v1.getBaseNumber());
+		base.append(".");
 		compare = v1.getInterimNumber() - v2.getInterimNumber();
 		if (compare != 0) {
 			return base.toString() + String.valueOf(Math.min(v1.getInterimNumber(), v2.getInterimNumber()));
 		}
-		base.append(".");
 		base.append(v1.getInterimNumber());
+		base.append(".");
 		compare = v1.getFeatureNumber() - v2.getFeatureNumber();
 		if (compare != 0) {
 			return base.toString() + String.valueOf(Math.min(v1.getFeatureNumber(), v2.getFeatureNumber()));
 		}
-		base.append(".");
+		
 		base.append(v1.getFeatureNumber());
 		base.append(".");
 		base.append(Math.min(v1.getPatchNumber(), v2.getPatchNumber()));
-		return base.toString().replaceAll("(\\.0)+$", "");
+		return base.toString();
 	}
 	
 	private String removeInvalidPart(String version) {
