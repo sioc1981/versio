@@ -26,15 +26,15 @@ import { PlatformHistory } from '../shared/platform.model';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 
-@Component({
+@Component( {
     encapsulation: ViewEncapsulation.None,
     selector: 'app-release-update',
     templateUrl: './release-update.component.html',
     styleUrls: ['./release-update.component.css']
-})
+} )
 export class ReleaseUpdateComponent implements OnInit, OnDestroy {
-    @ViewChild('wizard') wizard: WizardComponent;
-    @ViewChild('createIssue') createIssueTemplate: TemplateRef<any>;
+    @ViewChild( 'wizard' ) wizard: WizardComponent;
+    @ViewChild( 'createIssue' ) createIssueTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
     @Input() release: ReleaseFull;
     @Output() close = new EventEmitter<ReleaseFull>();
@@ -75,19 +75,19 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
 
-    constructor(private issueService: IssueService, private releaseService: ReleaseService,
-        private modalService: BsModalService) {
+    constructor( private issueService: IssueService, private releaseService: ReleaseService,
+        private modalService: BsModalService ) {
     }
 
     ngOnInit(): void {
-        this.data = cloneDeep(this.release);
-        this.data.release.buildDate = new Date(this.release.release.buildDate);
-        this.data.release.packageDate = this.initDate(this.release.release.packageDate);
-        this.data.release.qualification = this.initPlatformHistory(this.data.release.qualification);
-        this.data.release.keyUser = this.initPlatformHistory(this.data.release.keyUser);
-        this.data.release.pilot = this.initPlatformHistory(this.data.release.pilot);
-        this.data.release.production = this.initPlatformHistory(this.data.release.production);
-        this.data.issues.forEach(i => i.selected = true);
+        this.data = cloneDeep( this.release );
+        this.data.release.buildDate = new Date( this.release.release.buildDate );
+        this.data.release.packageDate = this.initDate( this.release.release.packageDate );
+        this.data.release.qualification = this.initPlatformHistory( this.data.release.qualification );
+        this.data.release.keyUser = this.initPlatformHistory( this.data.release.keyUser );
+        this.data.release.pilot = this.initPlatformHistory( this.data.release.pilot );
+        this.data.release.production = this.initPlatformHistory( this.data.release.production );
+        this.data.issues.forEach( i => i.selected = true );
         this.selectedIssues = [...this.data.issues];
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
@@ -193,7 +193,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         } as ListConfig;
 
 
-        this.setNavAway(false);
+        this.setNavAway( false );
         this.updateVersion();
         this.updateIssues();
 
@@ -203,18 +203,18 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
       * Clean up subscriptions
       */
     ngOnDestroy(): void {
-        this.subscriptions.forEach(sub => sub.unsubscribe);
+        this.subscriptions.forEach( sub => sub.unsubscribe );
     }
 
-    initDate(date: Date): Date {
-        return date ? new Date(date) : date;
+    initDate( date: Date ): Date {
+        return date ? new Date( date ) : date;
     }
 
-    initPlatformHistory(platformHistory: PlatformHistory): PlatformHistory {
-        if (platformHistory) {
-            platformHistory.deployDate = this.initDate(platformHistory.deployDate);
-            platformHistory.validationDate = this.initDate(platformHistory.validationDate);
-            platformHistory.undeployDate = this.initDate(platformHistory.undeployDate);
+    initPlatformHistory( platformHistory: PlatformHistory ): PlatformHistory {
+        if ( platformHistory ) {
+            platformHistory.deployDate = this.initDate( platformHistory.deployDate );
+            platformHistory.validationDate = this.initDate( platformHistory.validationDate );
+            platformHistory.undeployDate = this.initDate( platformHistory.undeployDate );
         } else {
             platformHistory = new PlatformHistory();
         }
@@ -222,65 +222,68 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     }
 
     getVersions(): void {
-        this.subscriptions.push(this.releaseService.getReleases()
-            .subscribe(newReleases => this.releases = newReleases));
+        this.subscriptions.push( this.releaseService.getReleases()
+            .subscribe( newReleases => this.releases = newReleases ) );
     }
 
     getIssues(): void {
-        this.subscriptions.push(this.issueService.getIssues()
-            .subscribe(newIssues => this.issues = newIssues.sort((i1, i2) => i2.reference.localeCompare(i1.reference))));
+        this.subscriptions.push( this.issueService.getIssues()
+            .subscribe( newIssues => this.issues = newIssues.sort(( i1, i2 ) => i2.reference.localeCompare( i1.reference ) ) ) );
     }
 
     // Methods
 
-    nextClicked($event: WizardEvent): void {
-        if ($event.step.config.id === 'step3b') {
-            this.closeWizard(this.data as ReleaseFull);
+    nextClicked( $event: WizardEvent ): void {
+        if ( $event.step.config.id === 'step3b' ) {
+            this.closeWizard( this.data as ReleaseFull );
         }
     }
 
-    closeWizard(releaseFull?: ReleaseFull) {
-        this.close.emit(releaseFull);
+    closeWizard( releaseFull?: ReleaseFull ) {
+        this.close.emit( releaseFull );
     }
     startDeploy(): void {
         this.deployComplete = false;
         this.wizardConfig.done = true;
         const platformList = ['qualification', 'keyUser', 'pilot', 'production'];
-        if (this.data.patches) {
-            this.data.patches.forEach(patch => {
-                platformList.forEach(currentPlatform => {
-                    if (patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
-                        this.release.release[currentPlatform].undeployDate === patch[currentPlatform].undeployDate) {
+        if ( this.data.patches ) {
+            this.data.patches.forEach( patch => {
+                platformList.forEach( currentPlatform => {
+                    if ( patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
+                        this.release.release[currentPlatform].undeployDate === patch[currentPlatform].undeployDate ) {
                         patch[currentPlatform].undeployDate = this.data.release[currentPlatform].undeployDate;
                     }
-                });
-            });
+                    if (this.release.release.undeployed === patch.undeployed ) {
+                        patch.undeployed = this.data.release.undeployed;
+                    }
+                } );
+            } );
         }
-        this.subscriptions.push(this.releaseService.updateRelease(this.data as ReleaseFull)
-            .subscribe(_ => {
+        this.subscriptions.push( this.releaseService.updateRelease( this.data as ReleaseFull )
+            .subscribe( _ => {
                 this.deployComplete = true;
                 this.deploySuccess = true;
             }, _ => {
                 this.deployComplete = true;
                 this.deploySuccess = false;
-            }));
+            } ) );
     }
 
 
 
-    stepChanged($event: WizardEvent) {
-        const flatSteps = flattenWizardSteps(this.wizard);
-        const currentStep = flatSteps.filter(step => step.config.id === $event.step.config.id);
-        if (currentStep && currentStep.length > 0) {
+    stepChanged( $event: WizardEvent ) {
+        const flatSteps = flattenWizardSteps( this.wizard );
+        const currentStep = flatSteps.filter( step => step.config.id === $event.step.config.id );
+        if ( currentStep && currentStep.length > 0 ) {
             currentStep[0].config.nextEnabled = true;
         }
-        if ($event.step.config.id === 'step1a') {
+        if ( $event.step.config.id === 'step1a' ) {
             this.updateVersion();
-        } else if ($event.step.config.id === 'step1b') {
+        } else if ( $event.step.config.id === 'step1b' ) {
             this.updateIssues();
-        } else if ($event.step.config.id === 'step3a') {
+        } else if ( $event.step.config.id === 'step3a' ) {
             this.wizardConfig.nextTitle = 'Deploy';
-        } else if ($event.step.config.id === 'step3b') {
+        } else if ( $event.step.config.id === 'step3b' ) {
             this.wizardConfig.nextTitle = 'Close';
         } else {
             this.wizardConfig.nextTitle = 'Next >';
@@ -289,18 +292,18 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
 
     updateVersion(): void {
-        this.step1aConfig.nextEnabled = (this.data.release !== undefined);
-        this.setNavAway(this.step1aConfig.nextEnabled);
+        this.step1aConfig.nextEnabled = ( this.data.release !== undefined );
+        this.setNavAway( this.step1aConfig.nextEnabled );
     }
 
     updateIssues(): void {
-        this.step1bConfig.nextEnabled = (this.data.issues !== undefined && this.data.issues.length > 0);
-        this.setNavAway(this.step2Config.nextEnabled);
+        this.step1bConfig.nextEnabled = ( this.data.issues !== undefined && this.data.issues.length > 0 );
+        this.setNavAway( this.step2Config.nextEnabled );
     }
 
     // Private
 
-    private setNavAway(allow: boolean) {
+    private setNavAway( allow: boolean ) {
         this.step1Config.allowClickNav = allow;
         this.step1aConfig.allowClickNav = allow;
         this.step1bConfig.allowClickNav = allow;
@@ -317,54 +320,54 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.step3bConfig.allowClickNav = allow;
     }
 
-    handleIssuesSelectionChange($event: ListEvent): void {
+    handleIssuesSelectionChange( $event: ListEvent ): void {
         this.data.issues = $event.selectedItems;
         this.updateIssues();
     }
 
-    onSelectIssue(event: TypeaheadMatch): void {
-        this.addIssue(event.item);
+    onSelectIssue( event: TypeaheadMatch ): void {
+        this.addIssue( event.item );
         this.selectIssue = null;
     }
 
-    onCreateIssueClose(issue: Issue) {
-        this.addIssue(issue);
+    onCreateIssueClose( issue: Issue ) {
+        this.addIssue( issue );
         this.modalRef.hide();
     }
 
-    private addIssue(issue: Issue) {
-        if (issue && this.data.issues.filter(i => i.reference === issue.reference).length === 0) {
+    private addIssue( issue: Issue ) {
+        if ( issue && this.data.issues.filter( i => i.reference === issue.reference ).length === 0 ) {
             issue.selected = true;
-            this.data.issues.push(issue);
+            this.data.issues.push( issue );
             this.updateIssues();
         }
 
-        if (issue) {
-            const exisingIssues = this.selectedIssues.filter(i => i.reference === issue.reference);
-            if (exisingIssues.length === 0) {
-                this.selectedIssues.push(issue);
+        if ( issue ) {
+            const exisingIssues = this.selectedIssues.filter( i => i.reference === issue.reference );
+            if ( exisingIssues.length === 0 ) {
+                this.selectedIssues.push( issue );
             } else {
-                exisingIssues.forEach(i => i.selected = true);
+                exisingIssues.forEach( i => i.selected = true );
             }
         }
     }
 
     openCreateIssue() {
-        this.modalRef = this.modalService.show(this.createIssueTemplate, { class: 'modal-lg' });
+        this.modalRef = this.modalService.show( this.createIssueTemplate, { class: 'modal-lg' } );
     }
 
 }
 
-function flattenWizardSteps(wizard: WizardComponent): WizardStep[] {
+function flattenWizardSteps( wizard: WizardComponent ): WizardStep[] {
     const flatWizard: WizardStep[] = [];
-    wizard.steps.forEach((step: WizardStepComponent) => {
-        if (step.hasSubsteps) {
-            step.steps.forEach(substep => {
-                flatWizard.push(substep);
-            });
+    wizard.steps.forEach(( step: WizardStepComponent ) => {
+        if ( step.hasSubsteps ) {
+            step.steps.forEach( substep => {
+                flatWizard.push( substep );
+            } );
         } else {
-            flatWizard.push(step);
+            flatWizard.push( step );
         }
-    });
+    } );
     return flatWizard;
 }

@@ -29,10 +29,17 @@
                     <ng-template tabHeading>
                         <span>Overview</span>
                     </ng-template>
+                    <div  *ngIf="release.undeployed" class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4>
+                                <div  style="color:red;"><strong>No more deployed</strong></div>
+                            </h4>
+                        </div>
+                    </div>
                     <div class="col-lg-12">
                         <div class="margin-left-20">
                             <h4><span class="fas myApp myApp-laptop-code" [class.myApp-green]="release.packageDate"
-                                    [class.myApp-orange]="!release.packageDate"></span><span>Build</span></h4>
+                                    [class.myApp-orange]="!release.packageDate" [class.myApp-grey]="release.undeployed"></span><span>Build</span></h4>
                             <div class="col-sm-4">
                                 <div><strong>Build Date</strong></div>
                                 <div *ngIf="release.buildDate">{{release.buildDate | date}}</div>
@@ -197,8 +204,9 @@
                                     </div>
                                     <div class="list-pf-additional-content">
                                         <span class="fas fa myApp myApp-laptop-code"
-                                            [class.myApp-green]="item.packageDate"
-                                            [class.myApp-orange]="!item.packageDate"></span>
+                                             [class.myApp-green]="item.packageDate && !item.undeployed"
+                                             [class.myApp-orange]="!item.packageDate && !item.undeployed"
+                                             [class.myApp-grey]="item.undeployed"></span>
                                         <span class="fas fa myApp myApp-user-shield"
                                             [appHistoryColor]="item.qualification"></span>
                                         <span class="fas fa myApp myApp-cart-check"

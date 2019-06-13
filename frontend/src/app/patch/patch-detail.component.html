@@ -36,13 +36,14 @@
                                 <span>{{RELEASE_CONSTANT.title}}
                                     <a routerLink="/release/{{versionNumber}}">{{versionNumber}}</a>
                                 </span>
+                                <div *ngIf="patch.undeployed" style="color:red;"><strong>No more deployed</strong></div>
                             </h4>
                         </div>
                     </div>
                     <div class="col-lg-12">
                         <div class="margin-left-20">
-                            <h4><span class="fas myApp myApp-laptop-code" [class.myApp-green]="patch.packageDate"
-                                    [class.myApp-orange]="!patch.packageDate"></span><span>Build</span></h4>
+                            <h4><span class="fas myApp myApp-laptop-code" [class.myApp-green]="patch.packageDate && !patch.undeployed"
+                                [class.myApp-orange]="!patch.packageDate && !patch.undeployed" [class.myApp-grey]="patch.undeployed"></span><span>Build</span></h4>
                             <div class="col-sm-4">
                                 <div><strong>Build Date</strong></div>
                                 <div *ngIf="patch.buildDate">{{patch.buildDate | date}}</div>

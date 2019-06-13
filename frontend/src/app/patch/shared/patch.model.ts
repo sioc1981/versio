@@ -8,6 +8,7 @@ export class Patch {
     release: Release;
 
     sequenceNumber: string;
+    undeployed: boolean;
 
     issues: Issue[];
 

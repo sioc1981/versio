@@ -44,8 +44,8 @@
                     </div>
                     <div class="list-pf-additional-content" style="justify-content:flex-end">
                         <div>
-                            <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate"
-                                [class.myApp-orange]="!item.packageDate"></span>
+                            <span class="fas fa myApp myApp-laptop-code" [class.myApp-green]="item.packageDate && !item.undeployed"
+                                [class.myApp-orange]="!item.packageDate && !item.undeployed" [class.myApp-grey]="item.undeployed"></span>
                         </div>
                         <div>
                             <span class="fas fa myApp myApp-user-shield" [appHistoryColor]="item.qualification"></span>
