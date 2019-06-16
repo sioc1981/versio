@@ -1,4 +1,4 @@
-package fr.sioc1981.versioning.backend.service;
+package fr.sioc1981.versioning.backend.service.admin;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -20,8 +20,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import fr.sioc1981.versioning.backend.entity.Application;
+import fr.sioc1981.versioning.backend.service.GlobalSSE;
 
-@Path("/application")
+@Path("/admin/application")
 @Stateless
 public class ApplicationService {
 

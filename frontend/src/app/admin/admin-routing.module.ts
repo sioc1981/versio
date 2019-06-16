@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminComponent } from './admin.component';
 import { AdminGuard } from './admin.guard';
 import { IssueContainerComponent } from './issuecontainer/issuecontainer.component';
+import { AdminMenuComponent } from './admin-menu.component';
 
 const adminRoutes: Routes = [
     {
@@ -10,6 +11,9 @@ const adminRoutes: Routes = [
         component: AdminComponent,
         canActivate: [AdminGuard],
         children: [{
+            path: '',
+            component: AdminMenuComponent
+        }, {
             path: 'issueContainers',
             component: IssueContainerComponent
         }]

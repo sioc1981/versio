@@ -59,6 +59,7 @@ import { AdminComponent } from './admin/admin.component';
 import { ApplicationsComponent } from './admin/application/applications/applications.component';
 import { ForbiddenPageComponent } from './misc/forbidden-page.component';
 import { IssueContainerComponent } from './admin/issuecontainer/issuecontainer.component';
+import { AdminMenuComponent } from './admin/admin-menu.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -94,7 +95,8 @@ defineLocale('fr', frLocale);
         AdminComponent,
         ApplicationsComponent,
         ForbiddenPageComponent,
-        IssueContainerComponent
+        IssueContainerComponent,
+        AdminMenuComponent
     ],
     imports: [
         AboutModalModule,

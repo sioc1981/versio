@@ -14,7 +14,7 @@ export class AdminGuard implements CanActivate {
         state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
         const url: string = state.url;
         return this.authService.isLoggedIn().then(logged => {
-            if (!logged) {
+            if (!logged || !this.authService.isAdmin()) {
                 this.router.navigate(['/forbidden', { from: url }]);
                 return false;
             }

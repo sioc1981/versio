@@ -8,6 +8,8 @@ import javax.ejb.Startup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.sioc1981.versioning.backend.service.admin.IssueContainerService;
+
 @Startup
 @Singleton
 public class Initializer {

@@ -1,4 +1,4 @@
-package fr.sioc1981.versioning.backend.service;
+package fr.sioc1981.versioning.backend.service.admin;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,8 +22,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import fr.sioc1981.versioning.backend.entity.IssueContainer;
+import fr.sioc1981.versioning.backend.service.GlobalSSE;
 
-@Path("/issueContainer")
+@Path("/admin/issueContainer")
 @Stateless
 public class IssueContainerService {
 

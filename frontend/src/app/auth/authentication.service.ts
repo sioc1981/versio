@@ -32,7 +32,7 @@ export class AuthenticationService {
             const token: string = localStorage.getItem(AUTH_TOKEN);
             const refreshToken: string = localStorage.getItem(AUTH_REFRESH_TOKEN) || '';
             const options = {
-                enableBearerInterceptor: false
+                enableBearerInterceptor: false,
             } as KeycloakOptions;
             if (token && refreshToken) {
                 options.initOptions = {
@@ -69,6 +69,14 @@ export class AuthenticationService {
             return this.keycloakService.isLoggedIn();
         } else {
             return Promise.resolve(true);
+        }
+    }
+
+    isAdmin(): boolean {
+        if (environment.hasAuthentication) {
+            return this.keycloakService.isUserInRole('admin');
+        } else {
+            return true;
         }
     }
 

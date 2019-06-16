@@ -217,7 +217,7 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
 
     // Methods
     nextClicked($event: WizardEvent): void {
-        if ($event.step.config.id === 'step3') {
+        if ($event.step.config.id === 'step3b') {
             this.closeWizard(this.data as Patch);
         }
     }
