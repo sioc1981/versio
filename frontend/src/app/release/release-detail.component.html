@@ -185,6 +185,9 @@
                                     (onFilterChange)="filterChanged($event, ReleaseDetailTabEnum.PATCHES)"
                                     (onSortChange)="handleSortChanged($event, ReleaseDetailTabEnum.PATCHES)">
                                 </pfng-toolbar>
+                                <ng-template #createPatch>
+					                <app-patch-create [release]="release" (close)="onWizardClose($event)"></app-patch-create>
+					            </ng-template>
                             </div>
                         </div>
                     </div>

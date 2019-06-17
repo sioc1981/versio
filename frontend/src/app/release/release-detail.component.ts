@@ -29,6 +29,7 @@ enum ReleaseDetailTab {
 })
 export class ReleaseDetailComponent implements OnInit, OnDestroy {
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
+    @ViewChild( 'createPatch' ) createPatchTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
     ReleaseDetailTabEnum = ReleaseDetailTab;
@@ -63,6 +64,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     patches: Patch[];
     filteredPatches: Patch[] = [];
     isAscendingSortForPatches = true;
+    patchActionConfig: ActionConfig;
     patchFilterConfig: FilterConfig;
     patchSortConfig: SortConfig;
     patchToolbarConfig: ToolbarConfig;
@@ -90,24 +92,19 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as EmptyStateConfig;
 
         this.actionConfig = {
-            primaryActions: [{
-                id: 'copyURL',
-                title: 'Copy URL',
-                tooltip: 'Copy URL with current filters'
-            }]
-        } as ActionConfig;
-
-        this.auth.isLoggedIn().then(loggedIn => {
-            if (loggedIn) {
-                this.globalActionConfig = {
-                    primaryActions: [{
-                        id: 'editRelease',
-                        title: 'Edit release',
-                        tooltip: 'Edit release'
-                    }]
-                } as ActionConfig;
-            }
-        });
+                primaryActions: [{
+                    id: 'copyURL',
+                    title: 'Copy URL',
+                    tooltip: 'Copy URL with current filters'
+                }]
+            } as ActionConfig;
+        this.patchActionConfig = {
+                primaryActions: [{
+                    id: 'copyURL',
+                    title: 'Copy URL',
+                    tooltip: 'Copy URL with current filters'
+                }]
+            } as ActionConfig;
 
         this.issueActionConfig = {
             primaryActions: [{
@@ -292,7 +289,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as PaginationConfig;
 
         this.patchToolbarConfig = {
-            actionConfig: this.actionConfig,
+            actionConfig: this.patchActionConfig,
             filterConfig: this.patchFilterConfig,
             sortConfig: this.patchSortConfig
         } as ToolbarConfig;
@@ -353,6 +350,23 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             filterConfig: this.allIssueFilterConfig,
             sortConfig: this.allIssueSortConfig
         } as ToolbarConfig;
+        
+        this.auth.isLoggedIn().then(loggedIn => {
+            if (loggedIn) {
+                this.globalActionConfig = {
+                    primaryActions: [{
+                        id: 'editRelease',
+                        title: 'Edit release',
+                        tooltip: 'Edit release'
+                    }]
+                } as ActionConfig;
+                this.patchActionConfig.primaryActions.push({
+                    id: 'addPatch',
+                    title: 'Add new patch',
+                    tooltip: 'Add a new patch'
+                });
+            }
+        });
 
         this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
@@ -465,7 +479,9 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     }
 
     handleAction(action: Action, item?: any): void {
-        if (action.id === 'editRelease') {
+        if ( action.id === 'addPatch' ) {
+            this.openModal( this.createPatchTemplate );
+        } else if (action.id === 'editRelease') {
             this.openModal(this.updateReleaseTemplate);
         } else if (action.id === 'openIssue') {
             const url = ISSUE_CONSTANT.constainer_urls[item.container] + item.reference;
@@ -806,7 +822,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             this.patchPaginationConfig.totalItems).slice(0, this.patchPaginationConfig.pageSize);
     }
 
-    onWizardClose(releaseFullChanged: ReleaseFull) {
+    onWizardClose(releaseFullChanged: any) {
         if (releaseFullChanged) {
             this.reloadData();
         }

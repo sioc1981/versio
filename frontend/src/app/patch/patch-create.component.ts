@@ -7,7 +7,8 @@ import {
     OnDestroy,
     TemplateRef,
     EventEmitter,
-    Output
+    Output,
+    Input
 } from '@angular/core';
 
 import {
@@ -37,6 +38,7 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
     modalRef: BsModalRef;
 
     @Output() close = new EventEmitter<Patch>();
+    @Input() release: Release;
 
     data: any = {
         issues: []
@@ -89,6 +91,10 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
         this.data.keyUser = new PlatformHistory();
         this.data.pilot = new PlatformHistory();
         this.data.production = new PlatformHistory();
+        if (this.release) {
+            this.data.release = this.release;
+            this.releaseVersion = this.release.version.versionNumber;
+        }
 
         // Step 1
         this.step1Config = {
