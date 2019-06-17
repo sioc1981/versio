@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { NavigationExtras, Router } from '@angular/router';
 import { CardConfig, UtilizationDonutChartConfig, DonutChartConfig, EmptyStateConfig } from 'patternfly-ng';
 import { ReleaseSummary } from 'src/app/release/shared/release.model';
 import { PlatformSummary } from 'src/app/shared/platform.model';
@@ -37,7 +38,7 @@ export class ReleaseCardComponent implements OnInit {
 
     chartHeight = 100;
 
-    constructor() { }
+    constructor(private router: Router) { }
 
     ngOnInit() {
         this.config = {
@@ -53,6 +54,11 @@ export class ReleaseCardComponent implements OnInit {
         this.packageConfig = {
             chartId: 'exampleUtilizationDonut' + this.item.id,
             centerLabelFormat: 'txt-func',
+            data: {
+                onclick: (data, element) => {
+                    this.router.navigate(['/release', this.item.versionNumber, 'PATCHES']);
+                }
+            },
             outerLabelAlignment: 'right',
             thresholds: { 'warning': 40, 'error': 80 },
             total: this.maxPatch,
@@ -151,6 +157,27 @@ export class ReleaseCardComponent implements OnInit {
                     label: {
                         text: !isDeployed ? 'Not deployed' : isUndeployed ? 'Undeployed' : 'No Patch'
                     }
+                },
+                onclick: (data, element) => {
+                    const extra = {} as NavigationExtras;
+                    let filterCriterium = '';
+                    switch (data.id) {
+                    case 'missing':
+                        filterCriterium = 'missingOn_';
+                        break;
+                    case 'deployed':
+                        filterCriterium = 'toTestOn_';
+                        break;
+                    case 'validated':
+                        filterCriterium = 'deployedOn_';
+                        break;
+                    }
+                    if ( filterCriterium !== '' ) {
+                        extra.queryParams = {
+                            'filter': filterCriterium + platform
+                        };
+                    }
+                    this.router.navigate(['/release', this.item.versionNumber, 'PATCHES'], extra);
                 }
             },
             legend: {

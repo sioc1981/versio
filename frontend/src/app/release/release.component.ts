@@ -97,6 +97,24 @@ export class ReleaseComponent implements OnInit, OnDestroy {
                     value: 'Production platform'
                 }]
             }, {
+                id: 'toTestOn',
+                title: 'To test on',
+                placeholder: 'To test on...',
+                type: FilterType.SELECT,
+                queries: [{
+                    id: 'qualification',
+                    value: 'Qualification platform'
+                }, {
+                    id: 'keyUser',
+                    value: 'KeyUser platform'
+                }, {
+                    id: 'pilot',
+                    value: 'Pilot platform'
+                }, {
+                    id: 'production',
+                    value: 'Production platform'
+                }]
+            }, {
                 id: 'missingOn',
                 title: 'Missing on',
                 placeholder: 'Missing on...',
@@ -297,6 +315,11 @@ export class ReleaseComponent implements OnInit, OnDestroy {
                 break;
             case 'deployedOn':
                 match = item.release[filter.query.id] && item.release[filter.query.id].deployDate
+                    && !item.release[filter.query.id].undeployDate;
+                break;
+            case 'toTestOn':
+                match = item.release[filter.query.id] && item.release[filter.query.id].deployDate
+                    && !item.release[filter.query.id].validationDate
                     && !item.release[filter.query.id].undeployDate;
                 break;
             case 'missingOn':
