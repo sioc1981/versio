@@ -174,7 +174,7 @@ export class ReleaseCardComponent implements OnInit {
                     }
                     if ( filterCriterium !== '' ) {
                         extra.queryParams = {
-                            'filter': filterCriterium + platform
+                            'filter': [filterCriterium + platform, 'onlyDeployed_onlyDeployed']
                         };
                     }
                     this.router.navigate(['/release', this.item.versionNumber, 'PATCHES'], extra);
