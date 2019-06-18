@@ -198,12 +198,21 @@
                             <ng-template #patchTemplate let-item="item" let-index="index">
                                 <div class="list-pf-content-wrapper">
                                     <div class="list-pf-main-content">
-                                        <div class="list-pf-main-content">
                                             <div class="list-pf-title">
                                                 <a
                                                     routerLink="/patch/{{versionNumber}}/{{item.sequenceNumber}}">{{item.sequenceNumber}}</a>
                                             </div>
-                                        </div>
+                                            <div class="list-pf-description">
+                                            	<div *ngFor="let issue of item.issues">
+                                            	<span [ngSwitch]="issue.container">
+				                                    <img src="assets/images/mantis_logo.png" class="list-pf-icon-small"
+				                                        *ngSwitchCase="'MANTIS'" />
+				                                    <img src="assets/images/jira.svg" class="list-pf-icon-small"
+				                                        *ngSwitchCase="'JIRA'" />
+				                                </span>
+                                            	<span>{{issue.reference}}</span>
+                                            	</div>
+                                            </div>
                                     </div>
                                     <div class="list-pf-additional-content">
                                         <span class="fas fa myApp myApp-laptop-code"
