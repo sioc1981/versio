@@ -780,7 +780,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                 match = issueMatch;
                 break;
             case 'onlyDeployed':
-                match = !item.release.undeployed;
+                match = !item.undeployed;
                 break;
             case 'deployedOn':
                 match = item[filter.query.id] && item[filter.query.id].deployDate
