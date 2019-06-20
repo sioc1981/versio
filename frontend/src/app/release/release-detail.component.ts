@@ -633,16 +633,16 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
     compareBuildDate(item1: any, item2: any): number {
         let compValue = 0;
-        const sourceRelease1 = item1.release.buildDate;
-        const sourceRelease2 = item2.release.buildDate;
+        const sourceRelease1 = item1.buildDate || 0;
+        const sourceRelease2 = item2.buildDate || 0;
         compValue = sourceRelease1 - sourceRelease2;
         return compValue;
     }
 
     compareDeployDate(item1: any, item2: any, platform: string): number {
         let compValue = 0;
-        const sourceRelease1 = item1.release[platform] ? item1.release[platform].deployDate : 0;
-        const sourceRelease2 = item2.release[platform] ? item2.release[platform].deployDate : 0;
+        const sourceRelease1 = item1[platform] ? item1[platform].deployDate : 0;
+        const sourceRelease2 = item2[platform] ? item2[platform].deployDate : 0;
         compValue = sourceRelease1 - sourceRelease2;
         return compValue;
     }
