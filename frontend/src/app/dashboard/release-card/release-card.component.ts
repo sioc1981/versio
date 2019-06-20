@@ -37,6 +37,8 @@ export class ReleaseCardComponent implements OnInit {
     maxPatch: number;
 
     chartHeight = 100;
+    
+    patchThreshold = 50;
 
     constructor(private router: Router) { }
 
@@ -50,7 +52,7 @@ export class ReleaseCardComponent implements OnInit {
         // this.packageConfig.used = this.item.packagePatched;
         // this.packageConfig.thresholds = {'warning': this.packageConfig.total=this.item.patchCount-1,
         //  'error': this.packageConfig.total=this.item.patchCount-3};
-        this.maxPatch = this.item.patchCount > 25 ? this.item.patchCount : 25;
+        this.maxPatch = this.item.patchCount > this.patchThreshold ? this.item.patchCount : this.patchThreshold;
         this.packageConfig = {
             chartId: 'exampleUtilizationDonut' + this.item.id,
             centerLabelFormat: 'txt-func',

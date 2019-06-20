@@ -30,6 +30,7 @@ enum ReleaseDetailTab {
 export class ReleaseDetailComponent implements OnInit, OnDestroy {
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
     @ViewChild( 'createPatch' ) createPatchTemplate: TemplateRef<any>;
+    @ViewChild( 'updatePatch' ) updatePatchTemplate: TemplateRef<any>;
     modalRef: BsModalRef;
 
     ReleaseDetailTabEnum = ReleaseDetailTab;
@@ -63,8 +64,10 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
     patches: Patch[];
     filteredPatches: Patch[] = [];
+    selectedPatch: Patch;
     isAscendingSortForPatches = true;
     patchActionConfig: ActionConfig;
+    patchToolbarActionConfig: ActionConfig;
     patchFilterConfig: FilterConfig;
     patchSortConfig: SortConfig;
     patchToolbarConfig: ToolbarConfig;
@@ -98,7 +101,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                     tooltip: 'Copy URL with current filters'
                 }]
             } as ActionConfig;
-        this.patchActionConfig = {
+        this.patchToolbarActionConfig = {
                 primaryActions: [{
                     id: 'copyURL',
                     title: 'Copy URL',
@@ -280,6 +283,10 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as SortConfig;
 
         this.currentPatchSortField = this.patchSortConfig.fields[0];
+        
+        this.patchActionConfig = {
+                primaryActions: []
+            } as ActionConfig;
 
         this.patchPaginationConfig = {
             pageNumber: 1,
@@ -289,7 +296,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as PaginationConfig;
 
         this.patchToolbarConfig = {
-            actionConfig: this.patchActionConfig,
+            actionConfig: this.patchToolbarActionConfig,
             filterConfig: this.patchFilterConfig,
             sortConfig: this.patchSortConfig
         } as ToolbarConfig;
@@ -360,10 +367,15 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                         tooltip: 'Edit release'
                     }]
                 } as ActionConfig;
-                this.patchActionConfig.primaryActions.push({
+                this.patchToolbarActionConfig.primaryActions.push({
                     id: 'addPatch',
                     title: 'Add new patch',
                     tooltip: 'Add a new patch'
+                });
+                this.patchActionConfig.primaryActions.push({
+                    id: 'editPatch',
+                    title: 'Edit patch',
+                    tooltip: 'Edit this patch'
                 });
             }
         });
@@ -481,6 +493,9 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     handleAction(action: Action, item?: any): void {
         if ( action.id === 'addPatch' ) {
             this.openModal( this.createPatchTemplate );
+        } else if (action.id === 'editPatch') {
+            this.selectedPatch = item;
+            this.openModal( this.updatePatchTemplate );
         } else if (action.id === 'editRelease') {
             this.openModal(this.updateReleaseTemplate);
         } else if (action.id === 'openIssue') {
@@ -505,7 +520,6 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                 this.applyAllIssueFilters();
                 break;
         }
-
     }
 
     applyIssueFilters(): void {
