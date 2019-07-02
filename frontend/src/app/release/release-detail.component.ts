@@ -176,14 +176,14 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
         this.patchFilterConfig = {
             fields: [{
+                 id: 'issue',
+                title: 'Issue',
+                placeholder: 'Filter by issue...',
+                type: FilterType.TEXT
+            }, {
                 id: 'sequence',
                 title: 'Sequence',
                 placeholder: 'Filter by Sequence Number...',
-                type: FilterType.TEXT
-            }, {
-                id: 'issue',
-                title: 'issue',
-                placeholder: 'Filter by issue...',
                 type: FilterType.TEXT
             }, {
                 id: 'onlyDeployed',
