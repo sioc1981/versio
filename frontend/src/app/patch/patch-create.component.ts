@@ -235,7 +235,9 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
     startDeploy(): void {
         this.deployComplete = false;
         this.wizardConfig.done = true;
-        this.data.buildDate = new Date();
+        if ( !this.data.buildDate) {
+            this.data.buildDate = new Date();
+        }
         this.subscriptions.push(this.patchService.addPatch(this.data as Patch)
             .subscribe(_ => {
                 this.deployComplete = true;
@@ -275,7 +277,6 @@ export class PatchCreateComponent implements OnInit, OnDestroy {
     }
 
     updateIssues(): void {
-        console.log('issues: ', this.data.issues);
         this.step1bConfig.nextEnabled = (this.data.issues !== undefined && this.data.issues.length > 0);
         this.setNavAway(this.step1bConfig.nextEnabled);
     }
