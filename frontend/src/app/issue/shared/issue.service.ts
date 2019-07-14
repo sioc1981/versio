@@ -5,7 +5,7 @@ import { catchError } from 'rxjs/operators';
 
 import { SseService } from '../../server-event/sse.service';
 import { ISSUE_CONSTANT } from './issue.constant';
-import { Issue } from './issue.model';
+import { Issue, IssueExtended } from './issue.model';
 import { IssueContainer } from 'src/app/admin/issuecontainer/shared/issue-container.model';
 
 
@@ -59,6 +59,13 @@ export class IssueService {
     updateIssue(issue: Issue): Observable<any> {
         return this.http.put(ISSUE_CONSTANT.backendUrl, issue, ISSUE_CONSTANT.httpOptions).pipe(
             catchError(this.logAndError('updatePatch'))
+        );
+	}
+	
+	searchIssueFull(issueRef: string): Observable<IssueExtended> {
+        const url = `${ISSUE_CONSTANT.backendUrl}/${issueRef}/full`;
+        return this.http.get<IssueExtended>(url).pipe(
+            catchError(this.logAndError(`searchIssueFull issueRef=${issueRef}`))
         );
     }
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IssueService } from './shared/issue.service';
 import {
     WizardEvent, FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
@@ -50,7 +50,7 @@ export class IssueComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor(private issueService: IssueService, private modalService: BsModalService, private auth: AuthenticationService,
-        private route: ActivatedRoute, private loc: Location, private copyService: CopyService) { }
+        private route: ActivatedRoute, private loc: Location, private copyService: CopyService, private router: Router) { }
 
     ngOnInit() {
         this.filterConfig = {
@@ -84,6 +84,10 @@ export class IssueComponent implements OnInit, OnDestroy {
 
         this.issueActionConfig = {
             primaryActions: [{
+                id: 'showMoreIssue',
+                title: 'Show More',
+                tooltip: 'Show Releases and patches mentionned by the issue'
+            }, {
                 id: 'openIssue',
                 title: 'Open issue',
                 tooltip: 'Open issue in an new tab'
@@ -278,6 +282,9 @@ export class IssueComponent implements OnInit, OnDestroy {
         } else if (action.id === 'editIssue') {
             this.selectedIssue = item;
             this.openModal(this.updateIssueTemplate);
+        } else if (action.id === 'showMoreIssue') {
+            this.selectedIssue = item;
+            this.router.navigate(['/issue', item.reference]);
         } else if (action.id === 'importIssues') {
             this.openModal(this.importIssueTemplate);
         } else if (action.id === 'openIssue') {

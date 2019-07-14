@@ -27,9 +27,12 @@ import javax.ws.rs.sse.SseEventSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.sioc1981.versioning.backend.data.IssueExtended;
 import fr.sioc1981.versioning.backend.data.IssueReleaseComparisonParam;
 import fr.sioc1981.versioning.backend.data.IssueReleaseComparisonResultItem;
 import fr.sioc1981.versioning.backend.entity.Issue;
+import fr.sioc1981.versioning.backend.entity.Patch;
+import fr.sioc1981.versioning.backend.entity.Release;
 
 @Path("/issue")
 @Stateless
@@ -138,6 +141,34 @@ public class IssueService {
 	}
 
 	@GET
+	@Path("/{id}/full")
+	@Produces("application/json")
+	public Response findRelatedById(@PathParam("id") String id) {
+		List<Issue> result = this.entityManager.createQuery("from Issue where reference = :reference", Issue.class)
+				.setParameter("reference", id).getResultList();
+
+		if (result.isEmpty()) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		
+		IssueExtended issueExtended = new IssueExtended();
+		issueExtended.setIssueReference(id);
+		issueExtended.setIssue(result.get(0));
+		
+		List<Release> releaseResult = this.entityManager.createQuery(
+				"select rf.release from ReleaseFull rf join rf.issues i where i.reference = :reference",
+				Release.class).setParameter("reference", id).getResultList();
+		issueExtended.setReleases(releaseResult);
+
+		List<Patch> patchResult = this.entityManager.createQuery(
+				"select p from Patch p join p.issues i where i.reference = :reference",
+				Patch.class).setParameter("reference", id).getResultList();
+		issueExtended.setPatches(patchResult);
+		
+		return Response.ok(issueExtended).build();
+	}
+
+	@GET
 	@Path("/{id}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") String id) {
@@ -153,7 +184,7 @@ public class IssueService {
 
 	private IssueReleaseComparisonResultItem createIssueReleaseComparisonResultItem(final Issue issue,
 			final String versionNumber, String patchSequence) {
-		LOG.warn("createIssueReleaseComparisonResultItem({},{},{})", issue.getReference(), versionNumber,
+		LOG.info("createIssueReleaseComparisonResultItem({},{},{})", issue.getReference(), versionNumber,
 				patchSequence);
 		IssueReleaseComparisonResultItem res = new IssueReleaseComparisonResultItem();
 		res.setIssue(issue);
@@ -162,4 +193,6 @@ public class IssueService {
 		res.setPatchSequence(patchSequence);
 		return res;
 	}
+	
+
 }
