@@ -2,13 +2,15 @@ import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/c
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
-    WizardEvent, EmptyStateConfig, Action, ActionConfig, CopyService
+    WizardEvent, EmptyStateConfig, Action, ActionConfig, CopyService, FilterConfig, SortConfig, ToolbarConfig, SortField
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AuthenticationService } from '../auth/authentication.service';
 import { Location } from '@angular/common';
 import { IssueService } from './shared/issue.service';
 import { IssueExtended } from './shared/issue.model';
+import { Patch } from '../patch/shared/patch.model';
+import { Release } from '../release/shared/release.model';
 
 enum ReleaseDetailTab {
     OVERVIEW,
@@ -29,6 +31,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
     ReleaseDetailTabEnum = ReleaseDetailTab;
 
     issueReference: string;
+    
+    parcels: (Patch | Release)[];
 
     loading = true;
     loadingFailed = false;
@@ -37,6 +41,13 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
 
     globalActionConfig: ActionConfig;
     actionConfig: ActionConfig;
+    issueActionConfig: ActionConfig;
+    isAscendingSort = false;
+    filterConfig: FilterConfig;
+    sortConfig: SortConfig;
+    toolbarConfig: ToolbarConfig;
+    currentSortField: SortField;
+
 
     issueExtended: IssueExtended;
 
@@ -97,6 +108,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
         this.subscriptions.push(this.issueService.searchIssueFull(this.issueReference)
             .subscribe(issueExtended => {
                     this.issueExtended = issueExtended;
+                    this.parcels = [...this.issueExtended.releases, ...this.issueExtended.patches];
                 },
                 _ => this.loadingFailed = true,
                 () => { this.loading = false; }));

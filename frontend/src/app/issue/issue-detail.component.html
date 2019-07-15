@@ -24,7 +24,70 @@
 
     <ng-template #loaded>
         <div *ngIf="issueExtended; else error">
-			{{issueExtended | json}}
+        	<div class="row" >
+                <div [ngSwitch]="issueExtended.issue.container" class="col-sm-1">
+	              <img src="assets/images/mantis_logo.png" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'MANTIS'"/>
+	              <img src="assets/images/jira.svg" class="list-pf-icon list-pf-icon-small" *ngSwitchCase="'JIRA'"/>
+	            </div>
+	            <span class="col-sm-11">{{issueExtended.issue.reference}} - {{issueExtended.issue.description}}</span>
+        	</div>
+
+			<div class="row">
+			    <div class="col-sm-12">
+			        <div class="form-group">
+			            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)"
+			                (onFilterChange)="filterChanged($event)" (onSortChange)="handleSortChanged($event)">
+			            </pfng-toolbar>
+			        </div>
+			    </div>
+			
+			    <div class="col-sm-12">
+			        <div class="form-group">
+			            <pfng-list id="myList" [actionTemplate]="actionTemplate" [items]="parcels"
+			                [itemTemplate]="parcelTemplate">
+			                <ng-template #parcelTemplate let-item="item" let-index="index">
+			                    <div class="list-pf-content-wrapper">
+			                        <div class="list-pf-main-content">
+			                           <div class="list-pf-title">
+			                                  <a *ngIf="!item.release; else ref_to_patch"
+			                                    routerLink="/release/{{item.version.versionNumber}}">{{item.version.versionNumber}}</a>
+			                                    <ng-template #ref_to_patch>
+			                                    <a routerLink="/patch/{{item.release.version.versionNumber}}/{{item.sequenceNumber}}">{{item.release.version.versionNumber}} - {{item.sequenceNumber}}</a>
+			                                    </ng-template>
+			                            </div>
+			                        </div>
+			                        <div class="list-pf-additional-content" style="justify-content:flex-end">
+			                            <div>
+			                                <span class="fas myApp myApp-laptop-code" [class.myApp-green]="item.packageDate"
+			                                    [class.myApp-orange]="!item.packageDate" [class.myApp-grey]="item.undeployed"></span>
+			                            </div>
+			                            <div>
+			                                <span class="fas myApp myApp-user-shield"
+			                                    [appHistoryColor]="item.qualification"></span>
+			                            </div>
+			                            <div>
+			                                <span class="fas myApp myApp-cart-check" [appHistoryColor]="item.keyUser"></span>
+			                            </div>
+			                            <div>
+			                                <span class="fas myApp myApp-cash-register" [appHistoryColor]="item.pilot"></span>
+			                            </div>
+			                            <div>
+			                                <span class="fas myApp myApp-store" [appHistoryColor]="item.production"></span>
+			                            </div>
+			                        </div>
+			                    </div>
+			                </ng-template>
+			                <ng-template #actionTemplate let-item="item" let-index="index">
+			                    <pfng-action class="list-pf-actions" [config]="actionConfig"
+			                        (onActionSelect)="handleAction($event, item)">
+			                    </pfng-action>
+			                </ng-template>
+			            </pfng-list>
+			            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+			                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+			        </div>
+			    </div>
+	        </div>
         </div>
     </ng-template>
 
