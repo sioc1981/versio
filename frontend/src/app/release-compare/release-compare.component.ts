@@ -77,13 +77,13 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.generateTableConfig();
 
-        this.route.paramMap.subscribe(params => {
+        this.subscriptions.push(this.route.paramMap.subscribe(params => {
             this.fromVersion = params.get('fromVersion');
             this.toVersion = params.get('toVersion');
             if (params.has('fromVersion') && params.has('fromVersion')) {
                 this.startCompare();
             }
-        });
+        }));
     }
 
     generateTableConfig() {

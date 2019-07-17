@@ -155,7 +155,7 @@ export class IssueComponent implements OnInit, OnDestroy {
             totalItems: this.filteredIssues.length
         } as PaginationConfig;
 
-        this.route.queryParamMap.subscribe(params => {
+        this.subscriptions.push(this.route.queryParamMap.subscribe(params => {
             const filters: string[] = params.getAll('filter');
             if (filters.length > 0) {
                 this.filterConfig.appliedFilters = [];
@@ -170,7 +170,7 @@ export class IssueComponent implements OnInit, OnDestroy {
                 });
                 this.applyFilters();
             }
-        });
+        }));
         this.getIssues();
     }
 

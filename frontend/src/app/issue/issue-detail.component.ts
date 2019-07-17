@@ -211,7 +211,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
                 totalItems: this.filteredParcels.length
             } as PaginationConfig;
 
-            this.route.queryParamMap.subscribe(params => {
+            this.subscriptions.push(this.route.queryParamMap.subscribe(params => {
                 const filters: string[] = params.getAll('filter');
                 if (filters.length > 0) {
                     this.filterConfig.appliedFilters = [];
@@ -226,7 +226,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
                     });
                     this.applyFilters();
                 }
-            });
+            }));
         this.auth.isLoggedIn().then(loggedIn => {
             if (loggedIn) {
                 this.globalActionConfig.primaryActions.push({
@@ -237,12 +237,12 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.route.paramMap.subscribe(params => {
+        this.subscriptions.push(this.route.paramMap.subscribe(params => {
             this.issueReference = params.get('ref');
             if (params.has('ref')) {
                 this.reloadData();
             }
-        });
+        }));
     }
 
     addFilterFromParam(paramFilter: string, filterField: FilterField, filterConf: FilterConfig): void {

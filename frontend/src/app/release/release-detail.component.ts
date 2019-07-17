@@ -380,7 +380,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.route.paramMap.subscribe(params => {
+        this.subscriptions.push(this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
             this.viewAtStartup = params.get('view');
             this.currentTab = ReleaseDetailTab[this.viewAtStartup];
@@ -391,7 +391,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
                 const filterConf: FilterConfig = this.getCurrentFilterConfig();
 
-                this.route.queryParamMap.subscribe(queryParams => {
+            this.subscriptions.push(this.route.queryParamMap.subscribe(queryParams => {
                     const filters: string[] = queryParams.getAll('filter');
                     if (filters.length > 0) {
                         filterConf.appliedFilters = [];
@@ -404,11 +404,13 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                                 }
                             });
                         });
-                        this.applyIssueFilters();
+                        if (this.releaseFull) {
+                            this.applyIssueFilters()
+                        };
                     }
-                });
+                }));
             }
-        });
+        }));
     }
 
     getCurrentFilterConfig(): FilterConfig {

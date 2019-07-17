@@ -211,7 +211,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
             totalItems: this.filteredReleases.length
         } as PaginationConfig;
 
-        this.route.queryParamMap.subscribe(params => {
+        this.subscriptions.push(this.route.queryParamMap.subscribe(params => {
             const filters: string[] = params.getAll('filter');
             if (filters.length > 0) {
                 this.filterConfig.appliedFilters = [];
@@ -226,7 +226,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
                 });
                 this.applyFilters();
             }
-        });
+        }));
 
     }
 

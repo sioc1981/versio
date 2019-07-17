@@ -153,15 +153,12 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
             totalItems: this.filteredIssues.length
         } as PaginationConfig;
 
-        this.route.paramMap.subscribe(params => {
+        this.subscriptions.push(this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
             this.sequenceNumber = params.get('sequence');
             this.viewAtStartup = params.get('view');
             this.currentTab = PatchDetailTab[this.viewAtStartup];
-            if (params.has('version') && params.has('sequence')) {
-                this.reloadData();
-            }
-            this.route.queryParamMap.subscribe(queryParams => {
+            this.subscriptions.push(this.route.queryParamMap.subscribe(queryParams => {
                 const filters: string[] = queryParams.getAll('filter');
                 if (filters.length > 0) {
                     this.issueFilterConfig.appliedFilters = [];
@@ -174,10 +171,15 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
                             }
                         });
                     });
-                    this.applyIssueFilters();
+                    if (this.patch) {
+                        this.applyIssueFilters();
+                    }
                 }
-            });
-        });
+            }));
+            if (params.has('version') && params.has('sequence')) {
+                this.reloadData();
+            }
+        }));
 
     }
 

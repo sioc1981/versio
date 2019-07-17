@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EmptyStateConfig, ActionConfig, Action } from 'patternfly-ng';
 import { AuthenticationService } from '../auth/authentication.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-forbidden-page',
@@ -15,6 +16,8 @@ export class ForbiddenPageComponent implements OnInit {
     actionConfig: ActionConfig;
 
     redirectUrl: string;
+
+    private subscriptions: Subscription[] = [];
 
     constructor(private route: ActivatedRoute, private router: Router, private loc: Location, private auth: AuthenticationService) {
     }
@@ -37,7 +40,7 @@ export class ForbiddenPageComponent implements OnInit {
             title: 'Forbidden Page'
         } as EmptyStateConfig;
 
-        this.route.paramMap.subscribe(params => {
+        this.subscriptions.push(this.route.paramMap.subscribe(params => {
             if (params.has('from')) {
                 this.redirectUrl = domainAndApp + params.get('from');
             }
@@ -55,7 +58,7 @@ export class ForbiddenPageComponent implements OnInit {
                         + '. Please choose another page or return to Home Page';
                 }
             });
-        });
+        }));
 
     }
 
