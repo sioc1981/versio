@@ -337,10 +337,10 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
                 || item.issue.description.indexOf(filter.value) !== -1;
         } else if (filter.field.id === 'sourceRelease') {
             match = item.sourceReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1
-                || item.sourcePatches.release === filter.query.id;
+                || (item.sourcePatches.release === filter.query.id && item.sourcePatches.patches.length !== 0);
         } else if (filter.field.id === 'destRelease') {
             match = item.destReleases.findIndex(r => r.version.versionNumber === filter.query.id) !== -1
-                || item.destPatches.release === filter.query.id;
+                || (item.destPatches.release === filter.query.id && item.destPatches.patches.length !== 0);
         } else if (filter.field.id === 'missingRelease') {
             if (filter.query.id === 'sourceReleases') {
                 match = item.destReleases.length === 0 && item.destPatches.patches.length === 0;
