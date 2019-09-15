@@ -18,8 +18,8 @@ import { PlatformSummary } from './platform.model';
     `
 })
 class SummaryColorDirectiveTestComponent {
-    nbPatches=5;
-    nbPatchesToDeploy=6;
+    nbPatches = 5;
+    nbPatchesToDeploy = 6;
 
     production: PlatformSummary = {
         deployed: true,
@@ -28,7 +28,7 @@ class SummaryColorDirectiveTestComponent {
         deployedPatchCount: 5,
         validedPatchCount: 5
     };
-    
+
     pilot: PlatformSummary = {
         deployed: true,
         validated: false,

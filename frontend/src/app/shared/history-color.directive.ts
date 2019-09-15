@@ -15,21 +15,25 @@ export class HistoryColorDirective implements OnInit {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'To be deployed');
        } else if (this.appHistoryColor.undeployDate) {
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'No more deployed');
        } else if (this.appHistoryColor.validationDate) {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Deployed and validated');
         } else {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Need to be Validated');
          }
     }
 }

@@ -26,19 +26,24 @@ export class SummaryColorDirective implements OnInit {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'To be deployed');
         } else if (this.appSummaryColor.undeployed) {
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'No more deployed');
         } else if (this.appSummaryColor.validated) {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Deployed and validated');
         } else {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-orange');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Need to be validated');
         }
+        
     }
 
     applyPatchColor(): void {
@@ -47,26 +52,31 @@ export class SummaryColorDirective implements OnInit {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'To be deployed');
         } else if (this.appSummaryColor.undeployed) {
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'No more deployed');
         } else if (this.appSummaryColor.deployedPatchCount !== this.appSummaryPatch) {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Missing patch(es)');
         } else if (this.appSummaryColor.validedPatchCount === this.appSummaryPatch) {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Patches deployed and validated');
         } else {
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-grey');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-green');
             this.renderer.addClass(this.hostElement.nativeElement, 'myApp-orange');
             this.renderer.removeClass(this.hostElement.nativeElement, 'myApp-red');
+            this.renderer.setAttribute(this.hostElement.nativeElement, 'title', 'Deployed Patches to be validated');
         }
     }
 }
