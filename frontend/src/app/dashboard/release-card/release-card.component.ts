@@ -55,24 +55,30 @@ export class ReleaseCardComponent implements OnInit {
         this.maxPatch = this.item.patchCount > this.patchThreshold ? this.item.patchCount : this.patchThreshold;
         this.packageConfig = {
             chartId: 'exampleUtilizationDonut' + this.item.id,
-            centerLabelFormat: 'txt-func',
+            //centerLabelFormat: 'txt-func',
+            centerLabelFormat: 'none',
+            centerLabel: ' ',
             data: {
                 onclick: (data, element) => {
                     this.router.navigate(['/release', this.item.versionNumber, 'PATCHES']);
                 }
             },
+            legend: {
+                show: false
+            },
+
             outerLabelAlignment: 'right',
             thresholds: { 'warning': 40, 'error': 80 },
             total: this.maxPatch,
-            units: 'patch',
+//            units: 'patch',
             used: this.item.patchCount
         } as UtilizationDonutChartConfig;
-        this.packageConfig.centerLabelFn = () => {
-            return {
-                title: this.packageConfig.used,
-                subTitle: 'Patches'
-            };
-        };
+        // this.packageConfig.centerLabelFn = () => {
+        //     return {
+        //         title: this.packageConfig.used,
+        //         subTitle: 'Patches'
+        //     };
+        // };
 
         this.issueConfig = {
             chartId: 'IssueDonut' + this.item.id,
@@ -138,8 +144,9 @@ export class ReleaseCardComponent implements OnInit {
     }
 
     geratateConfig(platform: string, isDeployed: boolean, isUndeployed: boolean): DonutChartConfig {
+        const chartId = platform + 'Donut' + this.item.id;
         return {
-            chartId: platform + 'Donut' + this.item.id,
+            chartId: chartId,
             colors: {
                 available: '#bbbbbb',     // grey
                 validated: '#3f9c35', // green
@@ -184,6 +191,39 @@ export class ReleaseCardComponent implements OnInit {
             },
             legend: {
                 show: false
+            }
+            ,
+            tooltip: {
+                position: function (data, width, height, element) {
+                    const chartOffsetX = document.querySelector('#' + chartId).getBoundingClientRect().left;
+                    const chartWidth = document.querySelector('#' + chartId).getBoundingClientRect().width;
+                    const graphOffsetX = document.querySelector('#' + chartId + ' g.c3-axis-y')
+                        .getBoundingClientRect().right;
+                    const tooltipWidth = document.querySelector('#' + chartId + ' .c3-tooltip-container')
+                        .getBoundingClientRect().width;
+                    const cy = element.getAttribute('cy');
+                    const x = Math.floor(chartWidth / 2) - Math.floor(tooltipWidth / 2);
+                    const position = { top: 0 , left: 0 };
+                    switch (platform) {
+                        case 'qualification':
+                        position.left = 0;
+                        position.top = cy - height;
+                        break;
+                        case 'keyUser':
+                        position.left = x;
+                        position.top = cy - height;
+                        break;
+                        case 'pilot':
+                        position.left =  graphOffsetX - chartOffsetX - Math.floor(tooltipWidth / 2);
+                        position.top = cy - height;
+                        break;
+                        case 'production':
+                        position.left =  graphOffsetX - chartOffsetX - Math.floor(tooltipWidth / 2);
+                        position.top = cy;
+                        break;
+                    }
+                    return position; 
+                }
             }
         } as DonutChartConfig;
     }

@@ -3,9 +3,9 @@
 </div>
 <ng-template #noPatch>
     <div [ngStyle]="{'height': height+'px','color': 'grey','font-size': '2em','padding': '20% 0px'}">
-        <span *ngIf="platformSummary?.undeployed; else undeployed">Undeployed</span>
+        <span *ngIf="platformSummary?.undeployed; else undeployed"> </span>
         <ng-template #undeployed>
-            <span>Not deployed</span>
+            <span> </span>
         </ng-template>
     </div>
 </ng-template>

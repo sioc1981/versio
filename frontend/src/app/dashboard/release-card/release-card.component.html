@@ -18,9 +18,17 @@
         <div class="col-sm-12 custom-blank-slate-card">
             <div *ngIf="item.patchCount > 0">
                 <div class="row">
-                    <div class="col-sm-6">
-                        <pfng-utilization-donut-chart [config]="packageConfig">
-                        </pfng-utilization-donut-chart>
+                    <div class="col-sm-6  text-center"
+                        [ngStyle]="{ 'color' : (item.patchCount > (patchThreshold * 0.8)) ? '#cc0000' : (item.patchCount > (patchThreshold * 0.4)) ? '#ec7a08' : '#3f9c35' }">
+                        <!-- <pfng-utilization-donut-chart [config]="packageConfig">
+                        </pfng-utilization-donut-chart> -->
+                        <div class="row">
+                            <span class="fas fa fa-plus-square"></span>
+                        </div>
+                        <div class="row">
+                            <span style="font-size: 5vw;"
+                                title="{{(item.patchCount > (patchThreshold * 0.8)) ? 'More than 40' : ( item.patchCount > (patchThreshold * 0.4) ? 'More than 20' : 'Less than 20')}}">{{item.patchCount}}</span>
+                        </div>
                     </div>
                     <div class="col-sm-6 text-center">
                         <div class="row">
@@ -76,7 +84,17 @@
                 </div>
             </div>
             <div *ngIf="item.patchCount === 0">
-                <pfng-empty-state [config]="emptyStateConfig"></pfng-empty-state>
+                <div class="col-sm-12  text-center"
+                    style="color : #3f9c35">
+                    <div class="row">
+                        <span class="fas fa fa-plus-square"></span>
+                    </div>
+                    <div class="row">
+                        <span style="font-size: 5vw;"
+                            title="No patch... yet">0</span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </pfng-card>
