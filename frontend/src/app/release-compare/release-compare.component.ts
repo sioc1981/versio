@@ -7,11 +7,12 @@ import { SseService } from '../server-event/sse.service';
 import {
     ToolbarConfig, TableConfig, SortConfig, PaginationConfig, FilterConfig, EmptyStateConfig,
     SortField, SortEvent, Filter, FilterEvent,
-    FilterField, FilterType, PaginationEvent
+    FilterField, FilterType, PaginationEvent, ActionConfig, Action
 } from 'patternfly-ng';
 import { Release, ReleaseComparison } from '../release/shared/release.model';
 import { Issue } from '../issue/shared/issue.model';
 import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
+import * as XLSX from 'xlsx';
 
 @Component({
     selector: 'app-release-compare',
@@ -54,7 +55,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         },
     };
 
-
+    actionConfig: ActionConfig;
     columns: any[];
     currentSortField: SortField;
     emptyStateConfig: EmptyStateConfig;
@@ -111,6 +112,14 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         }];
 
         this.filteredRows = this.issueItems;
+
+        this.actionConfig = {
+            primaryActions: [{
+                id: 'export',
+                title: 'Export',
+                tooltip: 'Export the filtered issues'
+            }]
+        } as ActionConfig;
 
         this.paginationConfig = {
             pageNumber: 1,
@@ -185,6 +194,7 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.toolbarConfig = {
             filterConfig: this.filterConfig,
+            actionConfig: this.actionConfig,
             sortConfig: this.sortConfig
         } as ToolbarConfig;
 
@@ -460,5 +470,84 @@ export class ReleaseCompareComponent implements OnInit, OnDestroy, AfterViewInit
         return ISSUE_CONSTANT.constainer_urls[issue.container] + issue.reference;
     }
 
+    handleAction(action: Action, item?: any): void {
+        if (action.id === 'export') {
+            console.log('export done');
+            this.export2();
+        } else {
+            console.log('handleAction: unknown action: ' + action.id);
+        }
+    }
+
+    export2(): void {
+        console.log('start export');
+        var wb = XLSX.utils.book_new();
+        wb.Props = {
+                Title: 'Compare version from ' + this.fromVersion +' to ' + this.toVersion,
+        };
+        
+        wb.SheetNames.push(this.fromVersion + ' to ' + this.toVersion);
+        const ws_data = [];
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.sheet_add_aoa(ws, [this.generateExcelHeader()]);
+        this.generateExcelBody(ws);
+        wb.Sheets[this.fromVersion + ' to ' + this.toVersion] = ws;
+        XLSX.writeFile(wb, 'compare_'+this.fromVersion+'_'+this.toVersion+'.xlsx');
+        console.log('export done');
+    }
+
+        private generateExcelHeader(): string[] {
+        const result = [];
+        result.push('Issue Container');
+        this.columns.forEach(col => { result.push(col.name) ;});
+        return result;
+    }
+
+    private generateExcelBody(ws: XLSX.WorkSheet): void {
+        this.filteredRows.forEach(row => {
+            const result = [];
+            result.push(row.issue.container);
+            result.push(row.issue.reference + ' - ' + row.issue.description);
+            let addEOF = false;
+            let source = '';
+            row.sourcePatches.patches.forEach(patch => {
+                if (addEOF) {
+                    source += '\n';
+                } else {
+                    addEOF = true;
+                }
+                source += row.sourcePatches.release + ' - ' + patch;
+            });
+            row.sourceReleases.forEach(release => {
+                if (addEOF) {
+                    source += '\n';
+                } else {
+                    addEOF = true;
+                }
+                source += release.version.versionNumber;
+            });
+            result.push(source);
+            addEOF = false;
+            let destination = '';
+            row.destPatches.patches.forEach(patch => {
+                if (addEOF) {
+                    destination += '\n';
+                } else {
+                    addEOF = true;
+                }
+                destination += row.destPatches.release + ' - ' + patch;
+            });
+            row.destReleases.forEach(release => {
+                if (addEOF) {
+                    destination += '\n';
+                } else {
+                    addEOF = true;
+                }
+                destination += release.version.versionNumber;
+            });
+            result.push(destination);
+            XLSX.utils.sheet_add_aoa(ws, [result], {origin: -1});
+        });
+    }
 
 }

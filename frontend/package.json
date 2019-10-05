@@ -29,6 +29,7 @@
     "patternfly": "^3.59.3",
     "patternfly-ng": "^4.5.1",
     "rxjs": "~6.2.0",
+    "xlsx": "^0.15.1",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
