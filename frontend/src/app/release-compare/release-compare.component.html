@@ -45,7 +45,8 @@
             <div class="form-group">
                 <pfng-table [columns]="columns" [config]="tableConfig" [rows]="rows"
                     (onFilterChange)="filterChanged($event)" (onPageNumberChange)="handlePageNumber($event)"
-                    (onPageSizeChange)="handlePageSize($event)" (onSortChange)="handleSortChanged($event)">
+                    (onPageSizeChange)="handlePageSize($event)" (onSortChange)="handleSortChanged($event)"
+                    (onActionSelect)="handleAction($event)">
                 </pfng-table>
                 <!-- Column templates -->
                 <ng-template #issueTemplate let-row="row">
