@@ -26,8 +26,10 @@
                             <span class="fas fa fa-plus-square"></span>
                         </div>
                         <div class="row">
-                            <span style="font-size: 5vw;"
-                                title="{{(item.patchCount > (patchThreshold * 0.8)) ? 'More than 40' : ( item.patchCount > (patchThreshold * 0.4) ? 'More than 20' : 'Less than 20')}}">{{item.patchCount}}</span>
+                         <a routerLink="/release/{{item.versionNumber}}/PATCHES" style="font-size: 5vw;"
+                         		[ngStyle]="{ 'color' : (item.patchCount > (patchThreshold * 0.8)) ? '#cc0000' : (item.patchCount > (patchThreshold * 0.4)) ? '#ec7a08' : '#3f9c35' }"
+                                title="{{(item.patchCount > (patchThreshold * 0.8)) ? 'More than 40' : ( item.patchCount > (patchThreshold * 0.4) ? 'More than 20' : 'Less than 20')}}">
+                               {{item.patchCount}}</a>
                         </div>
                     </div>
                     <div class="col-sm-6 text-center">
