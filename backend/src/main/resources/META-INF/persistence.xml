@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="backend"
 		transaction-type="JTA">
-		<jta-data-source>java:jboss/datasources/VersioningDS</jta-data-source>
+		<jta-data-source>java:jboss/datasources/VersioDS</jta-data-source>
 		<properties>
 			<property name="hibernate.hbm2ddl.auto" value="update" />
 			<property name="hibernate.show_sql" value="false" />

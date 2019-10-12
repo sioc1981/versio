@@ -1,4 +1,4 @@
-# versioning
+# versio
 Application using :
 - Rest
 - Server-send events
@@ -11,18 +11,17 @@ Application using :
 ## Backend:
 Add Datasource to wildfly server:
 ```xml
-<datasource jndi-name="java:/boss/datasources/VersioningDS" pool-name="VersioningDS">
-	<connection-url>jdbc:h2:mem:versioning;DB_CLOSE_DELAY=-1</connection-url>
-	<driver-class>org.h2.Driver</driver-class>
-	<driver>h2</driver>
-	<security>
-		<user-name>sa</user-name>
-		<password>sa</password>
-	</security>
-	<validation>
-		<background-validation>false</background-validation>
-	</validation>
-</datasource>
+                <datasource jndi-name="java:jboss/datasources/VersioDS" pool-name="VersioDS">
+                    <connection-url>jdbc:postgresql:versio</connection-url>
+                    <driver>postgres</driver>
+                    <security>
+                        <user-name>versio_user</user-name>
+                        <password>versio_password</password>
+                    </security>
+                    <validation>
+                        <background-validation>false</background-validation>
+                    </validation>
+                </datasource>
 ```
 
 Tested with a Postgresql Database.
@@ -41,7 +40,7 @@ npm install -g @angular/cli
 npm install
 ```
 
-To run local:
+To run localy:
 ```
 ng serve frontend
 ```

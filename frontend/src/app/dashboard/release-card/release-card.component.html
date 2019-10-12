@@ -2,14 +2,14 @@
     <pfng-card class="custom-card" [config]="config" [headerTemplate]="spacesHeaderTemplate">
         <ng-template #spacesHeaderTemplate>
             <div class="card-pf-heading-details">
-                <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
+                <!-- <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
                     appSummaryType="release"></span>
                 <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
                     appSummaryType="release"></span>
                 <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
                     appSummaryType="release"></span>
                 <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
-                    appSummaryType="release"></span>
+                    appSummaryType="release"></span> -->
             </div>
             <h2 class="card-pf-title">
                 <a routerLink="/release/{{item.versionNumber}}">{{item.versionNumber}}</a>
@@ -35,7 +35,7 @@
                     <div class="col-sm-6 text-center">
                         <div class="row">
                             <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
-                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                                appSummaryType="release"></span>
                         </div>
                         <div class="row">
                             <app-release-card-chart-container [platformSummary]="item.production"
@@ -50,7 +50,7 @@
                     <div class="col-sm-4 text-center">
                         <div class="row">
                             <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
-                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                    appSummaryType="release"></span>
                         </div>
                         <div class="row">
                             <app-release-card-chart-container [platformSummary]="item.qualification"
@@ -63,7 +63,7 @@
                     <div class="col-sm-4 text-center">
                         <div class="row">
                             <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
-                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                    appSummaryType="release"></span>
                         </div>
                         <div class="row">
                             <app-release-card-chart-container [platformSummary]="item.keyUser" [height]="chartHeight">
@@ -74,7 +74,7 @@
                     <div class="col-sm-4 text-center">
                         <div class="row">
                             <span class="fas fa myApp myApp-cash-register" [appSummaryColor]="item.pilot"
-                                appSummaryType="patch" [appSummaryPatch]="item.patchCount"></span>
+                                appSummaryType="release"></span>
                         </div>
                         <div class="row">
                             <app-release-card-chart-container [platformSummary]="item.pilot" [height]="chartHeight">

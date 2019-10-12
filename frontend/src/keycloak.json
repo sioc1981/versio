@@ -2,7 +2,7 @@
     "realm": "sioc1981",
     "auth-server-url": "http://localhost:8180/auth",
     "ssl-required": "external",
-    "resource": "version-frontend",
+    "resource": "versio-frontend",
     "public-client": true,
     "confidential-port": 0
 }
