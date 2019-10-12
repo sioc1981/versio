@@ -87,20 +87,10 @@ public class IssueService {
 	}
 
 	@GET
-	@Produces("application/json")
-	@Path("/test")
-	public Response summarize(@QueryParam("q") String q) {
-		LOG.warn("parameters: {}", request.getParameterMap());
-		LOG.warn("q: {}", q);
-		return Response.ok().build();
-	}
-
-	@GET
 	@Path("/search/releasecomparison")
 	@Produces(MediaType.SERVER_SENT_EVENTS)
 	public void search(final @Context SseEventSink eventSink) {
-		LOG.warn("parameters: {}", request.getParameterMap());
-		LOG.warn("q: {}", request.getParameter("q"));
+		LOG.info("parameters: {}", request.getParameterMap());
 		HashSet<String> versions = new HashSet<>();
 		HashSet<String> patchedVersions = new HashSet<>();
 		IssueReleaseComparisonParam comparison = IssueReleaseComparisonParam.valueOf(request.getParameter("q"));
