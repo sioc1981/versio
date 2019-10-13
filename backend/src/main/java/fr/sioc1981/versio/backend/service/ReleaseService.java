@@ -132,6 +132,8 @@ public class ReleaseService {
 		releaseFullSummary.setKeyUser((PlatformCount) res[2]);
 		releaseFullSummary.setPilot((PlatformCount) res[3]);
 		releaseFullSummary.setProduction((PlatformCount) res[4]);
+		releaseFullSummary.setApplicationUserIds(this.entityManager.createQuery("select rau.id from Release r join r.applicationUsers rau where r.id = :release_id",
+				Long.class).setParameter("release_id", releaseFullSummary.getId()).getResultStream().collect(Collectors.toSet()));
 		globalSSE.broadcast("release_summary_" + releaseFullSummary.getId(), releaseFullSummary);
 		return releaseFullSummary;
 	}

@@ -27,6 +27,7 @@ export class ReleaseFull {
 export class ReleaseSummary {
     id: number;
     versionNumber: string;
+    applicationUserIds: number[];
     patchCount: number;
     packagedPatches: number;
     qualification: PlatformSummary;

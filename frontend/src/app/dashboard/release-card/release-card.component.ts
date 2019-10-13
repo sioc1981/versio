@@ -3,6 +3,9 @@ import { NavigationExtras, Router } from '@angular/router';
 import { CardConfig, UtilizationDonutChartConfig, DonutChartConfig, EmptyStateConfig } from 'patternfly-ng';
 import { ReleaseSummary } from 'src/app/release/shared/release.model';
 import { PlatformSummary } from 'src/app/shared/platform.model';
+import { ApplicationUser } from 'src/app/admin/applicationuser/shared/application-user.model';
+import { APPLICATION_USER_CONSTANT } from 'src/app/admin/applicationuser/shared/application-user.constant';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-release-card',
@@ -23,6 +26,8 @@ export class ReleaseCardComponent implements OnInit {
         ['Patch', 5]
     ];
 
+    applicationUsers: ApplicationUser[] = [];
+
     qualificationConfig: DonutChartConfig;
     qualificationData: any[] = this.generateEmptyData();
     keyUserConfig: DonutChartConfig;
@@ -40,6 +45,7 @@ export class ReleaseCardComponent implements OnInit {
     
     patchThreshold = 50;
 
+    private subscriptions: Subscription[] = [];
     constructor(private router: Router) { }
 
     ngOnInit() {
@@ -47,7 +53,6 @@ export class ReleaseCardComponent implements OnInit {
             // noPadding: true,
             // topBorder: false
         } as CardConfig;
-
         // this.packageConfig.total = this.item.patchCount;
         // this.packageConfig.used = this.item.packagePatched;
         // this.packageConfig.thresholds = {'warning': this.packageConfig.total=this.item.patchCount-1,
@@ -100,6 +105,17 @@ export class ReleaseCardComponent implements OnInit {
                 show: false
             }
         } as DonutChartConfig;
+
+        this.subscriptions.push(APPLICATION_USER_CONSTANT.applicationUserSummariesNotifier$.subscribe(() => {
+            //  this.item.applicationUserIds.forEach(id => console.log('test:',  APPLICATION_USER_CONSTANT.applicationUserSummaries[id]));
+             this.applicationUsers = this.item.applicationUserIds
+                .filter(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id] !== undefined)
+                .map(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id]);
+        }));
+        // this.item.applicationUserIds.forEach(id => console.log('test:',  APPLICATION_USER_CONSTANT.applicationUserSummaries[id]));
+        this.applicationUsers = this.item.applicationUserIds
+            .filter(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id] !== undefined)
+            .map(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id]);
 
         this.qualificationConfig = this.geratateConfig('qualification', this.item.qualification.deployed,
             this.item.qualification.undeployed);

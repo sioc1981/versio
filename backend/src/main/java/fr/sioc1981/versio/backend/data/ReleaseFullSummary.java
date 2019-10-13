@@ -1,5 +1,7 @@
 package fr.sioc1981.versio.backend.data;
 
+import java.util.Set;
+
 public class ReleaseFullSummary {
 
 	private Long id;
@@ -10,6 +12,8 @@ public class ReleaseFullSummary {
 	
 	private int patchCount;
 	private int packagedPatches;
+	
+	private Set<Long> applicationUserIds;
 	
 	private PlatformCount qualification;
 	private PlatformCount keyUser;
@@ -100,6 +104,14 @@ public class ReleaseFullSummary {
 
 	public void setProduction(PlatformCount production) {
 		this.production = production;
+	}
+	
+	public Set<Long> getApplicationUserIds() {
+		return applicationUserIds;
+	}
+
+	public void setApplicationUserIds(Set<Long> applicationUserIds) {
+		this.applicationUserIds = applicationUserIds;
 	}
 
 	@Override
