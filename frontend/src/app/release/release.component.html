@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <div class="list-pf-additional-content" style="justify-content:flex-start; flex-basis: 16%">
-                            <div >
+                            <div>
                                 <span class="fa list-pf-title">{{item.issues.length}}</span> <span
                                     class="fas {{issueIconStyleClass}}"></span>
                             </div>
@@ -45,7 +45,8 @@
                         <div class="list-pf-additional-content" style="justify-content:flex-end">
                             <div>
                                 <span class="fas myApp myApp-laptop-code" [class.myApp-green]="release.packageDate"
-                                    [class.myApp-orange]="!release.packageDate" [class.myApp-grey]="release.undeployed"></span>
+                                    [class.myApp-orange]="!release.packageDate"
+                                    [class.myApp-grey]="release.undeployed"></span>
                             </div>
                             <div>
                                 <span class="fas myApp myApp-user-shield"
@@ -76,3 +77,4 @@
                 (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
         </div>
     </div>
+</div>
