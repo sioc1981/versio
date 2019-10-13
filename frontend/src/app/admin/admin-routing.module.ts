@@ -4,6 +4,7 @@ import { AdminComponent } from './admin.component';
 import { AdminGuard } from './admin.guard';
 import { IssueContainerComponent } from './issuecontainer/issuecontainer.component';
 import { AdminMenuComponent } from './admin-menu.component';
+import { ApplicationUserComponent } from './applicationuser/application-user.component';
 
 const adminRoutes: Routes = [
     {
@@ -16,6 +17,9 @@ const adminRoutes: Routes = [
         }, {
             path: 'issueContainers',
             component: IssueContainerComponent
+        }, {
+            path: 'applicationUsers',
+            component: ApplicationUserComponent
         }]
     }
 ];

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { APPLICATION_USER_CONSTANT } from './applicationuser/shared/application-user.constant';
+import { ISSUE_CONTAINER_CONSTANT } from './issuecontainer/shared/issue-container.constant';
 
 @Component({
   selector: 'app-admin-menu',
@@ -7,7 +9,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AdminMenuComponent implements OnInit {
 
-  constructor() { }
+    applicationUserUrl = APPLICATION_USER_CONSTANT.url;
+    issueContainerUrl = ISSUE_CONTAINER_CONSTANT.url;
+    
+    constructor() { }
 
   ngOnInit() {
   }

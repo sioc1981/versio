@@ -8,6 +8,7 @@ import javax.ejb.Startup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.sioc1981.versio.backend.service.admin.ApplicationUserService;
 import fr.sioc1981.versio.backend.service.admin.IssueContainerService;
 
 @Startup
@@ -28,6 +29,9 @@ public class Initializer {
 	@EJB
 	private ReleaseService releaseService;
 	
+	@EJB
+	private ApplicationUserService applicationUserService;
+	
 	@PostConstruct
 	public void init() {
 		LOG.info("Initialize services");
@@ -36,6 +40,8 @@ public class Initializer {
 		patchService.getCount();
 		releaseService.getCount();
 		releaseService.getSummary();
+		applicationUserService.getCount();
+		applicationUserService.getSummary();
 	}
 	
 }

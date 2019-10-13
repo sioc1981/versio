@@ -1,12 +1,14 @@
 package fr.sioc1981.versio.backend.entity;
 
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -27,6 +29,9 @@ public class Release extends Deployable {
 
 	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL, orphanRemoval=true)
 	protected Version version;
+	
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+	private Set<ApplicationUser> applicationUsers;
 
 	public Release() {
 		super();
@@ -48,6 +53,14 @@ public class Release extends Deployable {
 	public void setVersion(Version version) {
 		this.version = version;
 	}
+	
+	public Set<ApplicationUser> getApplicationUsers() {
+		return applicationUsers;
+	}
+
+	public void setApplicationUsers(Set<ApplicationUser> applicationUsers) {
+		this.applicationUsers = applicationUsers;
+	}
 
 	@Override
 	public int hashCode() {
@@ -63,7 +76,8 @@ public class Release extends Deployable {
 		if (getClass() != obj.getClass())
 			return false;
 		Release other = (Release) obj;
-		return Objects.equals(id, other.id) && Objects.equals(version, other.version);
+		return Objects.equals(id, other.id) && Objects.equals(version, other.version)
+				&& Objects.equals(applicationUsers, other.applicationUsers);
 	}
 
 	@Override

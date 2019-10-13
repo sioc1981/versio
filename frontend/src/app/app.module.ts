@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID, APP_INITIALIZER } from '@angular/core';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 // NGX Bootstrap
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
@@ -61,6 +62,10 @@ import { ForbiddenPageComponent } from './misc/forbidden-page.component';
 import { IssueContainerComponent } from './admin/issuecontainer/issuecontainer.component';
 import { AdminMenuComponent } from './admin/admin-menu.component';
 import { IssueDetailComponent } from './issue/issue-detail.component';
+import { ApplicationUserComponent } from './admin/applicationuser/application-user.component';
+import { ApplicationUserCreateComponent } from './admin/applicationuser/application-user-create.component';
+import { ApplicationUserLogoThumbnailDirective } from './admin/applicationuser/application-user-logo-thumbnail.directive';
+import { SafePipe } from './shared/safe.pipe';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -98,7 +103,11 @@ defineLocale('fr', frLocale);
         ForbiddenPageComponent,
         IssueContainerComponent,
         AdminMenuComponent,
-        IssueDetailComponent
+        IssueDetailComponent,
+        ApplicationUserComponent,
+        ApplicationUserCreateComponent,
+        ApplicationUserLogoThumbnailDirective,
+        SafePipe
     ],
     imports: [
         AboutModalModule,
@@ -117,6 +126,7 @@ defineLocale('fr', frLocale);
         ListModule,
         MarkdownModule.forRoot({ loader: HttpClient }),
         ModalModule.forRoot(),
+        NgSelectModule,
         NgxDatatableModule,
         NgxUploadModule.forRoot(),
         PaginationModule,

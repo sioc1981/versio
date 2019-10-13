@@ -21,6 +21,8 @@ import { IssueService } from '../issue/shared/issue.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 import { PlatformHistory } from '../shared/platform.model';
+import { ApplicationUser } from '../admin/applicationuser/shared/application-user.model';
+import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -68,12 +70,17 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
     selectIssue: Issue;
     selectedIssues: Issue[] = [];
 
+    applicationUsers: ApplicationUser[] = [];
+
     private subscriptions: Subscription[] = [];
 
     constructor(private releaseService: ReleaseService, private issueService: IssueService, private modalService: BsModalService) { }
 
     ngOnInit(): void {
         this.getIssues();
+        this.applicationUsers = Array.from(APPLICATION_USER_CONSTANT.applicationUserSummaries)
+            .filter(au => au !== undefined)
+            .sort((aua, aub) => aub.name.localeCompare(aua.name));
 
         this.data.release.buildDate = new Date();
         this.data.release.qualification = new PlatformHistory();

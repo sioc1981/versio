@@ -26,7 +26,6 @@ import { Location } from '@angular/common';
     styleUrls: ['./release.component.less']
 })
 export class ReleaseComponent implements OnInit, OnDestroy {
-    @ViewChild('wizardTemplate') wizardTemplate: TemplateRef<any>;
     @ViewChild('createRelease') createReleaseTemplate: TemplateRef<any>;
     @ViewChild('importRelease') importReleaseTemplate: TemplateRef<any>;
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;

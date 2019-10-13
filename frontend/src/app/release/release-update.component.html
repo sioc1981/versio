@@ -12,6 +12,28 @@
                     </div>
                 </div>
                 <div class="form-group required">
+                    <label class="col-sm-4 control-label  required-pf" for="myList">Application Users</label>
+                    <div class="col-sm-8">
+                        <ng-select [items]="applicationUsers" [multiple]="true" [ngModelOptions]="{standalone: true}"
+                            bindLabel="name" placeholder="Select items"
+                            [(ngModel)]="data.release.applicationUsers">
+                            <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+                                <div class="ng-value" *ngFor="let item of items">
+                                    <span class="ng-value-label"><img [src]="item.logo | safe: 'url'" width="20px"
+                                            height="20px"> <img [src]="'/assets/images/i8n/' + item.country + '.svg'"
+                                            width="20px" height="20px">{{item.name}}</span>
+                                    <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">x</span>
+                                </div>
+                            </ng-template>
+                            <ng-template ng-option-tmp let-item="item">
+                                <span class="ng-value-label"><img [src]="item.logo | safe: 'url'" width="20px"
+                                        height="20px"> <img [src]="'/assets/images/i8n/' + item.country + '.svg'"
+                                        width="20px" height="20px">{{item.name}}</span>
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="form-group required">
                     <label class="col-sm-4 control-label" for="Undeploy">Undeploy</label>
                     <div class="col-sm-8">
                         <ui-switch [(ngModel)]="data.release.undeployed" [ngModelOptions]="{standalone: true}">
@@ -226,6 +248,17 @@
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Version:</span>
             <span class="wizard-pf-review-item-value">{{data.release.version.versionNumber}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Application Users:</span>
+            <span class="wizard-pf-review-item-value" *ngFor="let item of data.release.applicationUsers">
+                <img [src]="item.logo | safe: 'url'" width="20px" height="20px">
+                <img [src]="'/assets/images/i8n/' + item.country + '.svg'" width="20px" height="20px">
+                {{item.name}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy:</span>
+            <span class="wizard-pf-review-item-value">{{data.release.undeployed}}</span>
         </div>
     </form>
 </ng-template>

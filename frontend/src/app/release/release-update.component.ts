@@ -25,6 +25,8 @@ import { Issue } from '../issue/shared/issue.model';
 import { PlatformHistory } from '../shared/platform.model';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
+import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
+import { ApplicationUser } from '../admin/applicationuser/shared/application-user.model';
 
 @Component( {
     encapsulation: ViewEncapsulation.None,
@@ -73,6 +75,8 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     selectIssue: Issue;
     selectedIssues: Issue[];
 
+    applicationUsers: ApplicationUser[] = [];
+
     private subscriptions: Subscription[] = [];
 
     constructor( private issueService: IssueService, private releaseService: ReleaseService,
@@ -92,6 +96,9 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
         this.getIssues();
+        this.applicationUsers = Array.from(APPLICATION_USER_CONSTANT.applicationUserSummaries)
+            .filter(au => au !== undefined)
+            .sort((aua, aub) => aub.name.localeCompare(aua.name));
 
         // Step 1
         this.step1Config = {

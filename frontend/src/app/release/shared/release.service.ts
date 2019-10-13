@@ -71,8 +71,8 @@ export class ReleaseService {
     }
 
     /** POST: add a new release to the server */
-    addRelease(hero: ReleaseFull): Observable<ReleaseFull> {
-        return this.http.post<ReleaseFull>(RELEASE_CONSTANT.backendUrl, hero, RELEASE_CONSTANT.httpOptions).pipe(
+    addRelease(release: ReleaseFull): Observable<ReleaseFull> {
+        return this.http.post<ReleaseFull>(RELEASE_CONSTANT.backendUrl, release, RELEASE_CONSTANT.httpOptions).pipe(
             catchError(this.logAndError('addRelease'))
         );
     }

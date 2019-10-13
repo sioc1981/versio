@@ -1,0 +1,70 @@
+<pfng-wizard #wizard [config]="wizardConfig" (onCancel)="closeWizard()" (onNext)="nextClicked($event)"
+    (onStepChange)="stepChanged($event)">
+    <pfng-wizard-step [config]="step1Config">
+        <form class="form-horizontal">
+            <div class="form-group required">
+                <label class="col-sm-4 control-label required-pf" for="name">Name</label>
+                <div class="col-sm-8">
+                    <input class="form-control" id="reference" name="Issue reference" type="text" required
+                        [(ngModel)]="data.name" (ngModelChange)="updateName()">
+                </div>
+            </div>
+            <div class="form-group required">
+                <label class="col-sm-4 control-label required-pf" for="name">Country</label>
+                <div class="col-sm-8">
+
+                    <ng-select [items]="countries" [(ngModel)]="data.country" [ngModelOptions]="{standalone: true}"
+                        [clearable]="false" (ngModelChange)="updateName()">
+                        <ng-template ng-label-tmp ng-option-tmp let-item="item">
+                            <img height="15" width="15" [src]="'/assets/images/i8n/' + item + '.svg'" />
+                            {{item}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+            </div>
+            <div class="form-group required">
+                <label class="col-sm-4 control-label required-pf" for="container">Logo</label>
+                <div class="col-sm-8">
+                    <div class="form-group" [ngSwitch]="uploader.queue.length">
+                        <div *ngSwitchCase="0">
+                            <div class="well my-drop-zone" [ngxDragAndDrop]="dndOptions" *ngxInputFile="optionsInput">
+                                <h5>Drop files here to upload</h5>
+                                <h6>Or click here to select local files.</h6>
+                            </div>
+                        </div>
+                        <div *ngSwitchDefault>
+                            <div class="col-sm-12" *ngIf="itemFile">
+                                <div class="col-sm-4" [logoThumbnail]="itemFile"></div>
+                                <div class="col-sm-4">Name: {{ itemFile.file.name }}<br />type: {{ itemFile.file.type }}
+                                </div>
+                                <div class="col-sm-4">
+                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                        (click)="itemFile.remove()">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" *ngIf="errorMessage && errorMessage !== ''">
+                                <div> Error: {{ errorMessage }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="stepFinalConfig" (onShow)="startDeploy()">
+        <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
+            <div class="spinner spinner-lg blank-slate-pf-icon"></div>
+            <h3 class="blank-slate-pf-main-action">Creation in progress</h3>
+        </div>
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && deploySuccess">
+            <div class="wizard-pf-success-icon"><span class="glyphicon glyphicon-ok-circle"></span></div>
+            <h3 class="blank-slate-pf-main-action">Creation was successful</h3>
+        </div>
+        <div class="wizard-pf-complete blank-slate-pf" *ngIf="deployComplete && !deploySuccess">
+            <div class="wizard-pf-success-icon"><span class="pficon pficon-error-circle-o"></span></div>
+            <h3 class="blank-slate-pf-main-action">Creation failed</h3>
+        </div>
+    </pfng-wizard-step>
+</pfng-wizard>

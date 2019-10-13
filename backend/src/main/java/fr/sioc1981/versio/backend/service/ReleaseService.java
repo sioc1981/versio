@@ -54,7 +54,7 @@ public class ReleaseService {
 	@POST
 	@Consumes("application/json")
 	public Response create(ReleaseFull newRelease) {
-		LOG.warn("create " + newRelease);
+		LOG.info("create {}", newRelease);
 		this.entityManager.persist(newRelease);
 		URI uri = null;
 		try {

@@ -1,0 +1,55 @@
+<div class="col-lg-12">
+    <ol class="fas breadcrumb">
+        <li class="breadcrumb-item">
+            <a [routerLink]="['/admin']">
+                Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            Application Users
+        </li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="form-group">
+            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)"
+                (onFilterChange)="filterChanged($event)" (onSortChange)="handleSortChanged($event)">
+            </pfng-toolbar>
+            <ng-template #createApplicationUser>
+                <app-application-user-create (close)="onWizardClose($event)"></app-application-user-create>
+            </ng-template>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <pfng-list id="myList" [actionTemplate]="actionTemplate" [items]="items"
+                [itemTemplate]="applicationUserTemplate">
+                <ng-template #applicationUserTemplate let-item="item" let-index="index" let-release="item.release">
+                    <div class="list-pf-content-wrapper">
+                        <div class="list-pf-main-content">
+                            <div class="list-pf-title">{{item.name}}
+                            </div>
+                        </div>
+                        <div class="list-pf-additional-content" style="justify-content:flex-end">
+                            <img [src]="item.logo | safe: 'url'" style="height:40px;"/>
+                            <img [src]="'/assets/images/i8n/' + item.country + '.svg'" style="height:30px;"/>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template #actionTemplate let-item="item" let-index="index">
+                    <pfng-action class="list-pf-actions" [config]="applicationUserActionConfig"
+                        (onActionSelect)="handleAction($event, item)">
+                    </pfng-action>
+                </ng-template>
+            </pfng-list>
+            <ng-template #updateRelease>
+                <!-- <app-application-user-update [applicationUser]="selectedApplicationUser" (close)="onWizardClose($event)"></app-application-user-update> -->
+            </ng-template>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+        </div>
+    </div>
+</div>

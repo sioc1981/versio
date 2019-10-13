@@ -10,6 +10,9 @@
                     appSummaryType="release"></span>
                 <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
                     appSummaryType="release"></span> -->
+                <img [src]="item.logo | safe: 'url'" width="20px" height="20px"> <img
+                    [src]="'/assets/images/i8n/' + item.country + '.svg'" width="20px"
+                    height="20px">{{item.name}}</span>
             </div>
             <h2 class="card-pf-title">
                 <a routerLink="/release/{{item.versionNumber}}">{{item.versionNumber}}</a>
@@ -26,10 +29,10 @@
                             <span class="fas fa fa-plus-square"></span>
                         </div>
                         <div class="row">
-                         <a routerLink="/release/{{item.versionNumber}}/PATCHES" style="font-size: 5vw;"
-                         		[ngStyle]="{ 'color' : (item.patchCount > (patchThreshold * 0.8)) ? '#cc0000' : (item.patchCount > (patchThreshold * 0.4)) ? '#ec7a08' : '#3f9c35' }"
+                            <a routerLink="/release/{{item.versionNumber}}/PATCHES" style="font-size: 5vw;"
+                                [ngStyle]="{ 'color' : (item.patchCount > (patchThreshold * 0.8)) ? '#cc0000' : (item.patchCount > (patchThreshold * 0.4)) ? '#ec7a08' : '#3f9c35' }"
                                 title="{{(item.patchCount > (patchThreshold * 0.8)) ? 'More than 40' : ( item.patchCount > (patchThreshold * 0.4) ? 'More than 20' : 'Less than 20')}}">
-                               {{item.patchCount}}</a>
+                                {{item.patchCount}}</a>
                         </div>
                     </div>
                     <div class="col-sm-6 text-center">
@@ -50,7 +53,7 @@
                     <div class="col-sm-4 text-center">
                         <div class="row">
                             <span class="fas fa myApp myApp-user-shield" [appSummaryColor]="item.qualification"
-                    appSummaryType="release"></span>
+                                appSummaryType="release"></span>
                         </div>
                         <div class="row">
                             <app-release-card-chart-container [platformSummary]="item.qualification"
@@ -63,7 +66,7 @@
                     <div class="col-sm-4 text-center">
                         <div class="row">
                             <span class="fas fa myApp myApp-cart-check" [appSummaryColor]="item.keyUser"
-                    appSummaryType="release"></span>
+                                appSummaryType="release"></span>
                         </div>
                         <div class="row">
                             <app-release-card-chart-container [platformSummary]="item.keyUser" [height]="chartHeight">
@@ -86,14 +89,12 @@
                 </div>
             </div>
             <div *ngIf="item.patchCount === 0">
-                <div class="col-sm-12  text-center"
-                    style="color : #3f9c35">
+                <div class="col-sm-12  text-center" style="color : #3f9c35">
                     <div class="row">
                         <span class="fas fa fa-plus-square"></span>
                     </div>
                     <div class="row">
-                        <span style="font-size: 5vw;"
-                            title="No patch... yet">0</span>
+                        <span style="font-size: 5vw;" title="No patch... yet">0</span>
                     </div>
                 </div>
 

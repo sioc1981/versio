@@ -22,6 +22,7 @@ import { PATCH_CONSTANT } from '../patch/shared/patch.service';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { ADMIN_CONSTANT } from '../admin/shared/admin.constant';
 import { ISSUE_CONTAINER_CONSTANT } from '../admin/issuecontainer/shared/issue-container.constant';
+import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
 
 class Property {
     key: string;
@@ -97,17 +98,13 @@ export class NavigationComponent implements OnInit, OnDestroy {
             filter(e => e instanceof RouterEvent)
         ).subscribe((e: RouterEvent) => {
             // to keep parameter when click on compare menu
-            if (e.url.startsWith('/compare')) {
-                this.navigationItems[this.COMPARE_INDEX].url = e.url;
-            } else {
-                this.navigationItems[this.COMPARE_INDEX].url = '/compare';
-            }
+            this.updateNavigationUrl(this.COMPARE_INDEX, '/compare', '/compare', e);
             // to keep parameter when click on releases menu
-            if (e.url.startsWith('/release')) {
-                this.navigationItems[this.RELEASES_INDEX].url = e.url;
-            } else {
-                this.navigationItems[this.RELEASES_INDEX].url = '/releases';
-            }
+            this.updateNavigationUrl(this.RELEASES_INDEX, '/release', '/releases', e);
+            // to keep parameter when click on patches menu
+            this.updateNavigationUrl(this.PATCHES_INDEX, '/patch', '/patches', e);
+            // to keep parameter when click on issues menu
+            this.updateNavigationUrl(this.ISSUES_INDEX, '/issue', '/issues', e);
         }));
         this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(c =>
             this.navigationItems[this.RELEASES_INDEX].badges[0].count = c));
@@ -199,11 +196,22 @@ export class NavigationComponent implements OnInit, OnDestroy {
                     title: ISSUE_CONTAINER_CONSTANT.title,
                     iconStyleClass: ISSUE_CONTAINER_CONSTANT.iconStyleClass,
                     url: ISSUE_CONTAINER_CONSTANT.url
+                },  {
+                    title: APPLICATION_USER_CONSTANT.title,
+                    iconStyleClass: APPLICATION_USER_CONSTANT.iconStyleClass,
+                    url: APPLICATION_USER_CONSTANT.url
                 }]
         };
         res[this.ADMIN_INDEX] = adminItem;
     }
 
+    updateNavigationUrl(index: number, urlBase: string, defaultUrl: string, e: RouterEvent): void {
+        if (e.url.startsWith(urlBase)) {
+            this.navigationItems[index].url = e.url;
+        } else {
+            this.navigationItems[index].url = defaultUrl;
+        }
+    }
 
     openModal(template: TemplateRef<any>): void {
         this.modalRef = this.modalService.show(template);
