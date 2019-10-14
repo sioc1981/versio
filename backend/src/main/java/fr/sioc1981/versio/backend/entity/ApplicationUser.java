@@ -31,7 +31,7 @@ public class ApplicationUser implements Serializable {
 	private String name;
 	
 	/** The country. */
-	@Column(unique=true, nullable=false)
+	@Column(nullable=false)
 	private String country;
 	
 	/** The logo. */
