@@ -10,10 +10,11 @@
                     appSummaryType="release"></span>
                 <span class="fas fa myApp myApp-store" [appSummaryColor]="item.production"
                     appSummaryType="release"></span> -->
-                <span *ngFor="let au of applicationUsers">
-                    <img [src]="au.logo | safe: 'url'" width="20px" height="20px">
-                    <img [src]="'/assets/images/i8n/' + au.country + '.svg'" width="20px"
-                    height="20px">{{au.name}}</span>
+                <span *ngFor="let au of applicationUsers" style="padding: 0px 5px;font-size: 14px;">
+                    <img [src]="au.logo | safe: 'url'" width="28px" height="28px">
+                    {{au.name}}
+                    <img [src]="'/assets/images/i8n/' + au.country + '.svg'" width="28px"
+                    height="28px"></span>
             </div>
             <h2 class="card-pf-title">
                 <a routerLink="/release/{{item.versionNumber}}">{{item.versionNumber}}</a>
