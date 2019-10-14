@@ -47,9 +47,11 @@ public class ApplicationUserService {
 	public Response create(ApplicationUser newApplicationUser) {
 		log.info("create {}", newApplicationUser);
 		this.entityManager.persist(newApplicationUser);
+		ApplicationUser applicationUser = this.entityManager.createQuery("from ApplicationUser where id = :id", ApplicationUser.class)
+				.setParameter("id", newApplicationUser.getId()).getSingleResult();
 		getCount();
-		sendSSE(newApplicationUser);
-		return Response.ok(newApplicationUser).build();
+		sendSSE(applicationUser);
+		return Response.ok(applicationUser).build();
 	}
 
 	@PUT
