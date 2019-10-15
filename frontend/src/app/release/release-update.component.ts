@@ -255,12 +255,19 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         const platformList = ['qualification', 'keyUser', 'pilot', 'production'];
         if ( this.data.patches ) {
             this.data.patches.forEach( patch => {
-                platformList.forEach( currentPlatform => {
-                    if ( patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
-                        this.release.release[currentPlatform].deployDate === patch[currentPlatform].deployDate ) {
-                        patch[currentPlatform].deployDate = this.data.release[currentPlatform].deployDate;
+                platformList.forEach( (currentPlatform, currentPlatformIndex )=> {
+                    if (this.data.release[currentPlatform] && this.data.release[currentPlatform].deployDate) {
+                        if(patch[currentPlatform] && this.release.release[currentPlatform] && this.release.release[currentPlatform].undeployDate === patch[currentPlatform].undeployDate){
+                            patch[currentPlatform].deployDate = this.data.release[currentPlatform].deployDate;
+                        } else if(!patch[currentPlatform] && !this.release.release[currentPlatform] && currentPlatformIndex > 0) {
+                            const previousPlatform = platformList[currentPlatformIndex-1];
+                            if (patch[previousPlatform] && patch[previousPlatform].validationDate) {
+                                patch[currentPlatform] = this.data.release[currentPlatform];
+                            }
+                        }
                     }
-                    if ( patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
+
+                    if (patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
                         this.release.release[currentPlatform].undeployDate === patch[currentPlatform].undeployDate ) {
                         patch[currentPlatform].undeployDate = this.data.release[currentPlatform].undeployDate;
                     }
