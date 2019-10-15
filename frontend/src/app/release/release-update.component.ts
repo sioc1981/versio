@@ -257,6 +257,10 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
             this.data.patches.forEach( patch => {
                 platformList.forEach( currentPlatform => {
                     if ( patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
+                        this.release.release[currentPlatform].deployDate === patch[currentPlatform].deployDate ) {
+                        patch[currentPlatform].deployDate = this.data.release[currentPlatform].deployDate;
+                    }
+                    if ( patch[currentPlatform] && this.release.release[currentPlatform] && this.data.release[currentPlatform] &&
                         this.release.release[currentPlatform].undeployDate === patch[currentPlatform].undeployDate ) {
                         patch[currentPlatform].undeployDate = this.data.release[currentPlatform].undeployDate;
                     }
