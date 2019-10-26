@@ -14,6 +14,7 @@ import { Patch } from '../patch/shared/patch.model';
 import { ReleaseFull, Release } from './shared/release.model';
 import { AuthenticationService } from '../auth/authentication.service';
 import { Location } from '@angular/common';
+import { MdEditorOption, MarkdownEditorComponent } from 'ngx-markdown-editor';
 
 enum ReleaseDetailTab {
     OVERVIEW,
@@ -31,6 +32,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     @ViewChild('updateRelease') updateReleaseTemplate: TemplateRef<any>;
     @ViewChild( 'createPatch' ) createPatchTemplate: TemplateRef<any>;
     @ViewChild( 'updatePatch' ) updatePatchTemplate: TemplateRef<any>;
+    @ViewChild( 'comment' ) commentTemplate: MarkdownEditorComponent;
     modalRef: BsModalRef;
 
     ReleaseDetailTabEnum = ReleaseDetailTab;
@@ -83,6 +85,12 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
     allIssueToolbarConfig: ToolbarConfig;
     allIssuePaginationConfig: PaginationConfig;
     currentAllIssuesSortField: SortField;
+
+    public options: MdEditorOption = {
+        enablePreviewContentClick: false,
+        resizable: false,
+        showPreviewPanel: false
+    };
 
     private subscriptions: Subscription[] = [];
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService,

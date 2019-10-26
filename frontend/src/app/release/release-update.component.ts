@@ -27,6 +27,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
 import { ApplicationUser } from '../admin/applicationuser/shared/application-user.model';
+import { MdEditorOption } from 'ngx-markdown-editor';
 
 @Component( {
     encapsulation: ViewEncapsulation.None,
@@ -60,11 +61,16 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
 
     // Wizard Step 3
     step3Config: WizardStepConfig;
-    step3aConfig: WizardStepConfig;
-    step3bConfig: WizardStepConfig;
+
+    // Wizard Step Final
+    stepFinalConfig: WizardStepConfig;
+    stepFinalReviewConfig: WizardStepConfig;
+    stepFinalDeployConfig: WizardStepConfig;
 
     // Wizard
     wizardConfig: WizardConfig;
+
+    commentOptions: MdEditorOption = {};
 
     releases: Release[];
     releaseListConfig: ListConfig;
@@ -84,6 +90,11 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.getIssues();
+        this.applicationUsers = Array.from(APPLICATION_USER_CONSTANT.applicationUserSummaries)
+            .filter(au => au !== undefined)
+            .sort((aua, aub) => aub.name.localeCompare(aua.name));
+
         this.data = cloneDeep( this.release );
         this.data.release.buildDate = new Date( this.release.release.buildDate );
         this.data.release.packageDate = this.initDate( this.release.release.packageDate );
@@ -95,10 +106,11 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.selectedIssues = [...this.data.issues];
         this.releaseVersion = this.data.release.version.versionNumber;
         this.getVersions();
-        this.getIssues();
-        this.applicationUsers = Array.from(APPLICATION_USER_CONSTANT.applicationUserSummaries)
-            .filter(au => au !== undefined)
-            .sort((aua, aub) => aub.name.localeCompare(aua.name));
+        this.commentOptions = {
+            enablePreviewContentClick: false,
+            resizable: false,
+            showPreviewPanel: false
+        };
 
         // Step 1
         this.step1Config = {
@@ -166,17 +178,25 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         // Step 3
         this.step3Config = {
             id: 'step3',
+            expandReviewDetails: true,
+            priority: 0,
+            title: 'Comment'
+        } as WizardStepConfig;
+
+        // Step Final
+        this.stepFinalConfig = {
+            id: 'stepFinal',
             priority: 2,
             title: 'Review'
         } as WizardStepConfig;
-        this.step3aConfig = {
-            id: 'step3a',
+        this.stepFinalReviewConfig = {
+            id: 'stepFinalReview',
             nextEnabled: false,
             priority: 0,
             title: 'Summary'
         } as WizardStepConfig;
-        this.step3bConfig = {
-            id: 'step3b',
+        this.stepFinalDeployConfig = {
+            id: 'stepFinalDeploy',
             nextEnabled: false,
             priority: 1,
             title: 'Deploy'
@@ -241,7 +261,7 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
     // Methods
 
     nextClicked( $event: WizardEvent ): void {
-        if ( $event.step.config.id === 'step3b' ) {
+        if ( $event.step.config.id === 'stepFinalDeploy' ) {
             this.closeWizard( this.data as ReleaseFull );
         }
     }
@@ -299,9 +319,9 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
             this.updateVersion();
         } else if ( $event.step.config.id === 'step1b' ) {
             this.updateIssues();
-        } else if ( $event.step.config.id === 'step3a' ) {
+        } else if ( $event.step.config.id === 'stepFinalReview' ) {
             this.wizardConfig.nextTitle = 'Deploy';
-        } else if ( $event.step.config.id === 'step3b' ) {
+        } else if ( $event.step.config.id === 'stepFinalDeploy' ) {
             this.wizardConfig.nextTitle = 'Close';
         } else {
             this.wizardConfig.nextTitle = 'Next >';
@@ -334,8 +354,10 @@ export class ReleaseUpdateComponent implements OnInit, OnDestroy {
         this.step2eConfig.allowClickNav = allow;
 
         this.step3Config.allowClickNav = allow;
-        this.step3aConfig.allowClickNav = allow;
-        this.step3bConfig.allowClickNav = allow;
+
+        this.stepFinalConfig.allowClickNav = allow;
+        this.stepFinalReviewConfig.allowClickNav = allow;
+        this.stepFinalDeployConfig.allowClickNav = allow;
     }
 
     handleIssuesSelectionChange( $event: ListEvent ): void {

@@ -14,15 +14,17 @@ import {
     ListConfig, ListEvent
 } from 'patternfly-ng';
 import { ReleaseService } from './shared/release.service';
-import { Subscription } from 'rxjs';
-import { ReleaseFull } from './shared/release.model';
-import { Issue } from '../issue/shared/issue.model';
 import { IssueService } from '../issue/shared/issue.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
+import { cloneDeep } from 'lodash';
+import { Subscription } from 'rxjs';
+import { Release, ReleaseFull } from './shared/release.model';
+import { Issue } from '../issue/shared/issue.model';
 import { PlatformHistory } from '../shared/platform.model';
-import { ApplicationUser } from '../admin/applicationuser/shared/application-user.model';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
+import { ApplicationUser } from '../admin/applicationuser/shared/application-user.model';
+import { MdEditorOption } from 'ngx-markdown-editor';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -59,11 +61,17 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
 
     // Wizard Step 3
     step3Config: WizardStepConfig;
-    step3aConfig: WizardStepConfig;
-    step3bConfig: WizardStepConfig;
+
+    // Wizard Step Final
+    stepFinalConfig: WizardStepConfig;
+    stepFinalReviewConfig: WizardStepConfig;
+    stepFinalDeployConfig: WizardStepConfig;
 
     // Wizard
     wizardConfig: WizardConfig;
+
+    commentOptions: MdEditorOption = {};
+
 
     issues: Issue[] = [];
     issuesListConfig: ListConfig;
@@ -87,6 +95,12 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
         this.data.release.keyUser = new PlatformHistory();
         this.data.release.pilot = new PlatformHistory();
         this.data.release.production = new PlatformHistory();
+
+        this.commentOptions = {
+            enablePreviewContentClick: false,
+            resizable: false,
+            showPreviewPanel: false
+        };
 
         // Step 1
         this.step1Config = {
@@ -154,29 +168,36 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
         // Step 3
         this.step3Config = {
             id: 'step3',
+            expandReviewDetails: true,
+            priority: 0,
+            title: 'Comment'
+        } as WizardStepConfig;
+
+        // Step Final
+        this.stepFinalConfig = {
+            id: 'stepFinal',
             priority: 2,
             title: 'Review'
         } as WizardStepConfig;
-        this.step3aConfig = {
-            id: 'step3a',
+        this.stepFinalReviewConfig = {
+            id: 'stepFinalReview',
             nextEnabled: false,
             priority: 0,
             title: 'Summary'
         } as WizardStepConfig;
-        this.step3bConfig = {
-            id: 'step3b',
+        this.stepFinalDeployConfig = {
+            id: 'stepFinalDeploy',
             nextEnabled: false,
             priority: 1,
             title: 'Deploy'
         } as WizardStepConfig;
+
         // Wizard
         this.wizardConfig = {
             //   title: 'Wizard Title',
             //   sidebarStyleClass: 'example-wizard-sidebar',
             //   stepStyleClass: 'example-wizard-step'
         } as WizardConfig;
-
-        this.setNavAway(false);
 
         this.issuesListConfig = {
             dblClick: false,
@@ -206,7 +227,7 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
 
 
     nextClicked($event: WizardEvent): void {
-        if ($event.step.config.id === 'step3b') {
+        if ($event.step.config.id === 'stepFinalDeploy') {
             this.closeWizard(this.data as ReleaseFull);
         }
     }
@@ -238,9 +259,9 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
             this.updateName();
         } else if ($event.step.config.id === 'step1b') {
             this.updateIssues();
-        } else if ($event.step.config.id === 'step3a') {
+        } else if ($event.step.config.id === 'stepFinalReview') {
             this.wizardConfig.nextTitle = 'Deploy';
-        } else if ($event.step.config.id === 'step3b') {
+        } else if ($event.step.config.id === 'stepFinalDeploy') {
             this.wizardConfig.nextTitle = 'Close';
         } else {
             this.wizardConfig.nextTitle = 'Next >';
@@ -274,8 +295,10 @@ export class ReleaseCreateComponent implements OnInit, OnDestroy {
         this.step2eConfig.allowClickNav = allow;
 
         this.step3Config.allowClickNav = allow;
-        this.step3aConfig.allowClickNav = allow;
-        this.step3bConfig.allowClickNav = allow;
+
+        this.stepFinalConfig.allowClickNav = allow;
+        this.stepFinalReviewConfig.allowClickNav = allow;
+        this.stepFinalDeployConfig.allowClickNav = allow;
     }
 
     handleIssuesSelectionChange($event: ListEvent): void {

@@ -22,6 +22,9 @@ public abstract class Deployable implements Serializable {
 	protected Date packageDate;
 	
 	protected boolean undeployed;
+	
+	@Column(name="commentContent", length = 512)
+	protected String comment;
 
 	@Embedded
 	// rename the basic mappings
@@ -111,9 +114,17 @@ public abstract class Deployable implements Serializable {
 		this.production = production;
 	}
 
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(buildDate, keyUser, packageDate, pilot, production, qualification, undeployed);
+		return Objects.hash(buildDate, keyUser, packageDate, pilot, production, qualification, undeployed, comment);
 	}
 
 	@Override
@@ -128,14 +139,14 @@ public abstract class Deployable implements Serializable {
 		return Objects.equals(buildDate, other.buildDate) && Objects.equals(keyUser, other.keyUser)
 				&& Objects.equals(packageDate, other.packageDate) && Objects.equals(pilot, other.pilot)
 				&& Objects.equals(production, other.production) && Objects.equals(qualification, other.qualification)
-				&& undeployed == other.undeployed;
+				&& undeployed == other.undeployed && Objects.equals(comment, other.comment);
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
-				"Deployable [buildDate=%s, packageDate=%s, undeployed=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s]",
-				buildDate, packageDate, undeployed, qualification, keyUser, pilot, production);
+				"Deployable [buildDate=%s, packageDate=%s, undeployed=%s, qualification=%s, keyUser=%s, pilot=%s, production=%s, comment=%s]",
+				buildDate, packageDate, undeployed, qualification, keyUser, pilot, production, comment);
 	}
 
 }

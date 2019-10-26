@@ -123,6 +123,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4>
+                                <span>Comment</span>
+                            </h4>
+                            <div class="col-sm-4">
+                                <markdown ngPreserveWhitespaces [data]="release.comment"></markdown>
+                            </div>
+                        </div>
+                    </div>
                 </tab>
                 <tab #tab_releasenote [active]="currentTab ===  ReleaseDetailTabEnum.RELEASE_NOTE" (select)="currentTab = ReleaseDetailTabEnum.RELEASE_NOTE">
                     <ng-template tabHeading>

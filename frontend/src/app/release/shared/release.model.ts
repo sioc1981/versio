@@ -7,6 +7,7 @@ export class Release {
     id: number;
     version: Version;
     undeployed: boolean;
+    comment: string;
     buildDate: Date;
     packageDate: Date;
     qualification: PlatformHistory;

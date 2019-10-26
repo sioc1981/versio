@@ -13,6 +13,7 @@ import { Patch } from '../patch/shared/patch.model';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { AuthenticationService } from '../auth/authentication.service';
 import { Location } from '@angular/common';
+import { MdEditorOption, MarkdownEditorComponent } from 'ngx-markdown-editor';
 
 enum PatchDetailTab {
     OVERVIEW,
@@ -58,6 +59,12 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
     issueToolbarConfig: ToolbarConfig;
     issuePaginationConfig: PaginationConfig;
     currentIssuesSortField: SortField;
+
+    public options: MdEditorOption = {
+        enablePreviewContentClick: false,
+        resizable: false,
+        showPreviewPanel: false
+    };
 
     private subscriptions: Subscription[] = [];
     constructor(private patchService: PatchService, private route: ActivatedRoute, private modalService: BsModalService,
@@ -236,7 +243,6 @@ export class PatchDetailComponent implements OnInit, OnDestroy {
     }
 
     handleAction(action: Action, item?: any): void {
-        console.log('action: ', action.id);
         if (action.id === 'editPatch') {
             this.openModal(this.updatePatchTemplate);
         } else if (action.id === 'openIssue') {

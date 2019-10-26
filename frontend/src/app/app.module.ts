@@ -11,6 +11,7 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxUploadModule } from '@wkoza/ngx-upload';
+import { LMarkdownEditorModule } from 'ngx-markdown-editor';
 import { MarkdownModule } from 'ngx-markdown';
 import { UiSwitchModule } from 'ngx-toggle-switch';
 import { KeycloakAngularModule } from 'keycloak-angular';
@@ -66,6 +67,7 @@ import { ApplicationUserComponent } from './admin/applicationuser/application-us
 import { ApplicationUserCreateComponent } from './admin/applicationuser/application-user-create.component';
 import { ApplicationUserLogoThumbnailDirective } from './admin/applicationuser/application-user-logo-thumbnail.directive';
 import { SafePipe } from './shared/safe.pipe';
+import { DisplayComponent } from './dashboard/display.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -107,7 +109,8 @@ defineLocale('fr', frLocale);
         ApplicationUserComponent,
         ApplicationUserCreateComponent,
         ApplicationUserLogoThumbnailDirective,
-        SafePipe
+        SafePipe,
+        DisplayComponent
     ],
     imports: [
         AboutModalModule,
@@ -124,6 +127,7 @@ defineLocale('fr', frLocale);
         InfoStatusCardModule,
         KeycloakAngularModule,
         ListModule,
+        LMarkdownEditorModule,
         MarkdownModule.forRoot({ loader: HttpClient }),
         ModalModule.forRoot(),
         NgSelectModule,

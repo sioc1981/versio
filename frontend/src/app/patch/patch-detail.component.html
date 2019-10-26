@@ -127,6 +127,14 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-12">
+                        <div class="margin-left-20">
+                            <h4>
+                                <span>Comment</span>
+                            </h4>
+                            <markdown ngPreserveWhitespaces [data]="patch.comment"></markdown>
+                        </div>
+                    </div>
                 </tab>
                 <tab #tab_releasenote [active]="currentTab === PatchDetailTabEnum.RELEASE_NOTE" (select)="currentTab = PatchDetailTabEnum.RELEASE_NOTE">
                     <ng-template tabHeading>

@@ -206,13 +206,23 @@
             </form>
         </pfng-wizard-substep>
     </pfng-wizard-step>
-    <pfng-wizard-step [config]="step3Config">
-        <!-- Step 3A: Review -->
-        <pfng-wizard-substep [config]="step3aConfig">
+    <pfng-wizard-step [config]="step3Config" [reviewTemplate]="step3ReviewTemplate">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <md-editor name="Comment" [mode]="'editor'" [options]="commentOptions" maxlength="500"
+                    [(ngModel)]="data.comment" [ngModelOptions]="{standalone: true}"></md-editor>
+                </div>
+            </div>
+        </form>
+    </pfng-wizard-step>
+    <pfng-wizard-step [config]="stepFinalConfig">
+        <!-- Step Final: Review -->
+        <pfng-wizard-substep [config]="stepFinalReviewConfig">
             <pfng-wizard-review></pfng-wizard-review>
         </pfng-wizard-substep>
-        <!-- Step 3B: Deploy -->
-        <pfng-wizard-substep [config]="step3bConfig" (onShow)="startDeploy()">
+        <!-- Step Final: Deploy -->
+        <pfng-wizard-substep [config]="stepFinalDeployConfig" (onShow)="startDeploy()">
             <div class="wizard-pf-contents">
                 <div class="wizard-pf-process blank-slate-pf" *ngIf="!deployComplete">
                     <div class="spinner spinner-lg blank-slate-pf-icon"></div>
@@ -227,7 +237,6 @@
                     <h3 class="blank-slate-pf-main-action">Update failed</h3>
                 </div>
             </div>
-
         </pfng-wizard-substep>
     </pfng-wizard-step>
 </pfng-wizard>
@@ -279,6 +288,10 @@
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.qualification.validationDate | date}}</span>
         </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.qualification.undeployDate | date}}</span>
+        </div>
     </form>
 </ng-template>
 <!-- Step 2C: Settings -->
@@ -291,6 +304,10 @@
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.keyUser.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.keyUser.undeployDate | date}}</span>
         </div>
     </form>
 </ng-template>
@@ -305,6 +322,10 @@
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.pilot.validationDate | date}}</span>
         </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.pilot.undeployDate | date}}</span>
+        </div>
     </form>
 </ng-template>
 <!-- Step 2E: Settings -->
@@ -317,6 +338,20 @@
         <div class="wizard-pf-review-item">
             <span class="wizard-pf-review-item-label">Validation Date:</span>
             <span class="wizard-pf-review-item-value">{{data.production.validationDate | date}}</span>
+        </div>
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-label">Undeploy Date:</span>
+            <span class="wizard-pf-review-item-value">{{data.production.undeployDate | date}}</span>
+        </div>
+    </form>
+</ng-template>
+<!-- Step 3: Comment -->
+<ng-template #step3ReviewTemplate>
+    <form class="form">
+        <div class="wizard-pf-review-item">
+            <span class="wizard-pf-review-item-value">
+                <markdown ngPreserveWhitespaces [data]="data.comment"></markdown>
+            </span>
         </div>
     </form>
 </ng-template>

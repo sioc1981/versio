@@ -9,6 +9,7 @@ export class Patch {
 
     sequenceNumber: string;
     undeployed: boolean;
+    comment: string;
 
     issues: Issue[];
 
