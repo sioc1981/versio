@@ -8,10 +8,12 @@ import { IssueRoutingModule } from './issue/issue-routing.module';
 import { PatchRoutingModule } from './patch/patch-routing.module';
 import { ReleaseCompareRoutingModule } from './release-compare/release-compare-routing.module';
 import { ReleaseRoutingModule } from './release/release-routing.module';
+import { DisplayComponent } from './dashboard/display.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     { path: 'dashboard', component: DashboardComponent },
+    { path: 'dashboard/rotate', component: DisplayComponent },
     { path: 'forbidden', component: ForbiddenPageComponent },
     { path: '**', component: PageNotFoundComponent }
 ];

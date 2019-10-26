@@ -141,7 +141,15 @@ export class NavigationComponent implements OnInit, OnDestroy {
         res[this.DASHBOARD_INDEX] = {
             title: 'Dashboard',
             iconStyleClass: 'fa fa-dashboard',
-            url: '/dashboard'
+            url: '/dashboard',
+            children: [
+                {
+                    title: 'All',
+                    url: '/dashboard'
+                },  {
+                    title: 'Rotate',
+                    url: '/dashboard/rotate'
+                }]
         } as VerticalNavigationItem;
 
         res[this.RELEASES_INDEX] = {

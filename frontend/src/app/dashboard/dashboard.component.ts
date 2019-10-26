@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { InfoStatusCardConfig, UtilizationDonutChartConfig } from 'patternfly-ng';
-import { PATCH_CONSTANT } from '../patch/shared/patch.service';
+import { UtilizationDonutChartConfig } from 'patternfly-ng';
 import { Subscription } from 'rxjs';
-import { ISSUE_CONSTANT } from '../issue/shared/issue.constant';
 import { ReleaseSummary } from '../release/shared/release.model';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 
@@ -13,11 +11,6 @@ import { RELEASE_CONSTANT } from '../release/shared/release.constant';
     styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-
-
-    issueConfig: InfoStatusCardConfig = this.getIssueCardConfig();
-    patchConfig: InfoStatusCardConfig = this.getPatchCardConfig();
-    releaseConfig: InfoStatusCardConfig = this.getReleaseCardConfig();
 
     releaseSummaries: ReleaseSummary[] = this.loadReleases();
 
@@ -35,9 +28,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     constructor() { }
 
     ngOnInit() {
-        this.subscriptions.push(ISSUE_CONSTANT.summary.count$.subscribe(() => this.issueConfig = this.getIssueCardConfig()));
-        this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(() => this.patchConfig = this.getPatchCardConfig()));
-        this.subscriptions.push(RELEASE_CONSTANT.summary.count$.subscribe(() => this.releaseConfig = this.getReleaseCardConfig()));
         this.subscriptions.push(RELEASE_CONSTANT.releaseSummariesNotifier$.subscribe(() => {
              this.releaseSummaries = this.loadReleases();
         }));
@@ -51,44 +41,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       */
     ngOnDestroy(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe);
-    }
-
-    private getIssueCardConfig(): InfoStatusCardConfig {
-        return {
-            showTopBorder: true,
-            htmlContent: true,
-            title: ISSUE_CONSTANT.title,
-            href: '#' + ISSUE_CONSTANT.url,
-            iconStyleClass: ISSUE_CONSTANT.iconStyleClass,
-            info: [
-                'number of issues: ' + ISSUE_CONSTANT.summary.count,
-            ]
-        };
-    }
-    private getPatchCardConfig(): InfoStatusCardConfig {
-        return {
-            showTopBorder: true,
-            htmlContent: true,
-            title: PATCH_CONSTANT.title,
-            href: '#' + PATCH_CONSTANT.url,
-            iconStyleClass: PATCH_CONSTANT.iconStyleClass,
-            info: [
-                'number of patches: ' + PATCH_CONSTANT.summary.count,
-            ]
-        };
-    }
-
-    private getReleaseCardConfig(): InfoStatusCardConfig {
-        return {
-            showTopBorder: true,
-            htmlContent: true,
-            title: RELEASE_CONSTANT.title,
-            href: '#' + RELEASE_CONSTANT.url,
-            iconStyleClass: RELEASE_CONSTANT.iconStyleClass,
-            info: [
-                'number of releases: ' + RELEASE_CONSTANT.summary.count,
-            ]
-        };
     }
 
 }

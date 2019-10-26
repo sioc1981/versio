@@ -17,6 +17,9 @@ export class ReleaseCardComponent implements OnInit {
     @Input()
     item: ReleaseSummary;
 
+    @Input()
+    showApplicationUsers = true;
+
     config: CardConfig;
 
     packageConfig: UtilizationDonutChartConfig;
@@ -42,7 +45,7 @@ export class ReleaseCardComponent implements OnInit {
     maxPatch: number;
 
     chartHeight = 100;
-    
+
     patchThreshold = 50;
 
     private subscriptions: Subscription[] = [];
@@ -53,14 +56,9 @@ export class ReleaseCardComponent implements OnInit {
             // noPadding: true,
             // topBorder: false
         } as CardConfig;
-        // this.packageConfig.total = this.item.patchCount;
-        // this.packageConfig.used = this.item.packagePatched;
-        // this.packageConfig.thresholds = {'warning': this.packageConfig.total=this.item.patchCount-1,
-        //  'error': this.packageConfig.total=this.item.patchCount-3};
         this.maxPatch = this.item.patchCount > this.patchThreshold ? this.item.patchCount : this.patchThreshold;
         this.packageConfig = {
             chartId: 'exampleUtilizationDonut' + this.item.id,
-            //centerLabelFormat: 'txt-func',
             centerLabelFormat: 'none',
             centerLabel: ' ',
             data: {
@@ -75,15 +73,8 @@ export class ReleaseCardComponent implements OnInit {
             outerLabelAlignment: 'right',
             thresholds: { 'warning': 40, 'error': 80 },
             total: this.maxPatch,
-//            units: 'patch',
             used: this.item.patchCount
         } as UtilizationDonutChartConfig;
-        // this.packageConfig.centerLabelFn = () => {
-        //     return {
-        //         title: this.packageConfig.used,
-        //         subTitle: 'Patches'
-        //     };
-        // };
 
         this.issueConfig = {
             chartId: 'IssueDonut' + this.item.id,
@@ -107,15 +98,9 @@ export class ReleaseCardComponent implements OnInit {
         } as DonutChartConfig;
 
         this.subscriptions.push(APPLICATION_USER_CONSTANT.applicationUserSummariesNotifier$.subscribe(() => {
-            //  this.item.applicationUserIds.forEach(id => console.log('test:',  APPLICATION_USER_CONSTANT.applicationUserSummaries[id]));
-             this.applicationUsers = this.item.applicationUserIds
-                .filter(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id] !== undefined)
-                .map(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id]);
+             this.reloadApplicationUsers();
         }));
-        // this.item.applicationUserIds.forEach(id => console.log('test:',  APPLICATION_USER_CONSTANT.applicationUserSummaries[id]));
-        this.applicationUsers = this.item.applicationUserIds
-            .filter(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id] !== undefined)
-            .map(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id]);
+        this.reloadApplicationUsers();
 
         this.qualificationConfig = this.geratateConfig('qualification', this.item.qualification.deployed,
             this.item.qualification.undeployed);
@@ -143,6 +128,14 @@ export class ReleaseCardComponent implements OnInit {
             info: 'This version has no patch... yet!',
             title: 'No Patch'
         } as EmptyStateConfig;
+    }
+
+    reloadApplicationUsers() {
+        if (this.showApplicationUsers) {
+            this.applicationUsers = this.item.applicationUserIds
+                .filter(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id] !== undefined)
+                .map(id => APPLICATION_USER_CONSTANT.applicationUserSummaries[id]);
+        }
     }
 
     generateData(summary: PlatformSummary): any[] {
@@ -238,7 +231,7 @@ export class ReleaseCardComponent implements OnInit {
                         position.top = cy;
                         break;
                     }
-                    return position; 
+                    return position;
                 }
             }
         } as DonutChartConfig;

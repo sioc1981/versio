@@ -7,6 +7,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 // NGX Bootstrap
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { BsDropdownConfig, BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { CarouselModule } from 'ngx-bootstrap/carousel';
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
@@ -120,6 +122,7 @@ defineLocale('fr', frLocale);
         BsDropdownModule.forRoot(),
         BrowserModule,
         CardModule,
+        CarouselModule.forRoot(),
         DonutChartModule,
         EmptyStateModule,
         FormsModule,
@@ -134,6 +137,7 @@ defineLocale('fr', frLocale);
         NgxDatatableModule,
         NgxUploadModule.forRoot(),
         PaginationModule,
+        ProgressbarModule.forRoot(),
         TableModule,
         TabsModule.forRoot(),
         ToastNotificationListModule,
