@@ -200,6 +200,10 @@ export class ReleaseCardComponent implements OnInit {
             },
             legend: {
                 show: false
+            },
+            size: {
+                width: 175,
+                height: 100
             }
             ,
             tooltip: {
