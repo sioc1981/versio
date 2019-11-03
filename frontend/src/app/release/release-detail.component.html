@@ -201,8 +201,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     <div class="col-sm-12">
                         <pfng-list id="myList" [items]="patches" [itemTemplate]="patchTemplate" [actionTemplate]="patchActionTemplate">
                             <ng-template #patchTemplate let-item="item" let-index="index">
@@ -220,7 +218,7 @@
 				                                    <img src="assets/images/jira.svg" class="list-pf-icon-small"
 				                                        *ngSwitchCase="'JIRA'" />
 				                                </span>
-                                            	<span title="{{issue.description}}" >{{issue.reference}}</span>
+                                            	<a [attr.href]="buildIssueUrl(issue)" target="_blank">{{issue.reference}} - {{issue.description}}</a>
                                             	</div>
                                             </div>
                                     </div>

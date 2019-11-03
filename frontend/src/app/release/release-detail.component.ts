@@ -852,4 +852,10 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         }
         this.modalRef.hide();
     }
+
+    buildIssueUrl(issue: Issue): string {
+        return ISSUE_CONSTANT.constainer_urls[issue.container] + issue.reference;
+    }
+
+
 }
