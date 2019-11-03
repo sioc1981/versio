@@ -1,5 +1,5 @@
 <div class="container-fluid pfng-fluid-width-container">
-    <carousel [interval]="interval" [noPause]="true">
+    <carousel [interval]="interval" [noPause]="true" [(activeSlide)]="activeSlideIndex">
         <slide *ngFor="let releaseSummariesByAU of releaseSummariesByApplicationUsers; index as i" >
             <div class="col-sm-12 text-center" >
                 <div class="col-sm-4 col-sm-offset-4" >
