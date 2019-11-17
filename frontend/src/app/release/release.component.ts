@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { ReleaseService } from './shared/release.service';
 import {
     FilterConfig, ToolbarConfig, FilterType, FilterEvent, Filter, SortConfig, ActionConfig, Action,
@@ -53,7 +53,7 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
     constructor(private releaseService: ReleaseService, private modalService: BsModalService,
         private auth: AuthenticationService, private route: ActivatedRoute, private loc: Location,
-        private copyService: CopyService) { }
+        private copyService: CopyService, private router: Router) { }
 
     ngOnInit() {
         this.reloadData();
@@ -212,8 +212,8 @@ export class ReleaseComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(this.route.queryParamMap.subscribe(params => {
             const filters: string[] = params.getAll('filter');
+            this.filterConfig.appliedFilters = [];
             if (filters.length > 0) {
-                this.filterConfig.appliedFilters = [];
                 filters.forEach(filter => {
                     this.filterConfig.fields.forEach(ff => {
                         if (ff.queries) {
@@ -293,6 +293,22 @@ export class ReleaseComponent implements OnInit, OnDestroy {
     }
     filterChanged($event: FilterEvent): void {
         this.applyFilters();
+        this.updateUrl();
+    }
+
+    private updateUrl(): void {
+        let params: Params = null;
+        if (this.filterConfig.appliedFilters.length > 0) {
+            params = [];
+            params['filter'] = [];
+            this.filterConfig.appliedFilters.forEach(af => {
+                params['filter'].push(af.field.id + '_' + (af.query ? af.query.id : af.value));
+            });
+        }
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: params
+        });
     }
 
     matchesFilter(item: any, filter: Filter): boolean {

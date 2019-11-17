@@ -25,7 +25,7 @@
     <ng-template #loaded>
         <div *ngIf="patch; else error">
             <tabset #staticTabs>
-                <tab #tab_overview (select)="currentTab = PatchDetailTabEnum.OVERVIEW">
+                <tab #tab_overview (select)="handleTabChange(PatchDetailTabEnum.OVERVIEW)">
                     <ng-template tabHeading>
                         <span>Overview</span>
                     </ng-template>
@@ -136,7 +136,7 @@
                         </div>
                     </div>
                 </tab>
-                <tab #tab_releasenote [active]="currentTab === PatchDetailTabEnum.RELEASE_NOTE" (select)="currentTab = PatchDetailTabEnum.RELEASE_NOTE">
+                <tab #tab_releasenote [active]="currentTab === PatchDetailTabEnum.RELEASE_NOTE" (select)="handleTabChange(PatchDetailTabEnum.RELEASE_NOTE)">
                     <ng-template tabHeading>
                         <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Release note
                             ({{patch.issues.length}})</span>

@@ -5,7 +5,6 @@ import { ReleaseDetailComponent } from './release-detail.component';
 
 const releaseRoutes: Routes = [
     { path: 'releases', component: ReleaseComponent },
-    { path: 'release/:version/:view', component: ReleaseDetailComponent },
     { path: 'release/:version', component: ReleaseDetailComponent }
 ];
 

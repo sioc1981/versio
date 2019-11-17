@@ -5,7 +5,6 @@ import { PatchDetailComponent } from './patch-detail.component';
 
 const patchRoutes: Routes = [
     { path: 'patches', component: PatchComponent },
-    { path: 'patch/:version/:sequence/:view', component: PatchDetailComponent },
     { path: 'patch/:version/:sequence', component: PatchDetailComponent }
 ];
 

@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { ReleaseService } from './shared/release.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
-    WizardEvent, EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
+    EmptyStateConfig, Action, ActionConfig, FilterConfig, ToolbarConfig, SortConfig, PaginationConfig, FilterType,
     PaginationEvent, Filter, FilterEvent, SortField, SortEvent, FilterField, CopyService
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -94,7 +94,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
     constructor(private releaseService: ReleaseService, private route: ActivatedRoute, private modalService: BsModalService,
-        private auth: AuthenticationService, private loc: Location, private copyService: CopyService) { }
+        private auth: AuthenticationService, private loc: Location, private copyService: CopyService, private router: Router) { }
 
     ngOnInit() {
         this.errorConfig = {
@@ -291,7 +291,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         } as SortConfig;
 
         this.currentPatchSortField = this.patchSortConfig.fields[0];
-        
+
         this.patchActionConfig = {
                 primaryActions: []
             } as ActionConfig;
@@ -365,7 +365,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             filterConfig: this.allIssueFilterConfig,
             sortConfig: this.allIssueSortConfig
         } as ToolbarConfig;
-        
+
         this.auth.isLoggedIn().then(loggedIn => {
             if (loggedIn) {
                 this.globalActionConfig = {
@@ -390,19 +390,21 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(this.route.paramMap.subscribe(params => {
             this.versionNumber = params.get('version');
-            this.viewAtStartup = params.get('view');
-            this.currentTab = ReleaseDetailTab[this.viewAtStartup];
             if (params.has('version')) {
                 this.reloadData();
             }
 
-            if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
-                const filterConf: FilterConfig = this.getCurrentFilterConfig();
-
             this.subscriptions.push(this.route.queryParamMap.subscribe(queryParams => {
+                this.viewAtStartup = queryParams.get('view');
+                if (queryParams.has('view')) {
+                    this.currentTab = ReleaseDetailTab[this.viewAtStartup];
+                }
+
+                if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
+                    const filterConf: FilterConfig = this.getCurrentFilterConfig();
                     const filters: string[] = queryParams.getAll('filter');
+                    filterConf.appliedFilters = [];
                     if (filters.length > 0) {
-                        filterConf.appliedFilters = [];
                         filters.forEach(filter => {
                             filterConf.fields.forEach(ff => {
                                 if (ff.queries) {
@@ -413,11 +415,11 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                             });
                         });
                         if (this.releaseFull) {
-                            this.applyIssueFilters()
-                        };
+                            this.applyIssueFilters();
+                        }
                     }
-                }));
-            }
+                }
+            }));
         }));
     }
 
@@ -530,6 +532,7 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
                 this.applyAllIssueFilters();
                 break;
         }
+        this.updateUrl(); 
     }
 
     applyIssueFilters(): void {
@@ -608,12 +611,12 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
             }
         });
         if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
-            urlToCopy = urlToCopy.concat('/', ReleaseDetailTab[this.currentTab]);
+            urlToCopy = urlToCopy.concat('?', 'view=', ReleaseDetailTab[this.currentTab]);
             const filterConf: FilterConfig = this.getCurrentFilterConfig();
             if (filterConf.appliedFilters.length > 0) {
                 let first = true;
                 filterConf.appliedFilters.forEach(af => {
-                    urlToCopy = urlToCopy.concat(first ? '?' : '&', 'filter=', af.field.id, '_', af.query ? af.query.id : af.value);
+                    urlToCopy = urlToCopy.concat('&', 'filter=', af.field.id, '_', af.query ? af.query.id : af.value);
                     first = false;
                 });
             }
@@ -702,6 +705,34 @@ export class ReleaseDetailComponent implements OnInit, OnDestroy {
         const container2 = item2.container;
         compValue = container1.localeCompare(container2);
         return compValue;
+    }
+
+    handleTabChange(newTab: ReleaseDetailTab){
+        this.currentTab = newTab;
+        this.updateUrl();
+    }
+
+    private updateUrl(): void {
+        let params: Params = null;
+        if (this.currentTab !== ReleaseDetailTab.OVERVIEW) {
+            params = params || [];
+            params['view'] = ReleaseDetailTab[this.currentTab];
+        }
+
+        const filterConf: FilterConfig = this.getCurrentFilterConfig();
+        if (filterConf.appliedFilters.length > 0) {
+            params = params || [];
+            params['filter'] = [];
+            filterConf.appliedFilters.forEach(af => {
+                params['filter'].push(af.field.id + '_' + (af.query ? af.query.id : af.value));
+            });
+        }
+
+        const command = [];
+        this.router.navigate(command, {
+            relativeTo: this.route,
+            queryParams: params
+        });
     }
 
     // Handle sort changes

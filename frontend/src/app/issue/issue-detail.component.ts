@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
-    WizardEvent, EmptyStateConfig, Action, ActionConfig, CopyService, FilterConfig, SortConfig, ToolbarConfig, SortField,
+    EmptyStateConfig, Action, ActionConfig, CopyService, FilterConfig, SortConfig, ToolbarConfig, SortField,
     FilterType, FilterEvent, FilterField, Filter, PaginationConfig, PaginationEvent, SortEvent
 } from 'patternfly-ng';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -32,7 +32,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
     ReleaseDetailTabEnum = ReleaseDetailTab;
 
     issueReference: string;
-    
+
     parcels: (Patch | Release)[] = [];
     filteredParcels: (Patch | Release)[] = [];
     items: (Patch | Release)[] = [];
@@ -56,7 +56,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = [];
     constructor(private issueService: IssueService, private route: ActivatedRoute, private modalService: BsModalService,
-        private auth: AuthenticationService, private loc: Location, private copyService: CopyService) { }
+        private auth: AuthenticationService, private loc: Location, private copyService: CopyService, private router: Router) { }
 
     ngOnInit() {
         this.errorConfig = {
@@ -71,7 +71,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
                 tooltip: 'Open issue in an new tab'
             }]
         } as ActionConfig;
-        
+
         this.actionConfig = {
             primaryActions: [{
                 id: 'copyURL',
@@ -213,8 +213,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
 
             this.subscriptions.push(this.route.queryParamMap.subscribe(params => {
                 const filters: string[] = params.getAll('filter');
+                this.filterConfig.appliedFilters = [];
                 if (filters.length > 0) {
-                    this.filterConfig.appliedFilters = [];
                     filters.forEach(filter => {
                         this.filterConfig.fields.forEach(ff => {
                             if (ff.queries) {
@@ -312,13 +312,30 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
         this.paginationConfig.totalItems = this.filteredParcels.length;
         this.updateItems();
     }
+
     filterChanged($event: FilterEvent): void {
         this.applyFilters();
+        this.updateUrl();
+    }
+
+    private updateUrl(): void {
+        let params: Params = null;
+        if (this.filterConfig.appliedFilters.length > 0) {
+            params = [];
+            params['filter'] = [];
+            this.filterConfig.appliedFilters.forEach(af => {
+                params['filter'].push(af.field.id + '_' + (af.query ? af.query.id : af.value));
+            });
+        }
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: params
+        });
     }
 
     matchesFilter(item: any, filter: Filter): boolean {
         let match = true;
-        const data = item.release ? item.release: item;
+        const data = item.release ? item.release : item;
         switch (filter.field.id) {
             case 'version':
                 match = data.version.versionNumber.indexOf(filter.value) !== -1;
@@ -360,7 +377,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy {
         });
         return matches;
     }
-    
+
     handleAction(action: Action, item?: any): void {
         if (action.id === 'copyURL') {
             this.copyURL();

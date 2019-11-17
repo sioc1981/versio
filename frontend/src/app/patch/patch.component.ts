@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Patch } from './shared/patch.model';
 import { PatchService } from './shared/patch.service';
 import {
@@ -52,7 +52,7 @@ export class PatchComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[] = [];
 
     constructor( private patchService: PatchService, private modalService: BsModalService, private auth: AuthenticationService,
-        private zone: NgZone, private route: ActivatedRoute, private loc: Location, private copyService: CopyService ) { }
+        private route: ActivatedRoute, private loc: Location, private copyService: CopyService, private router: Router ) { }
 
     ngOnInit() {
         this.reloadData();
@@ -219,8 +219,8 @@ export class PatchComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(this.route.queryParamMap.subscribe( params => {
             const filters: string[] = params.getAll( 'filter' );
+            this.filterConfig.appliedFilters = [];
             if ( filters.length > 0 ) {
-                this.filterConfig.appliedFilters = [];
                 filters.forEach( filter => {
                         this.filterConfig.fields.forEach(ff => {
                             if (ff.queries) {
@@ -305,6 +305,22 @@ export class PatchComponent implements OnInit, OnDestroy {
 
     filterChanged( $event: FilterEvent ): void {
         this.applyFilters();
+        this.updateUrl();
+    }
+
+    private updateUrl(): void {
+        let params: Params = null;
+        if (this.filterConfig.appliedFilters.length > 0) {
+            params = [];
+            params['filter'] = [];
+            this.filterConfig.appliedFilters.forEach(af => {
+                params['filter'].push(af.field.id + '_' + (af.query ? af.query.id : af.value));
+            });
+        }
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: params
+        });
     }
 
     matchesFilter( item: any, filter: Filter ): boolean {

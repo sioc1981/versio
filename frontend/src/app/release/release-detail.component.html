@@ -25,7 +25,7 @@
     <ng-template #loaded>
         <div *ngIf="release; else error">
             <tabset #staticTabs>
-                <tab #tab_overview (select)="currentTab = ReleaseDetailTabEnum.OVERVIEW">
+                <tab #tab_overview (select)="handleTabChange(ReleaseDetailTabEnum.OVERVIEW)">
                     <ng-template tabHeading>
                         <span>Overview</span>
                     </ng-template>
@@ -134,7 +134,7 @@
                         </div>
                     </div>
                 </tab>
-                <tab #tab_releasenote [active]="currentTab ===  ReleaseDetailTabEnum.RELEASE_NOTE" (select)="currentTab = ReleaseDetailTabEnum.RELEASE_NOTE">
+                <tab #tab_releasenote [active]="currentTab ===  ReleaseDetailTabEnum.RELEASE_NOTE" (select)="handleTabChange(ReleaseDetailTabEnum.RELEASE_NOTE)">
                     <ng-template tabHeading>
                         <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">Release note
                             ({{releaseFull.issues.length}})</span>
@@ -183,7 +183,7 @@
 
                     </div>
                 </tab>
-                <tab #tab_patches [active]="currentTab === ReleaseDetailTabEnum.PATCHES" (select)="currentTab = ReleaseDetailTabEnum.PATCHES">
+                <tab #tab_patches [active]="currentTab === ReleaseDetailTabEnum.PATCHES" (select)="handleTabChange(ReleaseDetailTabEnum.PATCHES)">
                     <ng-template tabHeading>
                         <span class="fas {{patchIconStyleClass}}"></span> <span class="padding-left-5">Patches
                             ({{releaseFull.patches.length}})</span>
@@ -250,7 +250,7 @@
 
                     </div>
                 </tab>
-                <tab #tab_all_issues [active]="currentTab === ReleaseDetailTabEnum.ALL_ISSUES" (select)="currentTab = ReleaseDetailTabEnum.ALL_ISSUES">
+                <tab #tab_all_issues [active]="currentTab === ReleaseDetailTabEnum.ALL_ISSUES" (select)="handleTabChange(ReleaseDetailTabEnum.ALL_ISSUES)">
                     <ng-template tabHeading>
                         <span class="fas {{issueIconStyleClass}}"></span> <span class="padding-left-5">All Issues
                             ({{allOriginalIssues.length}})</span>
