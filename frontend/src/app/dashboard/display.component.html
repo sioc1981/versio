@@ -1,25 +1,16 @@
 <div class="container-fluid pfng-fluid-width-container">
-    <carousel [interval]="interval" [noPause]="true" [(activeSlide)]="activeSlideIndex">
-        <slide *ngFor="let releaseSummariesByAU of releaseSummariesByApplicationUsers; index as i" >
-            <div class="col-sm-12 text-center" >
-                <div class="col-sm-4 col-sm-offset-4" >
-                    <span style="padding: 0px 5px;font-size: 14px;">
-                        <img [src]="applicationUsers[i].logo | safe: 'url'" width="28px" height="28px">
-                        {{applicationUsers[i].name}}
-                        <img [src]="'/assets/images/i8n/' + applicationUsers[i].country + '.svg'" width="28px"
-                        height="28px"></span>
-                    <div class="timer-bar">
-                        <span class="bar">
-                            <span class="timer" [ngStyle]="{'animation-duration.s': interval/1000 }"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div *ngFor="let item of (releaseSummariesByAU | skipUndeploy)">
-                <div *ngIf="item">
-                    <app-release-card [item]="item" [showApplicationUsers]="false" ></app-release-card>
-                </div>
-            </div>
-        </slide>
-    </carousel>
+    <div class="col-sm-12 text-center" *ngIf="applicationUser">
+        <div class="col-sm-4 col-sm-offset-4" >
+            <span style="padding: 0px 5px;font-size: 14px;">
+                <img [src]="applicationUser.logo | safe: 'url'" width="28px" height="28px">
+                {{applicationUser.name}}
+                <img [src]="'/assets/images/i8n/' + applicationUser.country + '.svg'" width="28px"
+                height="28px"></span>
+        </div>
+    </div>
+    <div *ngFor="let item of (filteredReleaseSummaries)">
+        <div *ngIf="item">
+            <app-release-card [item]="item" [showApplicationUsers]="false" ></app-release-card>
+        </div>
+    </div>
 </div>

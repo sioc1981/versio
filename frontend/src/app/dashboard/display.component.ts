@@ -5,6 +5,7 @@ import { ReleaseSummary } from '../release/shared/release.model';
 import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { ApplicationUser } from '../admin/applicationuser/shared/application-user.model';
 import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -15,13 +16,9 @@ import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/appli
 export class DisplayComponent implements OnInit, OnDestroy {
 
     releaseSummaries: ReleaseSummary[] = [];
-    applicationUsers: ApplicationUser[] = [];
-    releaseSummariesByApplicationUsers: ReleaseSummary[][] = [];
-
-    activeSlideIndex = 0;
-    activeApplicationUser: ApplicationUser = null;
-
-    interval = 5000;
+    filteredReleaseSummaries: ReleaseSummary[] = [];
+    applicationUser: ApplicationUser;
+    appUser = '';
 
     packageConfig: UtilizationDonutChartConfig = {
         chartId: 'exampleUtilizationDonut',
@@ -34,49 +31,25 @@ export class DisplayComponent implements OnInit, OnDestroy {
     };
 
     private subscriptions: Subscription[] = [];
-    constructor() { }
+    constructor(private route: ActivatedRoute) { }
 
     ngOnInit() {
         this.reloadApplicationUsers();
-        this.releaseSummaries = this.loadReleases();
-        this.dispatchReleaseSummariesByApplicationUsers();
+        this.loadReleases();
+        this.filterReleaseSummaries();
         this.subscriptions.push(APPLICATION_USER_CONSTANT.applicationUserSummariesNotifier$.subscribe(() => {
             this.reloadApplicationUsers();
-            this.dispatchReleaseSummariesByApplicationUsers();
+            this.filterReleaseSummaries();
         }));
         this.subscriptions.push(RELEASE_CONSTANT.releaseSummariesNotifier$.subscribe(() => {
-            this.releaseSummaries = this.loadReleases();
-            this.dispatchReleaseSummariesByApplicationUsers();
+            this.loadReleases();
+            this.filterReleaseSummaries();
         }));
-    }
-
-    private loadReleases(): ReleaseSummary[] {
-        if(this.applicationUsers.length > 0) {
-            this.activeApplicationUser = this.applicationUsers[this.activeSlideIndex]; 
-        }
-        return Array.from(RELEASE_CONSTANT.releaseSummaries).sort((ra, rb) => rb.versionNumber.localeCompare(ra.versionNumber));
-    }
-
-    private reloadApplicationUsers(): void {
-        if (this.applicationUsers.length > 0) {
-            this.activeApplicationUser = this.applicationUsers[this.activeSlideIndex]; 
-        }
-        this.applicationUsers = Array.from(APPLICATION_USER_CONSTANT.applicationUserSummaries)
-            .filter(au => au !== undefined)
-            .sort((aua, aub) => aua.name.localeCompare(aub.name));
-    }
-
-    private dispatchReleaseSummariesByApplicationUsers(): void {
-        const summariesByApplicationUsers: ReleaseSummary[][] = [];
-        const currentApplicationUserIndex = this.applicationUsers.findIndex(au => au && this.activeApplicationUser 
-            && au.id === this.activeApplicationUser.id);
-        this.applicationUsers.forEach((ap, index) => {
-            summariesByApplicationUsers[index] = this.releaseSummaries.filter(rs =>
-                rs && rs.applicationUserIds && rs.applicationUserIds.indexOf(ap.id) > -1
-            );
-        });
-        this.releaseSummariesByApplicationUsers = summariesByApplicationUsers;
-        this.activeSlideIndex = currentApplicationUserIndex !== -1 ? currentApplicationUserIndex : 0;
+        this.subscriptions.push(this.route.paramMap.subscribe(params => {
+            this.appUser = params.get('appUser');
+            this.reloadApplicationUsers();
+            this.filterReleaseSummaries();
+        }));
     }
 
     /**
@@ -84,6 +57,22 @@ export class DisplayComponent implements OnInit, OnDestroy {
       */
     ngOnDestroy(): void {
         this.subscriptions.forEach(sub => sub.unsubscribe);
+    }
+
+    private loadReleases(): void {
+        this.releaseSummaries = Array.from(RELEASE_CONSTANT.releaseSummaries)
+            .sort((ra, rb) => rb.versionNumber.localeCompare(ra.versionNumber));
+    }
+
+    private reloadApplicationUsers(): void {
+        this.applicationUser = APPLICATION_USER_CONSTANT.applicationUserSummaries.find(au => au && au.name === this.appUser);
+    }
+
+    private filterReleaseSummaries(): void {
+        const filtered = this.releaseSummaries.filter(rs =>
+            this.applicationUser && rs && rs.applicationUserIds && rs.applicationUserIds.indexOf(this.applicationUser.id) > -1
+        );
+        this.filteredReleaseSummaries = filtered;
     }
 
 }

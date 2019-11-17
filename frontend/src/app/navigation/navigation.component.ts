@@ -98,6 +98,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
             filter(e => e instanceof RouterEvent)
         ).subscribe((e: RouterEvent) => {
             // to keep parameter when click on compare menu
+            this.updateNavigationUrl(this.DASHBOARD_INDEX, '/dashboard', '/dashboard', e);
+            // to keep parameter when click on compare menu
             this.updateNavigationUrl(this.COMPARE_INDEX, '/compare', '/compare', e);
             // to keep parameter when click on releases menu
             this.updateNavigationUrl(this.RELEASES_INDEX, '/release', '/releases', e);
@@ -112,6 +114,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
             this.navigationItems[this.ISSUES_INDEX].badges[0].count = c));
         this.subscriptions.push(PATCH_CONSTANT.summary.count$.subscribe(c =>
             this.navigationItems[this.PATCHES_INDEX].badges[0].count = c));
+        this.subscriptions.push(APPLICATION_USER_CONSTANT.applicationUserSummariesNotifier$.subscribe(() => {
+            this.resetDashboardChildren();
+        }));
+
         this.navigationItems = this.getItems();
         if (this.hasAuthentication) {
             this.authenticationService.isLoggedIn().then(r => {
@@ -142,13 +148,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
             title: 'Dashboard',
             iconStyleClass: 'fa fa-dashboard',
             url: '/dashboard',
-            children: [
-                {
+            children: [{
                     title: 'All',
                     url: '/dashboard'
-                },  {
-                    title: 'Rotate',
-                    url: '/dashboard/rotate'
                 }]
         } as VerticalNavigationItem;
 
@@ -193,6 +195,21 @@ export class NavigationComponent implements OnInit, OnDestroy {
         return res;
     }
 
+    resetDashboardChildren(): void {
+        const res: VerticalNavigationItem[] = this.navigationItems;
+        if (res[this.DASHBOARD_INDEX]) {
+            const children = [{
+                    title: 'All',
+                    url: '/dashboard'
+                }];
+            res[this.DASHBOARD_INDEX].children = children.concat(APPLICATION_USER_CONSTANT.applicationUserSummaries
+                .filter(au => au).map(au => { return {
+                    title: au.name,
+                    url: '/dashboard/' + au.name
+                }; }));
+        }
+    }
+
     addAdminItems(): void {
         const res: VerticalNavigationItem[] = this.navigationItems;
         const adminItem: VerticalNavigationItem = {
@@ -204,7 +221,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
                     title: ISSUE_CONTAINER_CONSTANT.title,
                     iconStyleClass: ISSUE_CONTAINER_CONSTANT.iconStyleClass,
                     url: ISSUE_CONTAINER_CONSTANT.url
-                },  {
+                }, {
                     title: APPLICATION_USER_CONSTANT.title,
                     iconStyleClass: APPLICATION_USER_CONSTANT.iconStyleClass,
                     url: APPLICATION_USER_CONSTANT.url
