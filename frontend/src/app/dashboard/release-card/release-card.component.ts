@@ -63,7 +63,8 @@ export class ReleaseCardComponent implements OnInit {
             centerLabel: ' ',
             data: {
                 onclick: (data, element) => {
-                    this.router.navigate(['/release', this.item.versionNumber, 'PATCHES']);
+                    const extra = {queryParams:{'view': 'PATCHES'} } as NavigationExtras;
+                    this.router.navigate(['/release', this.item.versionNumber], extra);
                 }
             },
             legend: {
@@ -177,7 +178,7 @@ export class ReleaseCardComponent implements OnInit {
                     }
                 },
                 onclick: (data, element) => {
-                    const extra = {} as NavigationExtras;
+                    const extra = {queryParams:{'view': 'PATCHES'} } as NavigationExtras;
                     let filterCriterium = '';
                     switch (data.id) {
                     case 'missing':
@@ -192,10 +193,11 @@ export class ReleaseCardComponent implements OnInit {
                     }
                     if ( filterCriterium !== '' ) {
                         extra.queryParams = {
+							'view': 'PATCHES',
                             'filter': [filterCriterium + platform, 'onlyDeployed_onlyDeployed']
                         };
                     }
-                    this.router.navigate(['/release', this.item.versionNumber, 'PATCHES'], extra);
+                    this.router.navigate(['/release', this.item.versionNumber], extra);
                 }
             },
             legend: {
