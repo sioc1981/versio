@@ -29,6 +29,7 @@ import fr.sioc1981.versio.backend.security.Security;
 
 @Path("/patch")
 @Stateless
+@SecurityDomain(Security.Domain.DOMAIN)
 @DeclareRoles({Security.Role.BACKEND, Security.Role.USER})
 public class PatchService {
 

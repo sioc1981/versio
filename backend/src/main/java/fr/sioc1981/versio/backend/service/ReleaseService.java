@@ -42,6 +42,7 @@ import fr.sioc1981.versio.backend.security.Security;
 
 @Path(ReleaseService.RELEASE_PATH)
 @Stateless
+@SecurityDomain(Security.Domain.DOMAIN)
 @DeclareRoles({Security.Role.BACKEND, Security.Role.USER})
 public class ReleaseService {
 
@@ -171,6 +172,7 @@ public class ReleaseService {
 	@GET
 	@Produces("application/json")
 	@Path("{source}/compare/{dest}")
+	@PermitAll
 	public Response compare(@PathParam("source") String source, @PathParam("dest") String dest) {
 		Version v1 = new Version(source);
 		Version v2 = new Version(dest);

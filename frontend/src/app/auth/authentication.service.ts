@@ -32,17 +32,22 @@ export class AuthenticationService {
             const token: string = localStorage.getItem(AUTH_TOKEN);
             const refreshToken: string = localStorage.getItem(AUTH_REFRESH_TOKEN) || '';
             const options = {
-                enableBearerInterceptor: true,
-                      onLoad: 'check-sso',
-      checkLoginIframe: false
+                enableBearerInterceptor: false,
+                onLoad: 'check-sso',
+                checkLoginIframe: false
             } as KeycloakOptions;
-            // if (token && refreshToken) {
-            //     options.initOptions = {
-            //         token: token,
-            //         refreshToken: refreshToken
-            //     };
-            // }
-            res = this.keycloakService.init(options);
+            if (token && refreshToken) {
+                options.initOptions = {
+                    token: token,
+                    refreshToken: refreshToken
+                };
+            }
+            try {
+                res = this.keycloakService.init(options);
+            } catch (e) {
+                options.initOptions = {};
+                res = this.keycloakService.init(options);
+            }
         }
         return res;
     }

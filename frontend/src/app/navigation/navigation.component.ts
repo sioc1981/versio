@@ -124,7 +124,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
                 this.loggedIn = r;
                 this.username = r ? this.authenticationService.getUsername() : '';
                 (this.aboutConfig.productInfo[2] as Property).value = r ? this.username : '';
-                if (r) {
+                if (this.authenticationService.isAdmin()) {
                     this.addAdminItems();
                 } else {
                     delete this.navigationItems[this.ADMIN_INDEX];

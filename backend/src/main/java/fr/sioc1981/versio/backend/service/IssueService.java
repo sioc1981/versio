@@ -43,6 +43,7 @@ import fr.sioc1981.versio.backend.security.Security;
 
 @Path("/issue")
 @Stateless
+@SecurityDomain(Security.Domain.DOMAIN)
 @DeclareRoles({Security.Role.BACKEND, Security.Role.USER})
 public class IssueService {
 

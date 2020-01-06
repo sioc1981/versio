@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID, APP_INITIALIZER } from '@angular/core';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -68,6 +68,7 @@ import { ApplicationUserCreateComponent } from './admin/applicationuser/applicat
 import { ApplicationUserLogoThumbnailDirective } from './admin/applicationuser/application-user-logo-thumbnail.directive';
 import { SafePipe } from './shared/safe.pipe';
 import { DisplayComponent } from './dashboard/display.component';
+import { KeycloakBearerInterceptor } from './auth/keycloak-bearer.interceptor';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -149,6 +150,10 @@ defineLocale('fr', frLocale);
         useFactory: initializer,
         multi: true,
         deps: [AuthenticationService]
+    }, {
+      provide: HTTP_INTERCEPTORS,
+      useClass: KeycloakBearerInterceptor,
+      multi: true
     },
         BsDropdownConfig,
         CopyService,

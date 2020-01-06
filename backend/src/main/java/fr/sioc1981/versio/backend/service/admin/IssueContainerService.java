@@ -32,6 +32,7 @@ import fr.sioc1981.versio.backend.service.GlobalSSE;
 
 @Path("/admin/issueContainer")
 @Stateless
+@SecurityDomain(Security.Domain.DOMAIN)
 @DeclareRoles({Security.Role.ADMIN_ONLY, Security.Role.BACKEND})
 public class IssueContainerService {
 

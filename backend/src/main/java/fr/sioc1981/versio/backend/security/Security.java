@@ -3,7 +3,7 @@ package fr.sioc1981.versio.backend.security;
 public final class Security {
 	
 	public final class Domain {
-		public static final String DOMAIN = "KeycloakDomain";
+		public static final String DOMAIN = "other";
 		
 		private Domain() {
 			super();

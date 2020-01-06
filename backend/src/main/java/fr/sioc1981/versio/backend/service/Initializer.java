@@ -16,6 +16,7 @@ import fr.sioc1981.versio.backend.service.admin.IssueContainerService;
 
 @Startup
 @Singleton
+@SecurityDomain(Security.Domain.DOMAIN)
 @RunAs(Security.Role.BACKEND)
 public class Initializer {
 
