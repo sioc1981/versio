@@ -1,18 +1,22 @@
 package fr.sioc1981.versio.backend.service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.security.RunAs;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
+import org.jboss.ejb3.annotation.SecurityDomain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.sioc1981.versio.backend.security.Security;
 import fr.sioc1981.versio.backend.service.admin.ApplicationUserService;
 import fr.sioc1981.versio.backend.service.admin.IssueContainerService;
 
 @Startup
 @Singleton
+@RunAs(Security.Role.BACKEND)
 public class Initializer {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Initializer.class);

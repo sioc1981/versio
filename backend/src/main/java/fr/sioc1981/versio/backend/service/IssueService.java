@@ -1,13 +1,19 @@
 package fr.sioc1981.versio.backend.service;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.annotation.Resource;
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,6 +29,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 
+import org.jboss.ejb3.annotation.SecurityDomain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +39,11 @@ import fr.sioc1981.versio.backend.data.IssueReleaseComparisonResultItem;
 import fr.sioc1981.versio.backend.entity.Issue;
 import fr.sioc1981.versio.backend.entity.Patch;
 import fr.sioc1981.versio.backend.entity.Release;
+import fr.sioc1981.versio.backend.security.Security;
 
 @Path("/issue")
 @Stateless
+@DeclareRoles({Security.Role.BACKEND, Security.Role.USER})
 public class IssueService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(IssueService.class);
@@ -42,8 +51,12 @@ public class IssueService {
 	@Context
 	private Sse sse;
 
-	@Inject
+	@PersistenceContext
 	private EntityManager entityManager;
+	
+    // Inject the Session Context
+    @Resource
+    private SessionContext ctx;
 
 	@EJB
 	private GlobalSSE globalSSE;
@@ -53,6 +66,7 @@ public class IssueService {
 
 	@POST
 	@Consumes("application/json")
+	@RolesAllowed(Security.Role.USER)
 	public Response create(Issue newIssue) {
 		this.entityManager.persist(newIssue);
 		getCount();
@@ -61,12 +75,17 @@ public class IssueService {
 
 	@PUT
 	@Consumes("application/json")
+	@RolesAllowed(Security.Role.USER)
 	public Response update(Issue newIssue) {
+		// Session context injected using the resource annotation
+        Principal principal = ctx.getCallerPrincipal();
+		LOG.warn("principal= {}", principal);
 		return Response.ok(this.entityManager.merge(newIssue)).build();
 	}
 
 	@GET
 	@Produces("application/json")
+	@PermitAll
 	public Response findAll() {
 		return Response.ok(this.entityManager.createQuery("from Issue").getResultList()).build();
 	}
@@ -78,6 +97,7 @@ public class IssueService {
 		return Response.ok(getCount()).build();
 	}
 
+	@RolesAllowed(Security.Role.BACKEND)
 	public Long getCount() {
 		Long count = this.entityManager.createQuery("select count(1) as count from Issue", Long.class)
 				.getSingleResult();
@@ -88,6 +108,7 @@ public class IssueService {
 	@GET
 	@Path("/search/releasecomparison")
 	@Produces(MediaType.SERVER_SENT_EVENTS)
+	@PermitAll
 	public void search(final @Context SseEventSink eventSink) {
 		LOG.info("parameters: {}", request.getParameterMap());
 		HashSet<String> versions = new HashSet<>();
@@ -132,6 +153,7 @@ public class IssueService {
 	@GET
 	@Path("/{id}/full")
 	@Produces("application/json")
+	@PermitAll
 	public Response findRelatedById(@PathParam("id") String id) {
 		List<Issue> result = this.entityManager.createQuery("from Issue where reference = :reference", Issue.class)
 				.setParameter("reference", id).getResultList();
@@ -160,6 +182,7 @@ public class IssueService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
+	@PermitAll
 	public Response findById(@PathParam("id") String id) {
 		List<Issue> result = this.entityManager.createQuery("from Issue where reference = :reference", Issue.class)
 				.setParameter("reference", id).getResultList();

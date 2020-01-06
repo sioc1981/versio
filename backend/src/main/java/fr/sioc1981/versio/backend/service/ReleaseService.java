@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -25,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.jboss.ejb3.annotation.SecurityDomain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,15 +38,17 @@ import fr.sioc1981.versio.backend.data.ReleaseFullSummary;
 import fr.sioc1981.versio.backend.entity.Release;
 import fr.sioc1981.versio.backend.entity.ReleaseFull;
 import fr.sioc1981.versio.backend.entity.Version;
+import fr.sioc1981.versio.backend.security.Security;
 
 @Path(ReleaseService.RELEASE_PATH)
 @Stateless
+@DeclareRoles({Security.Role.BACKEND, Security.Role.USER})
 public class ReleaseService {
 
 	static final String RELEASE_PATH = "/release";
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseService.class);
-	@Inject
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	@EJB
@@ -53,6 +59,7 @@ public class ReleaseService {
 
 	@POST
 	@Consumes("application/json")
+	@RolesAllowed(Security.Role.USER)
 	public Response create(ReleaseFull newRelease) {
 		LOG.info("create {}", newRelease);
 		this.entityManager.persist(newRelease);
@@ -69,6 +76,7 @@ public class ReleaseService {
 
 	@PUT
 	@Consumes("application/json")
+	@RolesAllowed(Security.Role.USER)
 	public Response update(ReleaseFull newRelease) {
 		ReleaseFull updatedRelease = this.entityManager.merge(newRelease);
 		getSummary(updatedRelease.getId());
@@ -77,6 +85,7 @@ public class ReleaseService {
 
 	@GET
 	@Produces("application/json")
+	@PermitAll
 	public Response findAll() {
 		return Response.ok(
 				this.entityManager.createQuery("from Release r order by r.version.versionNumber DESC").getResultList())
@@ -86,6 +95,7 @@ public class ReleaseService {
 	@GET
 	@Produces("application/json")
 	@Path("/full")
+	@PermitAll
 	public Response findAllFull() {
 		return Response.ok(this.entityManager.createQuery("from ReleaseFull r").getResultList()).build();
 	}
@@ -93,10 +103,12 @@ public class ReleaseService {
 	@GET
 	@Produces("application/json")
 	@Path("/summary")
+	@RolesAllowed(Security.Role.BACKEND)
 	public Response summarize() {
 		return Response.ok(getSummary()).build();
 	}
 
+	@RolesAllowed(Security.Role.BACKEND)
 	public Long getCount() {
 		Long count = this.entityManager.createQuery("select count(1) as count from Release", Long.class)
 				.getSingleResult();
@@ -107,6 +119,7 @@ public class ReleaseService {
 	@GET
 	@Produces("application/json")
 	@Path("{id}/summary")
+	@PermitAll
 	public Response summarize(@PathParam("id") long id) {
 		try {
 			return Response.ok(getSummary(id)).build();
@@ -121,6 +134,7 @@ public class ReleaseService {
 		return convert(res);
 	}
 
+	@RolesAllowed(Security.Role.BACKEND)
 	public List<ReleaseFullSummary> getSummary() throws NoResultException {
 		Stream<?> stream = this.entityManager.createNamedQuery("releaseFullSummary").getResultStream();
 		return stream.map(o -> (Object[]) o).map(this::convert).collect(Collectors.toList());
@@ -141,6 +155,7 @@ public class ReleaseService {
 	@GET
 	@Path("{id}/full")
 	@Produces("application/json")
+	@PermitAll
 	public Response findById(@PathParam("id") String id) {
 		List<ReleaseFull> result = this.entityManager
 				.createQuery("from ReleaseFull rf where rf.release.version.versionNumber = :id", ReleaseFull.class)

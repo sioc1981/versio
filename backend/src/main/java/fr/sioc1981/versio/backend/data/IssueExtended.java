@@ -1,6 +1,5 @@
 package fr.sioc1981.versio.backend.data;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

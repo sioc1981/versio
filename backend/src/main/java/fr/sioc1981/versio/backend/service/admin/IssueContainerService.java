@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -21,16 +24,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.jboss.ejb3.annotation.SecurityDomain;
+
 import fr.sioc1981.versio.backend.entity.IssueContainer;
+import fr.sioc1981.versio.backend.security.Security;
 import fr.sioc1981.versio.backend.service.GlobalSSE;
 
 @Path("/admin/issueContainer")
 @Stateless
+@DeclareRoles({Security.Role.ADMIN_ONLY, Security.Role.BACKEND})
 public class IssueContainerService {
 
 	Logger log = Logger.getLogger(IssueContainerService.class.getName());
 
-	@Inject
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	@EJB
@@ -41,6 +48,7 @@ public class IssueContainerService {
 
 	@POST
 	@Consumes("application/json")
+	@RolesAllowed(Security.Role.ADMIN_ONLY)
 	public Response create(IssueContainer newIssueContainer) {
 		log.info("create " + newIssueContainer);
 		this.entityManager.persist(newIssueContainer);
@@ -50,6 +58,7 @@ public class IssueContainerService {
 
 	@PUT
 	@Consumes("application/json")
+	@RolesAllowed(Security.Role.ADMIN_ONLY)
 	public Response update(IssueContainer newIssueContainer) {
 		IssueContainer issueContainer = this.entityManager.merge(newIssueContainer);
 		globalSSE.broadcast("issue_container_" + issueContainer.getId(), issueContainer);
@@ -58,6 +67,7 @@ public class IssueContainerService {
 
 	@GET
 	@Produces("application/json")
+	@PermitAll
 	public Response findAll() {
 		return Response.ok(this.entityManager.createQuery("from IssueContainer").getResultList()).build();
 	}
@@ -65,6 +75,7 @@ public class IssueContainerService {
 	@GET
 	@Path("{id}")
 	@Produces("application/json")
+	@PermitAll
 	public Response findById(@PathParam("id") String id) {
 		List<IssueContainer> result = this.entityManager
 				.createQuery("from IssueContainer where id = :id", IssueContainer.class).setParameter("id", id)
@@ -76,6 +87,7 @@ public class IssueContainerService {
 		return Response.ok(result.get(0)).build();
 	}
 
+	@RolesAllowed(Security.Role.BACKEND)
 	public void initialize() {
 		try {
 			Stream<IssueContainer> stream = this.entityManager.createQuery("from IssueContainer", IssueContainer.class)
