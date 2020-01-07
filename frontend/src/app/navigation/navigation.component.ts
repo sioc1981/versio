@@ -122,7 +122,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
         if (this.hasAuthentication) {
             this.authenticationService.isLoggedIn().then(r => {
                 this.loggedIn = r;
-                this.username = r ? this.authenticationService.getUsername() : '';
+                this.username = '';
+                if (r) {
+                  this.authenticationService.getUsername().then(name => this.username = name);
+                }
                 (this.aboutConfig.productInfo[2] as Property).value = r ? this.username : '';
                 if (this.authenticationService.isAdmin()) {
                     this.addAdminItems();
@@ -131,7 +134,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
                 }
             });
         } else {
-            this.addAdminItems()
+            this.addAdminItems();
         }
     }
 

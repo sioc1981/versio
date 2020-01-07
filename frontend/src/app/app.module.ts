@@ -14,7 +14,7 @@ import { NgxUploadModule } from '@wkoza/ngx-upload';
 import { LMarkdownEditorModule } from 'ngx-markdown-editor';
 import { MarkdownModule } from 'ngx-markdown';
 import { UiSwitchModule } from 'ngx-toggle-switch';
-import { KeycloakAngularModule } from 'keycloak-angular';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 
 import {
     AboutModalModule, ListModule, VerticalNavigationModule, WizardModule, InfoStatusCardModule,
@@ -153,7 +153,8 @@ defineLocale('fr', frLocale);
     }, {
       provide: HTTP_INTERCEPTORS,
       useClass: KeycloakBearerInterceptor,
-      multi: true
+      multi: true,
+      deps: [KeycloakService]
     },
         BsDropdownConfig,
         CopyService,

@@ -1,0 +1,11 @@
+# Start batching commands
+batch
+
+# Add constant role mapper for versio
+/subsystem=elytron/constant-role-mapper=versio-user-mapper:add(roles=[versio.admin_only,versio.backend,versio.user])
+
+# Run the batch commands
+run-batch
+
+# Reload the server configuration
+reload

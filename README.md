@@ -27,6 +27,21 @@ Add Datasource to wildfly server:
 Tested with a Postgresql Database.
 
 
+Security roles
+
+- versio.admin_only
+- versio.backend
+- versio.user
+
+If no user management, add roles as constants:
+```
+jboss-cli.[bat|sh|ps1] --connect --file=backend/src/main/script/wildfly_default_security_install.cli
+```
+To uninstall them:
+```
+jboss-cli.[bat|sh|ps1] --connect --file=backend/src/main/script/wildfly_default_security_uninstall.cli
+```
+
 run with a Wildfly 16.0 running:
 ```
 mvn clean wildfly:deploy

@@ -1,16 +1,13 @@
 package fr.sioc1981.versio.backend.service;
 
-import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
 import javax.annotation.security.DeclareRoles;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -55,10 +52,6 @@ public class IssueService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-    // Inject the Session Context
-    @Resource
-    private SessionContext ctx;
-
 	@EJB
 	private GlobalSSE globalSSE;
 
@@ -78,9 +71,6 @@ public class IssueService {
 	@Consumes("application/json")
 	@RolesAllowed(Security.Role.USER)
 	public Response update(Issue newIssue) {
-		// Session context injected using the resource annotation
-        Principal principal = ctx.getCallerPrincipal();
-		LOG.warn("principal= {}", principal);
 		return Response.ok(this.entityManager.merge(newIssue)).build();
 	}
 

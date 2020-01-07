@@ -6,13 +6,13 @@
             <div class="form-group required">
                 <label class="col-sm-1 control-label  required-pf" for="fromVersion">From Version</label>
                 <div class="col-sm-2">
-                    <input id="myList" [(ngModel)]="fromVersion" [ngModelOptions]="{standalone: true}"
+                    <input id="mySourceList" [(ngModel)]="fromVersion" [ngModelOptions]="{standalone: true}"
                         class="form-control" [typeahead]="releases" typeaheadOptionField="version.versionNumber"
                         [typeaheadMinLength]="0" autocomplete="off">
                 </div>
                 <label class="col-sm-1 control-label  required-pf" for="toVersion">To Version</label>
                 <div class="col-sm-2">
-                    <input id="myList" [(ngModel)]="toVersion" [ngModelOptions]="{standalone: true}"
+                    <input id="myTargetList" [(ngModel)]="toVersion" [ngModelOptions]="{standalone: true}"
                         class="form-control" [typeahead]="releases" typeaheadOptionField="version.versionNumber"
                         [typeaheadMinLength]="0" autocomplete="off">
                 </div>

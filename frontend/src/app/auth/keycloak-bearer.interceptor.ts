@@ -11,14 +11,13 @@ import {
   HttpInterceptor,
   HttpRequest,
   HttpHandler,
-  HttpEvent,
-  HttpHeaders
+  HttpEvent
 } from '@angular/common/http';
 
 import { Observable, from } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { KeycloakService } from 'keycloak-angular';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 
 
 /**
@@ -52,7 +51,7 @@ export class KeycloakBearerInterceptor implements HttpInterceptor {
    */
   public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // If keycloak service is not initialized yet, or the interceptor should not be execute
-    if (!this.keycloak || environment.hasAuthentication) {
+    if (!this.keycloak || !environment.hasAuthentication) {
       return next.handle(req);
     }
 

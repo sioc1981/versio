@@ -18,23 +18,32 @@ export class AuthenticationService {
         return environment.hasAuthentication;
     }
 
-    getUsername(): string {
+    getUsername(): Promise<string> {
         if (environment.hasAuthentication) {
-            return this.keycloakService.getUsername();
+            return this.keycloakService.loadUserProfile(false).then( _ =>
+                this.keycloakService.getUsername()
+            );
         } else {
-            return '';
+            return new Promise<string>((resolve, reject) => {
+                resolve('');
+            });
         }
     }
 
     init(): any {
+
+        console.log('auth init');
         let res: any = environment.hasAuthentication;
         if (res) {
             const token: string = localStorage.getItem(AUTH_TOKEN);
             const refreshToken: string = localStorage.getItem(AUTH_REFRESH_TOKEN) || '';
             const options = {
                 enableBearerInterceptor: false,
+                loadUserProfileAtStartUp: false,
                 onLoad: 'check-sso',
-                checkLoginIframe: false
+                silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+                promiseType: 'native',
+                checkLoginIframe: true
             } as KeycloakOptions;
             if (token && refreshToken) {
                 options.initOptions = {
@@ -42,12 +51,10 @@ export class AuthenticationService {
                     refreshToken: refreshToken
                 };
             }
-            try {
-                res = this.keycloakService.init(options);
-            } catch (e) {
-                options.initOptions = {};
-                res = this.keycloakService.init(options);
-            }
+            res = this.keycloakService.init(options).then(init => {
+                this.checkAndRelog();
+                return init;
+            });
         }
         return res;
     }

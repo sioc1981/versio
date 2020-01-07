@@ -1,0 +1,11 @@
+# Start batching commands
+batch
+
+# remove constant role mapper for versio
+/subsystem=elytron/constant-role-mapper=versio-user-mapper:remove
+
+# Run the batch commands
+run-batch
+
+# Reload the server configuration
+reload
