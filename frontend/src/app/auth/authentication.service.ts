@@ -18,13 +18,13 @@ export class AuthenticationService {
         return environment.hasAuthentication;
     }
 
-    getUsername(): Promise<string> {
+    async getUsername(): Promise<string> {
         if (environment.hasAuthentication) {
             return this.keycloakService.loadUserProfile(false).then( _ =>
                 this.keycloakService.getUsername()
             );
         } else {
-            return new Promise<string>((resolve, reject) => {
+            return new Promise<string>((resolve, _reject) => {
                 resolve('');
             });
         }
@@ -38,7 +38,9 @@ export class AuthenticationService {
             const token: string = localStorage.getItem(AUTH_TOKEN);
             const refreshToken: string = localStorage.getItem(AUTH_REFRESH_TOKEN) || '';
             const options = {
+                // keep at false, we use our own interceptor => bearer only added if authenticated
                 enableBearerInterceptor: false,
+                // keep at false, otherwise the reload feature may failed
                 loadUserProfileAtStartUp: false,
                 onLoad: 'check-sso',
                 silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
