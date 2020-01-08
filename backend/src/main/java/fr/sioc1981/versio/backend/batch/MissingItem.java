@@ -1,6 +1,7 @@
 package fr.sioc1981.versio.backend.batch;
 
 import java.io.Serializable;
+import java.time.Duration;
 
 import fr.sioc1981.versio.backend.entity.Patch;
 
@@ -11,15 +12,18 @@ public class MissingItem implements Serializable {
 	private Patch patch;
 	
 	private Platform platform;
+	
+	private Duration duration; 
 
 	public MissingItem() {
 		super();
 	}
 
-	public MissingItem(Patch patch, Platform platform) {
+	public MissingItem(Patch patch, Platform platform, Duration duration) {
 		super();
 		this.patch = patch;
 		this.platform = platform;
+		this.duration = duration;
 	}
 
 	public Patch getPatch() {
@@ -36,6 +40,14 @@ public class MissingItem implements Serializable {
 
 	public void setPlatform(Platform platform) {
 		this.platform = platform;
+	}
+
+	public Duration getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Duration duration) {
+		this.duration = duration;
 	}
 
 }

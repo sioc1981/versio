@@ -15,21 +15,17 @@ import javax.inject.Named;
  * This artifact is in a partitioned step.
  */
 @Dependent
-@Named("MissingDeploymentReader")
-public class MissingDeploymentReader extends AbstractMissingReader {
+@Named("MissingValidationReader")
+public class MissingValidationReader extends AbstractMissingReader {
 
 	@Override
 	protected String getCheckColumn() {
-		return "p." + platform.getName() + ".deployDate";
-	}
-	
-    @Override
-    protected String getReferenceColumn() {
-    	if(platform == Platform.QUALIFICATION)
-    		return "p.packageDate";
-    	
-		return "p." + platform.getPreviousPlatform().getName() + ".validationDate";
+		return "p." + platform.getName() + ".validationDate";
 	}
 
+	@Override
+	protected String getReferenceColumn() {
+		return "p." + platform.getName() + ".deployDate";
+	}
 
 }

@@ -14,12 +14,12 @@ import javax.inject.Named;
  * Write each bill to a text file.
  */
 @Dependent
-@Named("MissingDeploymentWriter")
-public class MissingDeploymentWriter extends AbstractMissingWriter {
+@Named("MissingValidationWriter")
+public class MissingValidationWriter extends AbstractMissingWriter {
 
 	@Override
 	protected String getCheckName() {
-		return "deployment";
+		return "validation";
 	}
-
+    
 }
