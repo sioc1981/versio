@@ -16,6 +16,9 @@ import javax.batch.api.chunk.ItemWriter;
 import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Writer artifact.
@@ -24,6 +27,8 @@ import fr.sioc1981.versio.backend.entity.Patch;
 @Dependent
 @Named("MissingPackageWriter")
 public class MissingPackageWriter implements ItemWriter {
+	
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	private final SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
     
@@ -35,6 +40,7 @@ public class MissingPackageWriter implements ItemWriter {
 
     @Override
     public void writeItems(List<Object> list) throws Exception {
+    	log.info("Detect {} missing packaged patches", list.size());
     	FileWriter fwriter = new FileWriter("missing_package.txt");
     	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
     		bwriter.write("Missing packages: ");

@@ -18,12 +18,19 @@ import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemWriter;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.sioc1981.versio.backend.batch.data.MissingItem;
+import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Writer artifact.
  * Write each bill to a text file.
  */
 public abstract class AbstractMissingWriter implements ItemWriter {
+	
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
     @Inject
     @BatchProperty(name = "platform")
@@ -43,6 +50,7 @@ public abstract class AbstractMissingWriter implements ItemWriter {
 
     @Override
     public void writeItems(List<Object> list) throws Exception {
+    	log.info("Detect {} missing patches on {}", list.size(), platform.getName());
     	FileWriter fwriter = new FileWriter(platform.getName() + "_missing_" + getCheckName() + ".txt");
     	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
     		bwriter.write("Missing ");

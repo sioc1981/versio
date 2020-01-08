@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Reader batch artifact.

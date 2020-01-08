@@ -16,6 +16,8 @@ import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 
+import fr.sioc1981.versio.backend.batch.data.MissingItem;
+import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Processor batch artifact.

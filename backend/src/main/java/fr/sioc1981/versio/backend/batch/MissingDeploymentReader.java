@@ -10,6 +10,8 @@ package fr.sioc1981.versio.backend.batch;
 import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
+import fr.sioc1981.versio.backend.batch.data.Platform;
+
 /* Reader batch artifact.
  * Reads bills from the entity manager.
  * This artifact is in a partitioned step.
