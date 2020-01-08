@@ -3,6 +3,7 @@
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
 	<properties>
 		<property name="validation_duration_threshold" value="P2D" />
+		<property name="outputDir" value="#{systemProperties['jboss.server.data.dir']}/versio/missing" />
 	</properties>
 	<step id="missingValidations">
 		<chunk checkpoint-policy="item" item-count="10">

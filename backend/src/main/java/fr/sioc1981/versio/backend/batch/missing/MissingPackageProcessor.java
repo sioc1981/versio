@@ -5,7 +5,7 @@
  * compliance with  the terms of the License at:
  * https://github.com/javaee/tutorial-examples/LICENSE.txt
  */
-package fr.sioc1981.versio.backend.batch;
+package fr.sioc1981.versio.backend.batch.missing;
 
 import java.time.Duration;
 import java.time.Instant;

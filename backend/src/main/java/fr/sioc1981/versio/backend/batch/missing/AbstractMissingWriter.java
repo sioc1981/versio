@@ -5,7 +5,7 @@
  * compliance with  the terms of the License at:
  * https://github.com/javaee/tutorial-examples/LICENSE.txt
  */
-package fr.sioc1981.versio.backend.batch;
+package fr.sioc1981.versio.backend.batch.missing;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemWriter;
+import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -37,12 +38,20 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     private String platformName;
     
     private Platform platform;
+
+    @Inject
+    JobContext jobCtx;
+    
+	private File file;
     
     @Override
     public void open(Serializable ckpt) throws Exception {
     	platform = Platform.valueOf(platformName);
-    	File f = new File(platform.getName() + "_missing_" + getCheckName() + ".txt");
-    	f.delete();
+    	String dirPath = jobCtx.getProperties().getProperty("outputDir", ".");
+    	File dir = new File(dirPath);
+    	dir.mkdirs();
+    	file = new File(dir, "missing_" + getCheckName() + "_" + platform.getName() + ".txt");
+    	file.delete();
     }
 
     @Override
@@ -51,7 +60,7 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     @Override
     public void writeItems(List<Object> list) throws Exception {
     	log.info("Detect {} missing patches on {}", list.size(), platform.getName());
-    	FileWriter fwriter = new FileWriter(platform.getName() + "_missing_" + getCheckName() + ".txt");
+    	FileWriter fwriter = new FileWriter(file);
     	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
     		bwriter.write("Missing ");
     		bwriter.write(getCheckName());
