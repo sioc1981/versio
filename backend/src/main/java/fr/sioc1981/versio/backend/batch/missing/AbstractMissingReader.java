@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
 import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.entity.Patch;
 
@@ -75,7 +76,6 @@ public abstract class AbstractMissingReader implements ItemReader {
     public Object readItem() throws Exception {
         if (iterator.hasNext()) {
             checkpoint.nextItem();
-            checkpoint.setNumItems(checkpoint.getNumItems() - 1);
             return iterator.next();
         } else {
             return null;

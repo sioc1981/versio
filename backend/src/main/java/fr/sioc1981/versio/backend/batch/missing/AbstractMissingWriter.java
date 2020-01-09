@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
 import fr.sioc1981.versio.backend.batch.data.MissingItem;
 import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.entity.Patch;
@@ -67,8 +68,6 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     		bwriter.write(" on ");
     		bwriter.write(platform.getName());
     		bwriter.newLine();
-    		bwriter.write(" ");
-    		bwriter.newLine();
     		for (Object missingItemObject : list) {
     			MissingItem missingItem = (MissingItem) missingItemObject;
     			Patch patch = missingItem.getPatch();
@@ -79,6 +78,8 @@ public abstract class AbstractMissingWriter implements ItemWriter {
                 		));
                 bwriter.newLine();
             }
+    		bwriter.write(" ");
+    		bwriter.newLine();
         }
     }
 

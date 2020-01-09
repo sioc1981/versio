@@ -5,35 +5,38 @@
  * compliance with the terms of the License at:
  * https://github.com/javaee/tutorial-examples/LICENSE.txt
  */
-package fr.sioc1981.versio.backend.batch.missing;
+package fr.sioc1981.versio.backend.batch.notify.email;
 
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
+
 import javax.batch.api.chunk.ItemReader;
+import javax.batch.runtime.context.JobContext;
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
-import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Reader batch artifact.
  * Reads bills from the entity manager.
  * This artifact is in a partitioned step.
  */
 @Dependent
-@Named("MissingPackageReader")
-public class MissingPackageReader implements ItemReader {
+@Named("EmailNotifierReader")
+public class EmailNotifierReader implements ItemReader {
 
     private ItemNumberCheckpoint checkpoint;
 
-    @PersistenceContext
-    private EntityManager em;
-    private Iterator<Patch> iterator;
+    @Inject
+    JobContext jobCtx;
 
-    public MissingPackageReader() {
+    private Iterator<Path> iterator;
+
+    public EmailNotifierReader() {
     }
 
     @Override
@@ -49,10 +52,12 @@ public class MissingPackageReader implements ItemReader {
         /* Adjust range for this partition from the checkpoint */
         long firstItem = checkpoint.getItemNumber();
 
-        /* Obtain an iterator for the bills in this partition */
-        String query = "SELECT p FROM Patch p where p.packageDate is null or p.packageDate < p.buildDate ORDER BY p.release.version.versionNumber, p.sequenceNumber";
-        TypedQuery<Patch> q = em.createQuery(query, Patch.class).setFirstResult((int) firstItem);
-        iterator = q.getResultList().iterator();
+    	String dirPath = jobCtx.getProperties().getProperty("outputDir", ".");
+    	Path dir = Paths.get(dirPath);
+    	iterator = Files.newDirectoryStream(dir).iterator();
+    	for (int i = 0; i < firstItem; i++) {
+    		iterator.next();
+		}
     }
 
     @Override
@@ -63,7 +68,7 @@ public class MissingPackageReader implements ItemReader {
     public Object readItem() throws Exception {
         if (iterator.hasNext()) {
             checkpoint.nextItem();
-            return iterator.next();
+            return Files.readString(iterator.next());
         } else {
             return null;
         }

@@ -11,7 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.List;
 import javax.batch.api.chunk.ItemWriter;
 import javax.batch.runtime.context.JobContext;
@@ -22,6 +22,8 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
+import fr.sioc1981.versio.backend.batch.data.MissingItem;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Writer artifact.
@@ -33,8 +35,6 @@ public class MissingPackageWriter implements ItemWriter {
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
-	private final SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
-    
     @Inject
     JobContext jobCtx;
     
@@ -59,20 +59,28 @@ public class MissingPackageWriter implements ItemWriter {
     	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
     		bwriter.write("Missing packages: ");
     		bwriter.newLine();
-    		bwriter.write(" ");
-    		bwriter.newLine();
-    		for (Object patchObject : list) {
-    			Patch patch = (Patch) patchObject;
-                bwriter.write(String.format("%s - %s: Last Build on %s and package date %s", 
+    		for (Object missingItemObject : list) {
+    			MissingItem missingItem = (MissingItem) missingItemObject;
+    			Patch patch = missingItem.getPatch();
+                bwriter.write(String.format("%s - %s: since %s", 
                 		patch.getRelease().getVersion().getVersionNumber(),
                 		patch.getSequenceNumber(),
-                		dformat.format(patch.getBuildDate()),
-                		patch.getPackageDate() != null ? dformat.format(patch.getPackageDate()) : null
+                		printDuration(missingItem.getDuration())
                 		));
                 bwriter.newLine();
             }
+    		bwriter.write(" ");
+    		bwriter.newLine();
         }
     }
+
+    private String printDuration(Duration duration) {
+    	long nbDays = duration.toDaysPart();
+    	if (nbDays == 0) {
+    		return duration.toString();
+    	}
+    	return "P" + duration.toDaysPart() + "D";
+	}
 
     @Override
     public Serializable checkpointInfo() throws Exception {
