@@ -23,6 +23,7 @@ import { RELEASE_CONSTANT } from '../release/shared/release.constant';
 import { ADMIN_CONSTANT } from '../admin/shared/admin.constant';
 import { ISSUE_CONTAINER_CONSTANT } from '../admin/issuecontainer/shared/issue-container.constant';
 import { APPLICATION_USER_CONSTANT } from '../admin/applicationuser/shared/application-user.constant';
+import { BATCH_OPTION_CONSTANT } from '../admin/batchoption/shared/batch-option.constant';
 
 class Property {
     key: string;
@@ -225,6 +226,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
                     title: APPLICATION_USER_CONSTANT.title,
                     iconStyleClass: APPLICATION_USER_CONSTANT.iconStyleClass,
                     url: APPLICATION_USER_CONSTANT.url
+                }, {
+                    title: BATCH_OPTION_CONSTANT.title,
+                    iconStyleClass: BATCH_OPTION_CONSTANT.iconStyleClass,
+                    url: BATCH_OPTION_CONSTANT.url
                 }]
         };
         res[this.ADMIN_INDEX] = adminItem;

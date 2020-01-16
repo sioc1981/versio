@@ -5,6 +5,7 @@ import { AdminGuard } from './admin.guard';
 import { IssueContainerComponent } from './issuecontainer/issuecontainer.component';
 import { AdminMenuComponent } from './admin-menu.component';
 import { ApplicationUserComponent } from './applicationuser/application-user.component';
+import { BatchOptionComponent } from './batchoption/batch-option.component';
 
 const adminRoutes: Routes = [
     {
@@ -20,6 +21,9 @@ const adminRoutes: Routes = [
         }, {
             path: 'applicationUsers',
             component: ApplicationUserComponent
+        }, {
+            path: 'batchOptions',
+            component: BatchOptionComponent
         }]
     }
 ];

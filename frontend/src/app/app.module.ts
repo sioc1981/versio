@@ -68,6 +68,7 @@ import { ApplicationUserCreateComponent } from './admin/applicationuser/applicat
 import { ApplicationUserLogoThumbnailDirective } from './admin/applicationuser/application-user-logo-thumbnail.directive';
 import { SafePipe } from './shared/safe.pipe';
 import { DisplayComponent } from './dashboard/display.component';
+import { BatchOptionComponent } from './admin/batchoption/batch-option.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -110,7 +111,8 @@ defineLocale('fr', frLocale);
         ApplicationUserCreateComponent,
         ApplicationUserLogoThumbnailDirective,
         SafePipe,
-        DisplayComponent
+        DisplayComponent,
+        BatchOptionComponent
     ],
     imports: [
         AboutModalModule,

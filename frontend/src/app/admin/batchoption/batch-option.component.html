@@ -1,0 +1,54 @@
+<div class="col-lg-12">
+    <ol class="fas breadcrumb">
+        <li class="breadcrumb-item">
+            <a [routerLink]="['/admin']">
+                Admin
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            Batch Options
+        </li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="form-group">
+            <pfng-toolbar [config]="toolbarConfig" (onActionSelect)="handleAction($event)"
+                (onFilterChange)="filterChanged($event)" (onSortChange)="handleSortChanged($event)">
+            </pfng-toolbar>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <pfng-list id="myList" [actionTemplate]="actionTemplate" [items]="items"
+                [itemTemplate]="batchOptionTemplate">
+                <ng-template #batchOptionTemplate let-item="item" let-index="index">
+                    <div class="list-pf-content-wrapper">
+                        <div class="list-pf-main-content">
+                            <div class="list-pf-title">
+                                <input class="form-control" name="Batch Option key" type="text" required
+                            [(ngModel)]="item.key">
+                            </div>
+                            <input class="form-control" name="Batch Option value" type="text" required
+                            [(ngModel)]="item.value">
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template #actionTemplate let-item="item" let-index="index">
+                    <pfng-action class="list-pf-actions" [config]="batchOptionActionConfig"
+                        (onActionSelect)="handleAction($event, item)">
+                    </pfng-action>
+                </ng-template>
+            </pfng-list>
+            <ng-template #actionTemplate let-item="item" let-index="index">
+                <pfng-action class="list-pf-actions" [config]="batchOptionActionConfig"
+                    (onActionSelect)="handleAction($event, item)">
+                </pfng-action>
+            </ng-template>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
+                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+        </div>
+    </div>
+</div>
