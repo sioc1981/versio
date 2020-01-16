@@ -47,8 +47,8 @@
                     (onActionSelect)="handleAction($event, item)">
                 </pfng-action>
             </ng-template>
-            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber($event)"
-                (onPageSizeChange)="handlePageSize($event)"></pfng-pagination>
+            <pfng-pagination [config]="paginationConfig" (onPageNumberChange)="handlePageNumber()"
+                (onPageSizeChange)="handlePageSize()"></pfng-pagination>
         </div>
     </div>
 </div>

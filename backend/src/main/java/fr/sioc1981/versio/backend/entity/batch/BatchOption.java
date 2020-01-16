@@ -19,7 +19,7 @@ public class BatchOption {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "batch_option_sequence")
-	@SequenceGenerator(name = "batch_option_sequence")
+	@SequenceGenerator(name = "batch_option_sequence", allocationSize = 1 )
 	private Long id;
 
 	@Column(name = "option_key")
