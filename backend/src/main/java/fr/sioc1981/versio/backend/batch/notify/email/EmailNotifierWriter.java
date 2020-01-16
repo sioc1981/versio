@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.batch.api.chunk.ItemWriter;
-import javax.batch.runtime.context.JobContext;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
+import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 
 /* Writer artifact.
  * Write each bill to a text file.
@@ -34,50 +34,43 @@ import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
 @Dependent
 @Named("EmailNotifierWriter")
 public class EmailNotifierWriter implements ItemWriter {
-	
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
-	
-    @Inject
-    JobContext jobCtx;
-	
+
+	@Inject
+	OptionLoader optionLoader;
+
 	@Resource(name = "java:jboss/mail/Default")
 	private Session session;
-    
+
 	private StringBuffer buffer;
-    
-    @Override
-    public void open(Serializable ckpt) throws Exception {
-    	buffer = new StringBuffer();
-    }
 
-    @Override
-    public void close() throws Exception {
-		try {
-			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress("Versio Service <no-reply@sioc1981.fr>"));
-			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("Receiver <receiver@sioc1981.fr>"));
-			message.setSubject("Missing patches");
-			message.setText(buffer.toString());
+	@Override
+	public void open(Serializable ckpt) throws Exception {
+		buffer = new StringBuffer();
+	}
 
-			Transport.send(message);
+	@Override
+	public void close() throws Exception {
+		Message message = new MimeMessage(session);
+		message.setFrom(new InternetAddress(optionLoader.loadOption("email.sender")));
+		message.setRecipients(Message.RecipientType.TO,
+				InternetAddress.parse(optionLoader.loadOption("email.receivers")));
+		message.setSubject(optionLoader.loadOption("email.subject"));
+		message.setText(buffer.toString());
 
-		} catch (MessagingException e) {
-			log.warn("Cannot send mail", e);
-		}
-    	
-    }
+		Transport.send(message);
+	}
 
-    @Override
-    public void writeItems(List<Object> list) throws Exception {
-		for (Object contentObject: list) {
+	@Override
+	public void writeItems(List<Object> list) throws Exception {
+		for (Object contentObject : list) {
 			String content = (String) contentObject;
 			buffer.append(content);
-        }
-    }
+		}
+	}
 
-    @Override
-    public Serializable checkpointInfo() throws Exception {
-        return new ItemNumberCheckpoint();
-    }
-    
+	@Override
+	public Serializable checkpointInfo() throws Exception {
+		return new ItemNumberCheckpoint();
+	}
+
 }

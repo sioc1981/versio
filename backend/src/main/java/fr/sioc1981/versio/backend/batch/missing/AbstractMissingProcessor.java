@@ -13,11 +13,11 @@ import java.util.Date;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemProcessor;
-import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 
 import fr.sioc1981.versio.backend.batch.data.MissingItem;
 import fr.sioc1981.versio.backend.batch.data.Platform;
+import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Processor batch artifact.
@@ -32,7 +32,8 @@ public abstract class AbstractMissingProcessor implements ItemProcessor {
 	protected Platform platform;
     
 	@Inject
-    JobContext jobCtx;
+	OptionLoader optionLoader;
+	
     String threshold;
     
     public AbstractMissingProcessor() { }
@@ -42,9 +43,9 @@ public abstract class AbstractMissingProcessor implements ItemProcessor {
     	platform = Platform.valueOf(platformName);
         Patch patch;
         /* Calculate the price of this call */
-        threshold = jobCtx.getProperties().containsKey(platform.getName() + "_"+getCheckName()+"_duration_threshold")
-        		? jobCtx.getProperties().getProperty(platform.getName() + "_"+getCheckName()+"_duration_threshold")
-                : jobCtx.getProperties().getProperty(getCheckName()+"_duration_threshold");
+        threshold = optionLoader.containsOption(platform.getName() + "_"+getCheckName()+"_duration_threshold")
+        		? optionLoader.loadOption(platform.getName() + "_"+getCheckName()+"_duration_threshold")
+                : optionLoader.loadOption(getCheckName()+"_duration_threshold");
         patch = (Patch) obj;
         Duration duration = Duration.between(Instant.ofEpochMilli(getReferenceDate(patch).getTime()), Instant.now());
         Duration thresholdDuration = Duration.parse(threshold);

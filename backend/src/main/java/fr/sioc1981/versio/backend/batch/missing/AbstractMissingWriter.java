@@ -16,7 +16,6 @@ import java.util.List;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemWriter;
-import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
 import fr.sioc1981.versio.backend.batch.data.MissingItem;
 import fr.sioc1981.versio.backend.batch.data.Platform;
+import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Writer artifact.
@@ -41,14 +41,14 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     private Platform platform;
 
     @Inject
-    JobContext jobCtx;
+	OptionLoader optionLoader;
     
 	private File file;
     
     @Override
     public void open(Serializable ckpt) throws Exception {
     	platform = Platform.valueOf(platformName);
-    	String dirPath = jobCtx.getProperties().getProperty("outputDir", ".");
+    	String dirPath = optionLoader.loadOption("outputDir");
     	File dir = new File(dirPath);
     	dir.mkdirs();
     	file = new File(dir, "missing_" + getCheckName() + "_" + platform.getName() + ".txt");

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job id="notify" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
     <properties>
+		<property name="email.sender" value="Versio Service &lt;no-reply@sioc1981.fr&gt;" />
+		<property name="email.receivers" value="Receiver &lt;receiver@sioc1981.fr&gt;" />
+		<property name="email.subject" value="Missing patches" />
 		<property name="outputDir" value="#{systemProperties['jboss.server.data.dir']}/versio/missing" />
     </properties>
     <step id="sendEmail">
         <chunk checkpoint-policy="item" item-count="10">
             <reader ref="EmailNotifierReader"></reader>
-            <processor ref="EmailNotifierProcessor"></processor>
             <writer ref="EmailNotifierWriter"></writer>
         </chunk>
         <end on="COMPLETED"/>

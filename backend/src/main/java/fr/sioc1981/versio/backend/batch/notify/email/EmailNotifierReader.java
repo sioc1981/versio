@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
+import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 
 /* Reader batch artifact.
  * Reads bills from the entity manager.
@@ -32,7 +33,7 @@ public class EmailNotifierReader implements ItemReader {
     private ItemNumberCheckpoint checkpoint;
 
     @Inject
-    JobContext jobCtx;
+    OptionLoader optionLoader;
 
     private Iterator<Path> iterator;
 
@@ -52,7 +53,7 @@ public class EmailNotifierReader implements ItemReader {
         /* Adjust range for this partition from the checkpoint */
         long firstItem = checkpoint.getItemNumber();
 
-    	String dirPath = jobCtx.getProperties().getProperty("outputDir", ".");
+    	String dirPath = optionLoader.loadOption("outputDir");
     	Path dir = Paths.get(dirPath);
     	iterator = Files.newDirectoryStream(dir).iterator();
     	for (int i = 0; i < firstItem; i++) {

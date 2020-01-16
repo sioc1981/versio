@@ -11,12 +11,12 @@ import java.time.Duration;
 import java.time.Instant;
 
 import javax.batch.api.chunk.ItemProcessor;
-import javax.batch.runtime.context.JobContext;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import fr.sioc1981.versio.backend.batch.data.MissingItem;
+import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Processor batch artifact.
@@ -25,9 +25,10 @@ import fr.sioc1981.versio.backend.entity.Patch;
 @Dependent
 @Named("MissingPackageProcessor")
 public class MissingPackageProcessor implements ItemProcessor {
-    
+	
     @Inject
-    JobContext jobCtx;
+    OptionLoader optionLoader;
+    
     String threshold;
     
     public MissingPackageProcessor() { }
@@ -36,7 +37,7 @@ public class MissingPackageProcessor implements ItemProcessor {
     public Object processItem(Object obj) throws Exception {
         Patch patch;
         /* Calculate the price of this call */
-        threshold = jobCtx.getProperties().getProperty("package_duration_threshold");
+        threshold = optionLoader.loadOption("package_duration_threshold");
         patch = (Patch) obj;
         Duration duration = Duration.between(Instant.ofEpochMilli(patch.getBuildDate().getTime()), Instant.now());
         Duration thresholdDuration = Duration.parse(threshold);

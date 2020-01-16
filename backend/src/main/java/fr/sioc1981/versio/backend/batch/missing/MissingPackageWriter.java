@@ -13,8 +13,8 @@ import java.io.FileWriter;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.List;
+
 import javax.batch.api.chunk.ItemWriter;
-import javax.batch.runtime.context.JobContext;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
 import fr.sioc1981.versio.backend.batch.data.MissingItem;
+import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
 
 /* Writer artifact.
@@ -36,13 +37,13 @@ public class MissingPackageWriter implements ItemWriter {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
     @Inject
-    JobContext jobCtx;
+    OptionLoader optionLoader;
     
 	private File file;
     
     @Override
     public void open(Serializable ckpt) throws Exception {
-    	String dirPath = jobCtx.getProperties().getProperty("outputDir", ".");
+    	String dirPath = optionLoader.loadOption("outputDir");
     	File dir = new File(dirPath);
     	dir.mkdirs();
     	file = new File(dir, "missing_package.txt");
