@@ -18,8 +18,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
-import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.entity.Patch;
+import fr.sioc1981.versio.backend.entity.batch.Platform;
 
 /* Reader batch artifact.
  * Reads bills from the entity manager.

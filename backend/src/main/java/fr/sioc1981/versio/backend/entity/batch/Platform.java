@@ -1,4 +1,4 @@
-package fr.sioc1981.versio.backend.batch.data;
+package fr.sioc1981.versio.backend.entity.batch;
 
 public enum Platform {
 	QUALIFICATION("qualification"),

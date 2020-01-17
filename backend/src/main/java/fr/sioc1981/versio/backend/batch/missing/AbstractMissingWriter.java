@@ -11,21 +11,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.List;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemWriter;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
-import fr.sioc1981.versio.backend.batch.data.MissingItem;
-import fr.sioc1981.versio.backend.batch.data.Platform;
 import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
+import fr.sioc1981.versio.backend.entity.batch.MissingPatch;
+import fr.sioc1981.versio.backend.entity.batch.Platform;
+import fr.sioc1981.versio.backend.entity.batch.ProcessStep;
+import fr.sioc1981.versio.backend.util.DurationConverter;
 
 /* Writer artifact.
  * Write each bill to a text file.
@@ -40,8 +44,11 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     
     private Platform platform;
 
+    @PersistenceContext
+    private EntityManager em;
+    
     @Inject
-	OptionLoader optionLoader;
+	private OptionLoader optionLoader;
     
 	private File file;
     
@@ -51,8 +58,12 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     	String dirPath = optionLoader.loadOption("outputDir");
     	File dir = new File(dirPath);
     	dir.mkdirs();
-    	file = new File(dir, "missing_" + getCheckName() + "_" + platform.getName() + ".txt");
+    	file = new File(dir, "missing_" + getProcessStep().getName() + "_" + platform.getName() + ".txt");
     	file.delete();
+    	Query query = em.createQuery("DELETE FROM MissingPatch where platform = :platform and processStep = :processStep");
+    	query.setParameter("platform", platform);
+    	query.setParameter("processStep", getProcessStep());
+    	query.executeUpdate();
     }
 
     @Override
@@ -64,17 +75,18 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     	FileWriter fwriter = new FileWriter(file);
     	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
     		bwriter.write("Missing ");
-    		bwriter.write(getCheckName());
+    		bwriter.write(getProcessStep().name());
     		bwriter.write(" on ");
     		bwriter.write(platform.getName());
     		bwriter.newLine();
     		for (Object missingItemObject : list) {
-    			MissingItem missingItem = (MissingItem) missingItemObject;
+    			MissingPatch missingItem = (MissingPatch) missingItemObject;
+    			em.merge(missingItem);
     			Patch patch = missingItem.getPatch();
                 bwriter.write(String.format("%s - %s: since %s", 
                 		patch.getRelease().getVersion().getVersionNumber(),
                 		patch.getSequenceNumber(),
-                		printDuration(missingItem.getDuration())
+                		DurationConverter.convertDuration(missingItem.getDuration())
                 		));
                 bwriter.newLine();
             }
@@ -83,18 +95,10 @@ public abstract class AbstractMissingWriter implements ItemWriter {
         }
     }
 
-    private String printDuration(Duration duration) {
-    	long nbDays = duration.toDaysPart();
-    	if (nbDays == 0) {
-    		return duration.toString();
-    	}
-    	return "P" + duration.toDaysPart() + "D";
-	}
-
 	@Override
     public Serializable checkpointInfo() throws Exception {
         return new ItemNumberCheckpoint();
     }
     
-	protected abstract String getCheckName();
+	protected abstract ProcessStep getProcessStep();
 }

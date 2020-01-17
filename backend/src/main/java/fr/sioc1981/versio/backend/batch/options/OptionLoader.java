@@ -32,7 +32,7 @@ public class OptionLoader {
 		JobExecution jobExecution = BatchRuntime.getJobOperator().getJobExecution(jobCtx.getExecutionId());
 		result = jobExecution.getJobParameters().getProperty(key);
 		if(result != null) {
-			log.info("load option {} from JobParameters: {}", key, result);
+			log.debug("load option {} from JobParameters: {}", key, result);
 			return result;
 		}
 		TypedQuery<BatchOption> query = em.createQuery("select bo from BatchOption bo where bo.key = :key", BatchOption.class);
@@ -40,12 +40,12 @@ public class OptionLoader {
 		List<BatchOption> dbResult = query.getResultList();
 		if (!dbResult.isEmpty()) {
 			result = dbResult.get(0).getValue();
-			log.info("load option {} from BatchOption: {}", key, result);
+			log.debug("load option {} from BatchOption: {}", key, result);
 			return result;
 		}
     	
 		result =  jobCtx.getProperties().getProperty(key);
-		log.info("load option {} from JobProperties: {}", key, result);
+		log.debug("load option {} from JobProperties: {}", key, result);
 		return result;
 	}
 

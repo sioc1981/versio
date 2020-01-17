@@ -11,21 +11,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.List;
 
 import javax.batch.api.chunk.ItemWriter;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.sioc1981.versio.backend.batch.data.ItemNumberCheckpoint;
-import fr.sioc1981.versio.backend.batch.data.MissingItem;
 import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
+import fr.sioc1981.versio.backend.entity.batch.MissingPatch;
+import fr.sioc1981.versio.backend.entity.batch.ProcessStep;
+import fr.sioc1981.versio.backend.util.DurationConverter;
 
 /* Writer artifact.
  * Write each bill to a text file.
@@ -36,8 +40,11 @@ public class MissingPackageWriter implements ItemWriter {
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
-    @Inject
-    OptionLoader optionLoader;
+    @PersistenceContext
+    private EntityManager em;
+    
+	@Inject
+    private OptionLoader optionLoader;
     
 	private File file;
     
@@ -48,6 +55,9 @@ public class MissingPackageWriter implements ItemWriter {
     	dir.mkdirs();
     	file = new File(dir, "missing_package.txt");
     	file.delete();
+    	Query query = em.createQuery("DELETE FROM MissingPatch where platform is null and processStep = :processStep");
+    	query.setParameter("processStep", ProcessStep.PACKAGE);
+    	query.executeUpdate();
     }
 
     @Override
@@ -61,12 +71,13 @@ public class MissingPackageWriter implements ItemWriter {
     		bwriter.write("Missing packages: ");
     		bwriter.newLine();
     		for (Object missingItemObject : list) {
-    			MissingItem missingItem = (MissingItem) missingItemObject;
+    			MissingPatch missingItem = (MissingPatch) missingItemObject;
+    			em.merge(missingItem);
     			Patch patch = missingItem.getPatch();
                 bwriter.write(String.format("%s - %s: since %s", 
                 		patch.getRelease().getVersion().getVersionNumber(),
                 		patch.getSequenceNumber(),
-                		printDuration(missingItem.getDuration())
+                		DurationConverter.convertDuration(missingItem.getDuration())
                 		));
                 bwriter.newLine();
             }
@@ -74,14 +85,6 @@ public class MissingPackageWriter implements ItemWriter {
     		bwriter.newLine();
         }
     }
-
-    private String printDuration(Duration duration) {
-    	long nbDays = duration.toDaysPart();
-    	if (nbDays == 0) {
-    		return duration.toString();
-    	}
-    	return "P" + duration.toDaysPart() + "D";
-	}
 
     @Override
     public Serializable checkpointInfo() throws Exception {

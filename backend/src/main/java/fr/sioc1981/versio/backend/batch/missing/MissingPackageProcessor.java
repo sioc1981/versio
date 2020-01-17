@@ -15,9 +15,10 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import fr.sioc1981.versio.backend.batch.data.MissingItem;
 import fr.sioc1981.versio.backend.batch.options.OptionLoader;
 import fr.sioc1981.versio.backend.entity.Patch;
+import fr.sioc1981.versio.backend.entity.batch.MissingPatch;
+import fr.sioc1981.versio.backend.entity.batch.ProcessStep;
 
 /* Processor batch artifact.
  * Calculate the price of every call.
@@ -42,7 +43,7 @@ public class MissingPackageProcessor implements ItemProcessor {
         Duration duration = Duration.between(Instant.ofEpochMilli(patch.getBuildDate().getTime()), Instant.now());
         Duration thresholdDuration = Duration.parse(threshold);
         if (!patch.getUndeployed() && duration.compareTo(thresholdDuration) > 0) {
-        	return new MissingItem(patch, null, duration);
+        	return new MissingPatch(patch, null, ProcessStep.PACKAGE, duration);
         }
         return null;
     }

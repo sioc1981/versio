@@ -13,6 +13,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
 import fr.sioc1981.versio.backend.entity.Patch;
+import fr.sioc1981.versio.backend.entity.batch.ProcessStep;
 
 /* Processor batch artifact.
  * Calculate the price of every call.
@@ -66,8 +67,8 @@ public class MissingDeploymentProcessor extends AbstractMissingProcessor {
 	}
 
     @Override
-	protected String getCheckName() {
-		return "deployment";
+	protected ProcessStep getProcessStep() {
+		return ProcessStep.DEPLOYMENT;
 	}
     
 }

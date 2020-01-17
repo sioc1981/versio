@@ -14,7 +14,7 @@ import javax.batch.api.partition.PartitionPlanImpl;
 import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
-import fr.sioc1981.versio.backend.batch.data.Platform;
+import fr.sioc1981.versio.backend.entity.batch.Platform;
 
 /* Partition mapper artifact.
  * Determines the number of partitions (2) for the bill processing step
