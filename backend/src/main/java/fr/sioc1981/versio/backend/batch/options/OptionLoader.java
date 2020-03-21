@@ -30,8 +30,10 @@ public class OptionLoader {
 	public String loadOption(String key) throws Exception {
     	String result = null;
 		JobExecution jobExecution = BatchRuntime.getJobOperator().getJobExecution(jobCtx.getExecutionId());
-		result = jobExecution.getJobParameters().getProperty(key);
-		if(result != null) {
+		if (jobExecution.getJobParameters() != null) {
+			result = jobExecution.getJobParameters().getProperty(key);
+		}
+		if (result != null) {
 			log.debug("load option {} from JobParameters: {}", key, result);
 			return result;
 		}

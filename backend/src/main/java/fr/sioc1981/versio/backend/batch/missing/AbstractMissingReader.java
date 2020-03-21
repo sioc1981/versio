@@ -58,8 +58,14 @@ public abstract class AbstractMissingReader implements ItemReader {
         
         final String checkColumn = getCheckColumn();
         final String referenceColumn = getReferenceColumn();
+        final String nextStepColumn = getNextStepColumn();
+        String nextStepQuery = "";
+        if (nextStepColumn != null) {
+        	nextStepQuery = " AND (" + nextStepColumn + " is null OR " + checkColumn + " > " + nextStepColumn + ")";
+        }
+        
         String query = "SELECT p FROM Patch p where " + referenceColumn + " is not null and (" + checkColumn + " is null"
-        		+ " or " + checkColumn + " < " + referenceColumn + ") ORDER BY p.release.version.versionNumber, p.sequenceNumber";
+        		+ " or " + checkColumn + " < " + referenceColumn + ")" + nextStepQuery + " ORDER BY p.release.version.versionNumber, p.sequenceNumber";
         TypedQuery<Patch> q = em.createQuery(query, Patch.class).setFirstResult((int) firstItem);
         iterator = q.getResultList().iterator();
     }
@@ -67,6 +73,8 @@ public abstract class AbstractMissingReader implements ItemReader {
 	protected abstract String getCheckColumn() ;
 	
 	protected abstract String getReferenceColumn() ;
+	
+	protected abstract String getNextStepColumn() ;
 
 	@Override
     public void close() throws Exception {

@@ -18,5 +18,9 @@ public enum Platform {
 	public Platform getPreviousPlatform() {
 		return ordinal() != 0 ? Platform.values()[ordinal() -1] : null;
 	}
+
+	public Platform getNextPlatform() {
+		return ordinal() != values().length - 1 ? Platform.values()[ordinal() +1 ] : null;
+	}
 	
 }

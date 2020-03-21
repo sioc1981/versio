@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.ItemWriter;
@@ -51,6 +52,7 @@ public abstract class AbstractMissingWriter implements ItemWriter {
 	private OptionLoader optionLoader;
     
 	private File file;
+	private BufferedWriter bwriter;
     
     @Override
     public void open(Serializable ckpt) throws Exception {
@@ -60,6 +62,13 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     	dir.mkdirs();
     	file = new File(dir, "missing_" + getProcessStep().getName() + "_" + platform.getName() + ".txt");
     	file.delete();
+    	FileWriter fwriter = new FileWriter(file);
+    	bwriter = new BufferedWriter(fwriter);
+    	bwriter.write("Missing ");
+    	bwriter.write(getProcessStep().name());
+    	bwriter.write(" on ");
+    	bwriter.write(platform.getName());
+    	bwriter.newLine();
     	Query query = em.createQuery("DELETE FROM MissingPatch where platform = :platform and processStep = :processStep");
     	query.setParameter("platform", platform);
     	query.setParameter("processStep", getProcessStep());
@@ -67,31 +76,25 @@ public abstract class AbstractMissingWriter implements ItemWriter {
     }
 
     @Override
-    public void close() throws Exception { }
+    public void close() throws Exception {
+    	bwriter.write(" ");
+    	bwriter.newLine();
+    }
 
     @Override
     public void writeItems(List<Object> list) throws Exception {
     	log.info("Detect {} missing patches on {}", list.size(), platform.getName());
-    	FileWriter fwriter = new FileWriter(file);
-    	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
-    		bwriter.write("Missing ");
-    		bwriter.write(getProcessStep().name());
-    		bwriter.write(" on ");
-    		bwriter.write(platform.getName());
-    		bwriter.newLine();
-    		for (Object missingItemObject : list) {
-    			MissingPatch missingItem = (MissingPatch) missingItemObject;
-    			em.merge(missingItem);
-    			Patch patch = missingItem.getPatch();
-                bwriter.write(String.format("%s - %s: since %s", 
-                		patch.getRelease().getVersion().getVersionNumber(),
-                		patch.getSequenceNumber(),
-                		DurationConverter.convertDuration(missingItem.getDuration())
-                		));
-                bwriter.newLine();
-            }
-    		bwriter.write(" ");
-    		bwriter.newLine();
+		for (Object missingItemObject : list) {
+			MissingPatch missingItem = (MissingPatch) missingItemObject;
+			em.merge(missingItem);
+			Patch patch = missingItem.getPatch();
+            bwriter.write(String.format("%s - %s %s: since %s", 
+            		patch.getRelease().getVersion().getVersionNumber(),
+            		patch.getSequenceNumber(),
+            		patch.getIssues().stream().map(i -> i.getReference()).collect(Collectors.joining(", ", "[", "]")),
+            		DurationConverter.convertDuration(missingItem.getDuration())
+            		));
+            bwriter.newLine();
         }
     }
 

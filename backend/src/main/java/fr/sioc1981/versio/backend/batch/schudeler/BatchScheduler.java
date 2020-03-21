@@ -1,5 +1,7 @@
 package fr.sioc1981.versio.backend.batch.schudeler;
 
+import java.util.Properties;
+
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.ejb.LocalBean;
@@ -18,7 +20,7 @@ public class BatchScheduler {
 	@Schedule(hour = "6")
 	public void traiterMinutes() {
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
-		long execID = jobOperator.start("missingall", null);
+		long execID = jobOperator.start("missingall", new Properties());
 		LOG.info("Starting missingAll job ({})", execID);
 	}
 

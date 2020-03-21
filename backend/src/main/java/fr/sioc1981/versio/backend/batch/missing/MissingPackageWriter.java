@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.batch.api.chunk.ItemWriter;
 import javax.enterprise.context.Dependent;
@@ -37,58 +38,59 @@ import fr.sioc1981.versio.backend.util.DurationConverter;
 @Dependent
 @Named("MissingPackageWriter")
 public class MissingPackageWriter implements ItemWriter {
-	
+
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
-	
-    @PersistenceContext
-    private EntityManager em;
-    
+
+	@PersistenceContext
+	private EntityManager em;
+
 	@Inject
-    private OptionLoader optionLoader;
-    
+	private OptionLoader optionLoader;
+
 	private File file;
-    
-    @Override
-    public void open(Serializable ckpt) throws Exception {
-    	String dirPath = optionLoader.loadOption("outputDir");
-    	File dir = new File(dirPath);
-    	dir.mkdirs();
-    	file = new File(dir, "missing_package.txt");
-    	file.delete();
-    	Query query = em.createQuery("DELETE FROM MissingPatch where platform is null and processStep = :processStep");
-    	query.setParameter("processStep", ProcessStep.PACKAGE);
-    	query.executeUpdate();
-    }
+	private BufferedWriter bwriter;
 
-    @Override
-    public void close() throws Exception { }
+	@Override
+	public void open(Serializable ckpt) throws Exception {
+		String dirPath = optionLoader.loadOption("outputDir");
+		File dir = new File(dirPath);
+		dir.mkdirs();
+		file = new File(dir, "missing_package.txt");
+		file.delete();
+		FileWriter fwriter = new FileWriter(file);
+		bwriter = new BufferedWriter(fwriter);
+		bwriter.write("Missing packages: ");
+		bwriter.newLine();
+		Query query = em.createQuery("DELETE FROM MissingPatch where platform is null and processStep = :processStep");
+		query.setParameter("processStep", ProcessStep.PACKAGE);
+		query.executeUpdate();
+	}
 
-    @Override
-    public void writeItems(List<Object> list) throws Exception {
-    	log.info("Detect {} missing packaged patches", list.size());
-    	FileWriter fwriter = new FileWriter(file);
-    	try (BufferedWriter bwriter = new BufferedWriter(fwriter)) {
-    		bwriter.write("Missing packages: ");
-    		bwriter.newLine();
-    		for (Object missingItemObject : list) {
-    			MissingPatch missingItem = (MissingPatch) missingItemObject;
-    			em.merge(missingItem);
-    			Patch patch = missingItem.getPatch();
-                bwriter.write(String.format("%s - %s: since %s", 
-                		patch.getRelease().getVersion().getVersionNumber(),
-                		patch.getSequenceNumber(),
-                		DurationConverter.convertDuration(missingItem.getDuration())
-                		));
-                bwriter.newLine();
-            }
-    		bwriter.write(" ");
-    		bwriter.newLine();
-        }
-    }
+	@Override
+	public void close() throws Exception {
+		bwriter.write(" ");
+		bwriter.newLine();
+	}
 
-    @Override
-    public Serializable checkpointInfo() throws Exception {
-        return new ItemNumberCheckpoint();
-    }
-    
+	@Override
+	public void writeItems(List<Object> list) throws Exception {
+		log.info("Detect {} missing packaged patches", list.size());
+		for (Object missingItemObject : list) {
+			MissingPatch missingItem = (MissingPatch) missingItemObject;
+			em.merge(missingItem);
+			Patch patch = missingItem.getPatch();
+			bwriter.write(String.format("%s - %s %s: since %s", patch.getRelease().getVersion().getVersionNumber(),
+					patch.getSequenceNumber(),
+					patch.getIssues().stream().map(i -> i.getReference()).collect(Collectors.joining(", ", "[", "]")),
+					DurationConverter.convertDuration(missingItem.getDuration())));
+			bwriter.newLine();
+		}
+
+	}
+
+	@Override
+	public Serializable checkpointInfo() throws Exception {
+		return new ItemNumberCheckpoint();
+	}
+
 }

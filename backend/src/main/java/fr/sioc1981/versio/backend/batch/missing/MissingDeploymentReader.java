@@ -33,5 +33,10 @@ public class MissingDeploymentReader extends AbstractMissingReader {
 		return "p." + platform.getPreviousPlatform().getName() + ".validationDate";
 	}
 
+	@Override
+	protected String getNextStepColumn() {
+		return "p." + platform.getName() + ".validationDate";
+	}
+
 
 }
